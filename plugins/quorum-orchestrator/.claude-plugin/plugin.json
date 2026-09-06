@@ -1,10 +1,16 @@
 {
   "name": "quorum-orchestrator",
-  "version": "1.2.1",
-  "description": "End-to-end Jira ticket delivery orchestrator. Drives a ticket through fetch → analyze → plan → implement → test → review → PR with human approval gates at every phase. Ships the quorum-orchestrator agent, sub-agents (quorum-ticket-analyzer, quorum-prompt-builder, quorum-pr-generator, quorum-qa-handoff-publisher, quorum-ticket-validator, quorum-ticket-image-analyzer, quorum-memory-synchronizer, quorum-decision-documenter, quorum-pattern-documenter, quorum-test-specialist), and the quorum-orchestrate / quorum-prompt-gen / quorum-pr-template / quorum-validate-ticket slash commands.",
-  "author": { "name": "Enrique Moya" },
+  "version": "1.3.0",
+  "description": "Stack-agnostic delivery orchestrator. Drives a work item through fetch → analyze → plan → implement → test → review → PR with a human approval gate at every phase, reading .claude/profile.yml to learn which skills, commands and paths this repository actually uses. Run /quorum-init first: it discovers the stack from the repository and writes that profile. Ships the quorum-orchestrator agent, its sub-agents (quorum-ticket-analyzer, quorum-prompt-builder, quorum-pr-generator, quorum-qa-handoff-publisher, quorum-ticket-validator, quorum-ticket-image-analyzer, quorum-memory-synchronizer, quorum-decision-documenter, quorum-pattern-documenter, quorum-test-specialist), the quorum-init discovery skill, and the quorum-orchestrate / quorum-prompt-gen / quorum-pr-template / quorum-validate-ticket slash commands.",
+  "author": {
+    "name": "Enrique Moya"
+  },
   "commands": "./commands",
   "dependencies": [
-    { "name": "quorum-tooling", "version": ">=1.0.0" }
-  ]
+    {
+      "name": "quorum-tooling",
+      "version": ">=1.0.0"
+    }
+  ],
+  "skills": "./skills"
 }

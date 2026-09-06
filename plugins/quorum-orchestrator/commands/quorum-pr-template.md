@@ -20,11 +20,11 @@ This command delegates to the `quorum-pr-generator` agent, which reads `.claude/
 
 - `{{role:conventions}}` — branch naming, commit format, PR checklist content
 - `{{profile.git.default_base_branch}}` — default base branch when none is passed (e.g. `Develop`, `main`, `master`)
-- `{{profile.atlassian.host}}` and `{{profile.ticket_prefix}}` — for the ticket link in the PR body
+- `{{profile.tracker.host}}` and `{{profile.tracker.ticket_prefix}}` — for the ticket link in the PR body
 
 ## Process
 
-1. Validate ticket key format against `{{profile.ticket_prefix}}` (defaults to `PROJ-NNNNN` when null)
+1. Validate ticket key format against `{{profile.tracker.ticket_prefix}}` (defaults to `PROJ-NNNNN` when null)
 2. Resolve base branch — argument > `{{profile.git.default_base_branch}}` > fallback
 3. Fetch ticket from Jira via MCP
 4. Find artifacts: `.claude/prompts/`, `.claude/validations/`

@@ -164,8 +164,10 @@ git:
   default_base_branch: "master"
 
 # ─── Atlassian / Jira ────────────────────────────────────────────────────
-atlassian:
-  # Atlassian Cloud subdomain (e.g. "your-org.atlassian.net").
+tracker:
+  # Read by whichever skill `roles.tracker` names. With `roles.tracker: null`
+  # this block is ignored entirely.
+  # Tracker host (e.g. "your-org.atlassian.net").
   # Used by the PR template command to build ticket
   # links. `null` produces a `YOUR-JIRA-HOST` placeholder so the human
   # notices and fills it in once.
@@ -199,7 +201,7 @@ atlassian:
 # Jira project key prefix used throughout this org (e.g. "PROJ", "ENG").
 # Defaults to "PROJ". Used by validation, sprint-
 # review filtering, and the PR template.
-ticket_prefix: "PROJ"
+  ticket_prefix: "PROJ"
 
 # ─── Org-level metadata ──────────────────────────────────────────────────
 # Free-form org metadata referenced by command templates.
@@ -325,11 +327,11 @@ commands:
 git:
   default_base_branch: "Develop"
 
-atlassian:
+tracker:
   host: "your-org.atlassian.net"
   subtask_issuetype: "Dev Task"
 
-ticket_prefix: "PROJ"
+  ticket_prefix: "PROJ"
 
 org:
   application_name_key: "ApplicationName"
@@ -398,11 +400,11 @@ commands:
 git:
   default_base_branch: "Develop"
 
-atlassian:
+tracker:
   host: "your-org.atlassian.net"
   subtask_issuetype: "Dev Task"
 
-ticket_prefix: "PROJ"
+  ticket_prefix: "PROJ"
 
 org:
   application_name_key: "ApplicationName"
@@ -465,11 +467,11 @@ commands:
 git:
   default_base_branch: "master"
 
-atlassian:
+tracker:
   host: "your-org.atlassian.net"
   subtask_issuetype: "Dev Task"
 
-ticket_prefix: "PROJ"
+  ticket_prefix: "PROJ"
 
 org:
   application_name_key: "ApplicationName"

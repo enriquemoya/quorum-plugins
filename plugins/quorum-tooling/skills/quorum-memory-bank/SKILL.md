@@ -52,13 +52,26 @@ When the argument is `init`:
    .claude/memory-bank/troubleshooting/
    ```
 
-2. **Scan the project** to create initial documentation:
-   - Read the project structure (key directories, config files, entry points)
-   - Identify the tech stack (languages, frameworks, libraries)
-   - Document the high-level architecture
-   - Note any existing patterns visible in the code
+2. **Start from the profile, not from scratch.**
 
-3. **Create initial architecture doc:**
+   Read `.claude/profile.yml` first. If `/quorum-init` has run, the stack, test
+   tooling, commands, layout and generated-file patterns are already established
+   from evidence — reuse them rather than re-deriving them differently. Two
+   answers to "what stack is this" that disagree are worse than one.
+
+   When there is no profile, say so and offer to run `/quorum-init` before
+   continuing. Proceeding without it is supported, but the bank you produce will
+   be a scan rather than a record, and nothing downstream will share its
+   conclusions.
+
+3. **Scan for what the profile does not cover:**
+   - Entry points and how the application starts
+   - Module boundaries and what each one owns
+   - Data flow between the main components
+   - Patterns visible in the code — with a file and line for each, because a
+     convention stated without an example is a preference
+
+4. **Create initial architecture doc:**
 
    Write `.claude/memory-bank/architecture/overview.md`:
    ```markdown
@@ -82,7 +95,7 @@ When the argument is `init`:
    - [Build tools, deployment process if identifiable]
    ```
 
-4. **Report** what was created and suggest areas to document further.
+5. **Report** what was created and suggest areas to document further.
 
 ---
 

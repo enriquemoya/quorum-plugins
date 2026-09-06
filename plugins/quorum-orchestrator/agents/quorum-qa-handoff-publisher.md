@@ -67,14 +67,14 @@ Reads `.claude/profile.yml` for:
   via `/quorum-manual-qa-test-cases` — but that invocation is outside the
   orchestrator pipeline and never touches the QA subtask.
 
-- `{{profile.atlassian.host}}` — Atlassian Cloud hostname for ticket links.
+- `{{profile.tracker.host}}` — Atlassian Cloud hostname for ticket links.
 
-- `{{profile.atlassian.subtask_issuetype}}` — Issue type for the "Review
+- `{{profile.tracker.subtask_issuetype}}` — Issue type for the "Review
   Automation Tests" subtask. Defaults to `Dev Task` (a common convention
   for subtasks under stories). Other orgs may override with `Subtask`,
   `Task`, etc.
 
-- `{{profile.ticket_prefix}}` — Used to validate the ticket key and to
+- `{{profile.tracker.ticket_prefix}}` — Used to validate the ticket key and to
   derive the Jira project key when creating the subtask.
 
 - `{{profile.paths.e2e_spec_root}}` and `{{profile.paths.e2e_repo}}` —
@@ -96,7 +96,7 @@ Reads `.claude/profile.yml` for:
 
 ### Step 1 — Validate inputs and ensure preconditions
 
-- `TICKET_KEY` matches `{{profile.ticket_prefix}}-\d+`; else report and exit.
+- `TICKET_KEY` matches `{{profile.tracker.ticket_prefix}}-\d+`; else report and exit.
 - `BASE_BRANCH` exists locally; else report and exit.
 - Create the output directory: `.claude/qa-handoff/{TICKET_KEY}/`.
 
@@ -163,7 +163,7 @@ Artifact" pointer, a "consult the markdown in the repo" hint, or any
 ```markdown
 # Review Automation Tests — {TICKET_KEY}: {TICKET_SUMMARY}
 
-**Ticket:** [{TICKET_KEY}](https://{{profile.atlassian.host}}/browse/{TICKET_KEY})
+**Ticket:** [{TICKET_KEY}](https://{{profile.tracker.host}}/browse/{TICKET_KEY})
 **Branch:** `{current-branch}` → `{BASE_BRANCH}`
 **Generated:** {YYYY-MM-DD} by orchestrator Phase 7
 
@@ -177,7 +177,7 @@ the feature does, not how.}
 
 Information the QA tester needs before running these tests.
 
-- **Environment:** `{e.g. QA Marketing Portal at https://qa.example.com}` — derive from `{{profile.atlassian.host}}` context where possible
+- **Environment:** `{e.g. QA Marketing Portal at https://qa.example.com}` — derive from `{{profile.tracker.host}}` context where possible
 - **Required roles / accounts:** {e.g. `quorum-admin`, `client-admin` — derive from the auth pattern at `{{profile.e2e.auth_pattern}}` and roles found in the new E2E specs}
 - **Auth pattern:** {one-line summary of `{{profile.e2e.auth_pattern}}` — verbatim from the profile so QA writers see the canonical convention}
 - **Required data / fixtures:** {seeded entities, reservation pool entries, feature flags — derive from `cy.reserveTestClient(...)` calls or fixture imports in the new specs}
@@ -302,14 +302,14 @@ this publisher does **NOT** call `createJiraIssue` directly. The orchestrator's 
        "cloudId":     "{resolved cloud ID}",
        "projectKey":  "{prefix of TICKET_KEY, e.g. \"PROJ\"}",
        "summary":     "Review Automation Tests",
-       "issuetype":   "{{profile.atlassian.subtask_issuetype}}",
+       "issuetype":   "{{profile.tracker.subtask_issuetype}}",
        "parent":      "{resolved STORY key — TICKET_KEY's parent story if TICKET_KEY is a subtask, else TICKET_KEY}",
        "description": "{ADF document built in Step 2}"
      }
    }
    ```
 
-   If `{{profile.atlassian.subtask_issuetype}}` is null, the orchestrator defaults to `Dev Task` at execution time.
+   If `{{profile.tracker.subtask_issuetype}}` is null, the orchestrator defaults to `Dev Task` at execution time.
 
 4. **No direct API call here.** Step 5 is purely declarative — it builds the action and hands it to the orchestrator. The orchestrator's Sub-phase 7b "Execute approved actions" step invokes `createJiraIssue` only after the human approves the enumerated queue.
 

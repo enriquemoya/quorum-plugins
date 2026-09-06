@@ -38,6 +38,14 @@ reference partner it can pattern-match against. A tool that guesses your
 conventions produces confident, wrong code — the failure mode both are designed
 to prevent.
 
+`/quorum-init` writes that profile for you. It reads the repository, works out
+the stack, test tooling, commands and layout from manifests and lockfiles rather
+than folder names, and shows you the evidence behind every value before writing
+it. Where the evidence runs out — your tracker, your ticket prefix — it asks
+instead of defaulting. Nothing here is pinned to a stack: a Go repository with
+most roles left null is a valid profile, and the skills that do not apply skip
+themselves silently.
+
 The same rule shows up throughout:
 
 - **Human gates on irreversible steps.** The orchestrator stops for approval
@@ -50,11 +58,16 @@ The same rule shows up throughout:
 ## Getting started
 
 1. **Install** the marketplace and the plugins you want (above).
-2. **Create the profile** your plugins read — see
-   [`plugins/quorum-orchestrator/PROFILE_SCHEMA.md`](plugins/quorum-orchestrator/PROFILE_SCHEMA.md)
-   and the example at
-   [`plugins/quorum-orchestrator/profile.example.yml`](plugins/quorum-orchestrator/profile.example.yml).
-3. **Run one command end to end** — `/quorum-orchestrate <TICKET-KEY>` is the
+2. **Run `/quorum-init`** in your repository. It discovers the stack and writes
+   `.claude/profile.yml`, showing its evidence as it goes. Review what it
+   proposes — it is a proposal, and you are the one who knows which parts of
+   your own repository it read wrong. The schema is at
+   [`PROFILE_SCHEMA.md`](plugins/quorum-orchestrator/PROFILE_SCHEMA.md) if you
+   would rather write it yourself.
+3. **Seed the memory bank** when it offers — the discovery becomes
+   `architecture/stack.md` and `patterns/conventions.md` rather than an empty
+   skeleton.
+4. **Run one command end to end** — `/quorum-orchestrate <WORK-ITEM>` is the
    widest path through the system.
 
 ## Docs

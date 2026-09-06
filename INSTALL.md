@@ -32,11 +32,17 @@ command resolves — type `/quorum-` and confirm the completions appear.
 
 Plugins are installed once per machine; **configuration is per repo.**
 
-1. **`profile.yml`** at the repo root, for `quorum-orchestrator`,
-   `quorum-tooling`, and `quorum-workflows`. Start from
+1. **`.claude/profile.yml`** — run **`/quorum-init`** in the repo. It reads the
+   tree, works out the stack, test tooling, commands and layout from what is
+   actually there, shows you the evidence for each value it proposes, asks about
+   the few things no file can answer, and writes the profile. Re-running it is
+   safe: values you set by hand are kept.
+
+   Writing it by hand is still supported — start from
    [`plugins/quorum-orchestrator/profile.example.yml`](plugins/quorum-orchestrator/profile.example.yml)
    and read the contract in
    [`plugins/quorum-orchestrator/PROFILE_SCHEMA.md`](plugins/quorum-orchestrator/PROFILE_SCHEMA.md).
+   Discovery just spares you a pass through a schema you did not write.
 2. **`integration-profile.yml`** at the repo root, if you use
    `quorum-integration-kit`. Contract:
    [`plugins/quorum-integration-kit/skills/quorum-new-integration/references/profile-schema.md`](plugins/quorum-integration-kit/skills/quorum-new-integration/references/profile-schema.md).

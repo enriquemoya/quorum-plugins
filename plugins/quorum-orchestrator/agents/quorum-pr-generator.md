@@ -15,8 +15,8 @@ Reads `.claude/profile.yml` for:
 
 - `{{role:conventions}}` — branch naming, commit format, PR-title format, PR-body checklist content
 - `{{role:e2e-patterns}}` — to know which E2E framework (if any) the consumer uses, for the "E2E Coverage" section and the testing checklist. When null, the E2E sections are skipped silently.
-- `{{profile.atlassian.host}}` — Jira URL host (defaults to `your-org.atlassian.net` if null)
-- `{{profile.ticket_prefix}}` — ticket prefix (defaults to `PROJ` if null)
+- `{{profile.tracker.host}}` — Jira URL host (defaults to `your-org.atlassian.net` if null)
+- `{{profile.tracker.ticket_prefix}}` — ticket prefix (defaults to `PROJ` if null)
 - `{{profile.git.default_base_branch}}` — base branch the PR targets
 - `{{profile.commands.type_check}}` / `{{profile.commands.test_unit}}` / `{{profile.commands.lint}}` — populate the "Run Commands" block and the testing checklist. Null commands are omitted, not shown as blank lines.
 - `{{profile.paths.e2e_repo}}` / `{{profile.paths.e2e_spec_root}}` — for cross-repo or same-repo E2E spec links
@@ -33,7 +33,7 @@ Reads `.claude/profile.yml` for:
 
 ```markdown
 ## {TICKET-KEY}: {Summary}
-**Jira:** [{TICKET-KEY}](https://{{profile.atlassian.host}}/browse/{TICKET-KEY}) | **Sprint:** {N} | **Type:** {type}
+**Jira:** [{TICKET-KEY}](https://{{profile.tracker.host}}/browse/{TICKET-KEY}) | **Sprint:** {N} | **Type:** {type}
 
 ### Summary
 {2–3 sentences describing what changed and why. Pull the "why" from the ticket
@@ -86,7 +86,7 @@ was added or modified.}
 1. **Null = omit, not blank.** Every line that resolves to a null profile field is dropped, not rendered as a placeholder or empty bullet.
 2. **Empty table = omit the whole section.** If "Files Changed" or "E2E Coverage" would have zero rows, drop the heading too.
 3. **The testing checklist is a minimum.** Consumers can append items via `{{role:conventions}}` (if the conventions skill defines a `pr_checklist_extras` list).
-4. **Atlassian host fallback:** if `{{profile.atlassian.host}}` is null, the PR body still renders with a literal `https://YOUR-JIRA-HOST/browse/...` placeholder so the human notices and fills it in once.
+4. **Atlassian host fallback:** if `{{profile.tracker.host}}` is null, the PR body still renders with a literal `https://YOUR-JIRA-HOST/browse/...` placeholder so the human notices and fills it in once.
 
 ## What this agent does NOT do
 

@@ -35,7 +35,7 @@ acceptance criteria, subtasks (if `--include-subtasks`).
 
 > **Story content often lives in custom fields**, not the standard `description`
 > (which is often empty). Use the Story Description / Acceptance Criteria the
-> orchestrator already resolved at fetch time from `{{profile.atlassian.fields}}`
+> orchestrator already resolved at fetch time from `{{profile.tracker.fields}}`
 > (or from label-based discovery when the profile does not declare them — the IDs
 > are per-instance and must never be assumed). Do not treat a null `description`
 > as "no content."

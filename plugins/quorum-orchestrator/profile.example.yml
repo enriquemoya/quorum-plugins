@@ -21,8 +21,13 @@ roles:
   e2e-tests-gen:          null    # generator skill that scaffolds E2E specs;
                                   # often the same value as `e2e-patterns`
   qa-handoff:             null    # e.g. quorum-manual-qa-test-cases — generates the
-                                  # Dev→QA handoff package at Phase 7 and posts it
-                                  # to the Jira ticket
+                                  # Dev→QA handoff package and posts it to the ticket
+  tracker:                null    # WHERE tickets live. null = no tracker: the
+                                  # orchestrator takes the work item as free text
+                                  # and skips every fetch/post step silently.
+                                  # e.g. quorum-jira-story
+  docs:                   null    # WHERE long-form notes go. null = the memory
+                                  # bank alone. e.g. quorum-obsidian-vault
 
 # ─── Paths ────────────────────────────────────────────────────────────────
 paths:
@@ -43,23 +48,30 @@ commands:
 
 # ─── Git ──────────────────────────────────────────────────────────────────
 git:
-  default_base_branch: "master"   # e.g. "Develop", "main", "master"
+  default_base_branch: null       # e.g. "main", "master", "develop".
+                                  # null = ask git for origin/HEAD.
 
-# ─── Atlassian / Jira ─────────────────────────────────────────────────────
-atlassian:
+# ─── Tracker settings ─────────────────────────────────────────────────────
+# Read by whichever skill `roles.tracker` names. Every field is optional; with
+# `roles.tracker: null` this whole block is ignored.
+tracker:
   host: null                      # e.g. "your-org.atlassian.net"
-  subtask_issuetype: "Dev Task"   # subtask-eligible type used by the
-                                  # quorum-qa-handoff-publisher when creating the
-                                  # "Review Automation Tests" subtask under
-                                  # the story (Phase 7). this template uses "Dev Task".
-                                  # Generic Jira projects may use "Subtask".
-
-# ─── Ticket prefix ────────────────────────────────────────────────────────
-ticket_prefix: "PROJ"               # e.g. "PROJ", "ENG"
+  subtask_issuetype: null         # the sub-item type used when filing follow-up
+                                  # work under a parent. Jira projects differ:
+                                  # "Subtask", "Dev Task", "Sub-task". Whatever
+                                  # your project actually accepts.
+  ticket_prefix: null             # e.g. "PROJ", "ENG" — the key prefix that
+                                  # marks a branch or commit as ticketed
+  fields: {}                      # tracker-specific field ids the orchestrator
+                                  # resolves once at fetch time and passes down,
+                                  # so no sub-agent has to know the tracker's
+                                  # schema. e.g. {acceptance_criteria: "customfield_10001"}
 
 # ─── Org-level metadata ───────────────────────────────────────────────────
 org:
-  application_name_key: "ApplicationName"   # JSON key inside paths.config
+  application_name_key: null      # the key inside paths.config holding this
+                                  # project's display name, if it has one.
+                                  # null = fall back to the repo directory name.
   sprint_anchor: null
   # Uncomment + edit to enable sprint-number suggestions:
   # sprint_anchor:
@@ -71,7 +83,8 @@ org:
 e2e:
   trigger_paths:   []             # globs that signal "this change needs E2E"
   auth_pattern:    null           # free-form text describing the auth flow specs use
-  branch_base:     "master"       # branch base for new E2E specs in the E2E repo
+  branch_base:     null           # branch base for new E2E specs in the E2E
+                                  # repo; null = same as git.default_base_branch
   spec_extension:  null           # e.g. ".cy.ts", ".spec.ts", ".feature"
 
 # ─── Env validation ───────────────────────────────────────────────────────
