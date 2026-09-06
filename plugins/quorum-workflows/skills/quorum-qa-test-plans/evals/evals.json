@@ -1,0 +1,164 @@
+{
+  "skill_name": "quorum-qa-test-plans",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Create a QA test plan for PROJ-69209",
+      "expected_output": "A plan.md file created at qa-test-plans/PROJ-69209/plan.md containing test cases derived from the story's acceptance criteria, with all TCs set to Pending status and concrete steps referencing AcmeSync sync jobs and DB queries.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "plan-file-created",
+          "description": "qa-test-plans/PROJ-69209/plan.md exists on disk",
+          "type": "file_exists",
+          "target": "qa-test-plans/PROJ-69209/plan.md"
+        },
+        {
+          "name": "has-test-cases",
+          "description": "plan.md contains at least one TC-01 heading",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-69209/plan.md",
+          "value": "TC-01"
+        },
+        {
+          "name": "has-progress-line",
+          "description": "plan.md contains the Progress summary line",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-69209/plan.md",
+          "value": "**Progress**:"
+        },
+        {
+          "name": "all-pending-status",
+          "description": "No test cases are marked as Pass or Fail on a newly created plan",
+          "type": "file_not_contains",
+          "target": "qa-test-plans/PROJ-69209/plan.md",
+          "value": "✅ Pass"
+        },
+        {
+          "name": "has-acceptance-criteria",
+          "description": "plan.md contains an Acceptance Criteria section",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-69209/plan.md",
+          "value": "## Acceptance Criteria"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Persist the QA test plan for PROJ-68433 to disk",
+      "expected_output": "A plan.md file written at qa-test-plans/PROJ-68433/plan.md using data already available in session context (from memory), containing TC-01 through TC-09 with the open questions and SQL snippets from the grooming session.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "plan-file-created",
+          "description": "qa-test-plans/PROJ-68433/plan.md exists on disk",
+          "type": "file_exists",
+          "target": "qa-test-plans/PROJ-68433/plan.md"
+        },
+        {
+          "name": "has-nine-test-cases",
+          "description": "plan.md contains TC-09",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "TC-09"
+        },
+        {
+          "name": "has-open-questions",
+          "description": "plan.md has an Open Questions section",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "## Open Questions"
+        },
+        {
+          "name": "tc10-skipped",
+          "description": "TC-10 is marked as Skipped (out of scope)",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "⏭ Skipped"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Mark TC-03 as blocked on PROJ-68433. The RAM test clients don't have virtual tour URLs configured in AcmeSync, so we can't run this test yet.",
+      "expected_output": "The existing qa-test-plans/PROJ-68433/plan.md is updated: TC-03 status changes from Pending to Blocked, the blocking reason is captured in the Notes field, and the Progress summary line reflects the change.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "tc03-status-blocked",
+          "description": "TC-03 status is updated to Blocked in the persisted file",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "⏸ Blocked"
+        },
+        {
+          "name": "blocking-reason-captured",
+          "description": "Notes on TC-03 mention the test client / RAM issue",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "RAM"
+        },
+        {
+          "name": "progress-updated",
+          "description": "Progress line reflects at least 1 Blocked",
+          "type": "file_contains",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "value": "1 ⏸ Blocked"
+        },
+        {
+          "name": "tc03-not-pending",
+          "description": "TC-03 section no longer shows Pending status (file was actually modified on disk)",
+          "type": "file_line_check",
+          "target": "qa-test-plans/PROJ-68433/plan.md",
+          "description_detail": "The TC-03 Status line must not contain Pending — verifies disk write happened, not just a verbal response"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Resume the PROJ-68433 test plan. Where are we?",
+      "expected_output": "Reads the existing plan.md from disk and shows current status: story name, progress count, a table of all test cases with their current statuses, and highlights any blocked or open items.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "reads-from-disk",
+          "description": "Response includes content that could only come from the persisted file (TC-01 through TC-09, open questions)",
+          "type": "response_contains",
+          "value": "TC-01"
+        },
+        {
+          "name": "shows-progress",
+          "description": "Response includes a status summary or progress indicator",
+          "type": "response_contains",
+          "value": "Pending"
+        },
+        {
+          "name": "highlights-blocked",
+          "description": "Response surfaces the blocked TC-03 (from eval-3)",
+          "type": "response_contains",
+          "value": "Blocked"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "List my QA test plans",
+      "expected_output": "Scans the qa-test-plans/ directory and shows a table of all stories with plan.md files, including story key, title, and current progress counts.",
+      "files": [],
+      "assertions": [
+        {
+          "name": "lists-proj-68433",
+          "description": "Response mentions PROJ-68433",
+          "type": "response_contains",
+          "value": "PROJ-68433"
+        },
+        {
+          "name": "shows-progress-counts",
+          "description": "Response includes progress counts or status indicators",
+          "type": "response_contains",
+          "value": "Pending"
+        }
+      ]
+    }
+  ]
+}

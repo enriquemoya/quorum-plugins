@@ -1,0 +1,8 @@
+{
+  "name": "quorum-workflows",
+  "version": "1.0.0",
+  "description": "General-purpose development workflows: Jira story intake, cross-repo scaffolding, and other tasks that span multiple projects",
+  "author": { "name": "Enrique Moya" },
+  "commands": "./commands",
+  "skills": "./skills"
+}

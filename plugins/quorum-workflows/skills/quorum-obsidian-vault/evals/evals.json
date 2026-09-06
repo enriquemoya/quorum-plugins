@@ -1,0 +1,90 @@
+{
+  "skill_name": "obsidian-vault",
+  "notes": "Covers all four kinds plus the PROJ-vs-ticketless routing tie-breaker and a story regression guard. Identifiers in expected output are illustrative — the slug an agent picks may differ; assertions key on folder/section/frontmatter shape, not the exact slug.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "story-start",
+      "prompt": "Starting PROJ-69835, AcmeSync property-fee mapping and dedup. Branch feature/PROJ-69835-fee-mapping. Set up notes.",
+      "expected_output": "Stories/PROJ-69835/ folder with PROJ-69835.md (story-shaped: AC checkboxes, Jira link) + status.md + attachments/; kind: story; Home under '## Stories'.",
+      "files": [],
+      "assertions": [
+        "Created Stories/PROJ-69835/PROJ-69835.md overview + Stories/PROJ-69835/status.md + attachments/",
+        "Overview frontmatter has kind: story and a jira: link",
+        "Overview has an Acceptance Criteria section",
+        "status.md records the branch feature/PROJ-69835-fee-mapping",
+        "Home.md lists [[PROJ-69835]] under '## Stories'"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "initiative-start",
+      "prompt": "Starting a POC to migrate our big reporting solution onto the new platform-v2 stack. There's no Jira ticket. Set up notes so I can track this daily across sessions.",
+      "expected_output": "Initiatives/<slug>/ folder with an initiative MOC (Goal/Definition of Done + phase checklist, NO User Story/AC/Jira), status.md, lessons.md, decisions/_index.md; kind: initiative + no-ticket: true; Home under '## Initiatives & POCs'; no dangling Jira/QA links.",
+      "files": [],
+      "assertions": [
+        "Created an Initiatives/<slug>/ folder (NOT under Stories)",
+        "Overview frontmatter has kind: initiative and no-ticket: true",
+        "Initiative folder has status.md, lessons.md, and decisions/_index.md",
+        "Overview has Goal / Definition of Done and a phase/progress checklist, and NO User Story / Acceptance Criteria / jira sections",
+        "No dangling '[ in Jira]()' link and no empty jira: \"\" anywhere in the initiative notes",
+        "Home.md lists the initiative under '## Initiatives & POCs'"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "effort-spike",
+      "prompt": "Quick spike, no ticket: evaluate whether we can replace the AngularJS Kendo grid in AdminUI with AG Grid. Capture it as a vault note.",
+      "expected_output": "A single Efforts/<slug>.md note (NOT an Initiatives tree, NO status.md); kind: effort; Goal/Question + Log + Findings/Outcome sections; Home under '## Efforts & Spikes'.",
+      "files": [],
+      "assertions": [
+        "Created a single note under Efforts/ (Efforts/<slug>.md)",
+        "Did NOT create an Initiatives/<slug>/ folder tree for this",
+        "Frontmatter has kind: effort and no-ticket: true",
+        "Note has Goal/Question, Log, and Findings/Outcome sections",
+        "Home.md lists it under '## Efforts & Spikes'"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "reference-recipe",
+      "prompt": "Write a reusable recipe note in the vault: how to rebuild the throwaway AcmeSync getfees local probe — it loads encrypted OAuth creds from the control DB, inlines an AES decrypt, and dumps the raw audit response so I can inspect fee payloads.",
+      "expected_output": "A single Resources/<slug>.md note; kind: reference, type: recipe; When To Use / Procedure / Key Facts / Known Gotchas / Don't-Ship sections; no status lifecycle; Home under '## Resources'.",
+      "files": [],
+      "assertions": [
+        "Created a single note under Resources/ (Resources/<slug>.md)",
+        "Frontmatter has kind: reference and type: recipe",
+        "Note has When To Use / Procedure / Key Facts / Known Gotchas sections",
+        "Frontmatter has no status: lifecycle field (reference notes are evergreen)",
+        "Home.md lists it under '## Resources'"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "routing-tiebreaker",
+      "prompt": "Starting PROJ-1200 — it's the platform-v2 migration of the fees module. Set up notes.",
+      "expected_output": "Routed to a STORY because a ticket key is present: Stories/PROJ-1200/ folder (NOT an Initiatives/ tree), kind: story, jira link, status.md; Home under '## Stories'.",
+      "files": [],
+      "assertions": [
+        "Created Stories/PROJ-1200/ (story folder) — NOT an Initiatives/<...migration> folder",
+        "Overview frontmatter has kind: story and a jira: link to PROJ-1200",
+        "status.md exists in the story folder",
+        "Home.md lists [[PROJ-1200]] under '## Stories'"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "log-discovery-update",
+      "prompt": "Update my PROJ-68433 notes: I found AcmeSync v2 virtual tours pull the iframe URL from the unit-type sync, not the floorplan (Mapper.cs:212). Also we're blocked — the staging hub isn't published yet.",
+      "expected_output": "Updates the existing Stories/PROJ-68433 status.md in place: new discovery (Mapper.cs:212), a [!warning]/[!danger] blocker, status flipped to blocked, a dated progress-log entry; existing content preserved; no duplicate folder. (Requires a pre-seeded PROJ-68433.)",
+      "files": [],
+      "assertions": [
+        "Updated existing Stories/PROJ-68433 in place; no duplicate folder",
+        "Added a discovery noting the iframe URL comes from the unit-type sync, referencing Mapper.cs:212",
+        "Added a blocker callout (> [!warning] or > [!danger]) about the unpublished staging hub",
+        "status frontmatter changed to blocked",
+        "Pre-existing content preserved"
+      ]
+    }
+  ]
+}

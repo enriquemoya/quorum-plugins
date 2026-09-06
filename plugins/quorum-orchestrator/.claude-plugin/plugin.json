@@ -1,0 +1,10 @@
+{
+  "name": "quorum-orchestrator",
+  "version": "1.2.1",
+  "description": "End-to-end Jira ticket delivery orchestrator. Drives a ticket through fetch → analyze → plan → implement → test → review → PR with human approval gates at every phase. Ships the quorum-orchestrator agent, sub-agents (quorum-ticket-analyzer, quorum-prompt-builder, quorum-pr-generator, quorum-qa-handoff-publisher, quorum-ticket-validator, quorum-ticket-image-analyzer, quorum-memory-synchronizer, quorum-decision-documenter, quorum-pattern-documenter, quorum-test-specialist), and the quorum-orchestrate / quorum-prompt-gen / quorum-pr-template / quorum-validate-ticket slash commands.",
+  "author": { "name": "Enrique Moya" },
+  "commands": "./commands",
+  "dependencies": [
+    { "name": "quorum-tooling", "version": ">=1.0.0" }
+  ]
+}

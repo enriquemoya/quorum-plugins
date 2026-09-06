@@ -1,0 +1,83 @@
+# .claude/profile.yml — copy this file into the consumer repo at
+# `.claude/profile.yml` and edit the values. All fields are optional;
+# leaving a value as `null` (or omitting the line) means "this concern
+# does not apply to this repo — skip silently."
+#
+# Full schema + worked examples for the three consumer repos live in
+# the bundled `PROFILE_SCHEMA.md` (ships with the quorum-orchestrator plugin,
+# alongside this file).
+
+# ─── Roles ────────────────────────────────────────────────────────────────
+# Map each role to the skill filename (without `.md`) that owns it.
+roles:
+  primary-stack-expert:   null    # e.g. vue-expert, dotnet-expert, react-expert
+  secondary-stack-expert: null    # null unless the repo is genuinely full-stack
+  code-searcher:          code-searcher
+  conventions:            null    # e.g. quorum-conventions
+  e2e-patterns:           null    # e.g. cypress-patterns, playwright-patterns, karate-patterns
+  env-validator:          null    # e.g. env-validator
+  unit-tests-gen:         null    # e.g. quorum-gen-unit-tests-vitest, -dotnet9, -jasmine
+  integration-tests-gen:  null    # rare — only if your repo has a distinct integration tier
+  e2e-tests-gen:          null    # generator skill that scaffolds E2E specs;
+                                  # often the same value as `e2e-patterns`
+  qa-handoff:             null    # e.g. quorum-manual-qa-test-cases — generates the
+                                  # Dev→QA handoff package at Phase 7 and posts it
+                                  # to the Jira ticket
+
+# ─── Paths ────────────────────────────────────────────────────────────────
+paths:
+  ui_glob:        null            # e.g. "src/modules/*/{views,components}/**/*.vue"
+  e2e_repo:       null            # absolute path if E2E lives in a SEPARATE repo
+  e2e_spec_root:  null            # e.g. "cypress/e2e/marketing-portal/ui"
+  memory_bank:    ".claude/memory-bank"
+  config:         ".claude/quorum-config.json"   # consumer's app-level config file
+  reviews:        ".claude/reviews"            # where code-review writes
+  no_hand_edit:   []                           # auto-gen files glob list — orchestrator refuses to edit / merge matches
+                                               # e.g. for .NET / EF repos: ["*.Designer.cs", "*.edml", "*.Diagram1.view"]
+
+# ─── Commands ─────────────────────────────────────────────────────────────
+commands:
+  type_check: null                # e.g. "npm run type-check" / "dotnet build" / "mypy ."
+  test_unit:  null                # e.g. "npm run test:unit" / "dotnet test" / "pytest"
+  lint:       null                # e.g. "npm run lint" / "ruff check ."
+
+# ─── Git ──────────────────────────────────────────────────────────────────
+git:
+  default_base_branch: "master"   # e.g. "Develop", "main", "master"
+
+# ─── Atlassian / Jira ─────────────────────────────────────────────────────
+atlassian:
+  host: null                      # e.g. "your-org.atlassian.net"
+  subtask_issuetype: "Dev Task"   # subtask-eligible type used by the
+                                  # quorum-qa-handoff-publisher when creating the
+                                  # "Review Automation Tests" subtask under
+                                  # the story (Phase 7). this template uses "Dev Task".
+                                  # Generic Jira projects may use "Subtask".
+
+# ─── Ticket prefix ────────────────────────────────────────────────────────
+ticket_prefix: "PROJ"               # e.g. "PROJ", "ENG"
+
+# ─── Org-level metadata ───────────────────────────────────────────────────
+org:
+  application_name_key: "ApplicationName"   # JSON key inside paths.config
+  sprint_anchor: null
+  # Uncomment + edit to enable sprint-number suggestions:
+  # sprint_anchor:
+  #   sprint: 284
+  #   start_date: "2026-02-11"
+  #   length_days: 14
+
+# ─── E2E specifics ────────────────────────────────────────────────────────
+e2e:
+  trigger_paths:   []             # globs that signal "this change needs E2E"
+  auth_pattern:    null           # free-form text describing the auth flow specs use
+  branch_base:     "master"       # branch base for new E2E specs in the E2E repo
+  spec_extension:  null           # e.g. ".cy.ts", ".spec.ts", ".feature"
+
+# ─── Env validation ───────────────────────────────────────────────────────
+env:
+  trigger_paths: []               # globs of env/config files (.env.*, etc.)
+
+# ─── Code review extras ───────────────────────────────────────────────────
+code_review:
+  extra_rules: []                 # stack-specific rules prepended to the base review

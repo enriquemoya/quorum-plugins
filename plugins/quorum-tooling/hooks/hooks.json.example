@@ -1,0 +1,27 @@
+{
+  "_comment": "TEMPLATE — not auto-loaded. quorum-tooling ships its two hooks dormant on purpose. To activate them in a consumer repo, copy this file's `hooks` object into that repo's .claude/settings.json (merge under the top-level \"hooks\" key), or save it as the repo's own .claude/hooks/hooks.json. Requires `bash` on PATH (Git Bash on Windows). See README.md in this directory.",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/memory-bank-nudge.sh\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/pre-commit-env-check.sh\""
+          }
+        ]
+      }
+    ]
+  }
+}

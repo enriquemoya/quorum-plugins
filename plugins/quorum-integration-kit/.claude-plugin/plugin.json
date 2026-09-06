@@ -1,0 +1,9 @@
+{
+  "name": "quorum-integration-kit",
+  "version": "0.1.0",
+  "description": "Domain-neutral scaffolding for onboarding and maintaining third-party integration partners: a generator skill that lays down a complete inbound/outbound pipeline from a declared partner profile, a ticket-driven change planner, and two pre-merge agents (structural reviewer + change analyzer). Point it at your own repo layout via integration-profile.yml \u2014 it ships no domain knowledge of its own.",
+  "author": {
+    "name": "Enrique Moya"
+  },
+  "skills": "./skills"
+}

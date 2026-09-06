@@ -1,0 +1,80 @@
+{
+  "skill_name": "quorum-memory-bank (obsidian adapter)",
+  "notes": "Covers the `obsidian` subcommand / memory-bank-to-obsidian.ps1 adapter: frontmatter injection+repair, Related/See-also [[wikilink]] rewriting, _index.md MOC, idempotency, stem-collision warning, and lint. Reproduce by running the script against a COPY of fixtures/before with a FIXED date and comparing to fixtures/after: `memory-bank-to-obsidian.ps1 -Path <copy> -Mode migrate -Date 2026-06-12`. The fixed -Date keeps `updated:` deterministic for the golden; in real use -Date defaults to today. Assertions key on frontmatter/link/section shape, not byte-exact whitespace.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "migrate-frontmatter-per-kind",
+      "prompt": "Run: memory-bank-to-obsidian.ps1 -Path <copy-of fixtures/before> -Mode migrate -Date 2026-06-12",
+      "expected_output": "Every note gains/repairs YAML frontmatter: kind matches its folder (architecture|decision|pattern|troubleshooting) and is CORRECTED if wrong; title from the H1; tags [<kind>,<stem>]; created from a body **Date:**/**Generated:** or the run date; decisions also get status. updated is set to the run date.",
+      "files": ["fixtures/before/**", "fixtures/after/**"],
+      "assertions": [
+        "patterns/form-validation.md has kind: pattern, title: Form Validation, created+updated present",
+        "decisions/2026-05-10-use-react-query.md has kind: decision, status: accepted, created: 2026-05-10",
+        "architecture/overview.md has kind: architecture and created: 2026-05-01 (from **Generated:**)",
+        "troubleshooting/cors-preflight-failures.md has kind: troubleshooting",
+        "Frontmatter is prepended above the existing H1; body content is not reordered"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "migrate-rewrites-related-and-see-also",
+      "prompt": "Run migrate, then inspect the ## Related and ## See also sections.",
+      "expected_output": "Relative .md links to known notes become [[stem|text]] (or [[stem]] when text == stem); `backtick-wrapped` known note names become [[stem]]; both ## Related and ## See also (any heading level) are linkified; external URLs and unknown targets are left unchanged.",
+      "files": ["fixtures/after/**"],
+      "assertions": [
+        "form-validation.md Related has [[2026-05-10-use-react-query|adopt React Query]], [[overview]] and [[api-error-handling]]",
+        "api-error-handling.md has a ## See also section with [[overview|project overview]] (proves See-also is linkified, not just Related)",
+        "use-react-query.md Related has [[2026-04-02-monorepo-structure|monorepo data layer]]",
+        "An existing [[ghost-decision]] wikilink to a non-existent note is left intact",
+        "Links/prose outside Related/See-also sections (e.g. Real Examples) are untouched"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "migrate-generates-index-moc",
+      "prompt": "Run migrate and inspect <Path>/_index.md.",
+      "expected_output": "_index.md is created with kind: index frontmatter, a section per non-empty category, one [[note]] bullet per active note, newest-first by body date, excluding _archived.",
+      "files": ["fixtures/after/_index.md"],
+      "assertions": [
+        "_index.md exists with frontmatter kind: index",
+        "Has ## Architecture, ## Decisions, ## Patterns, ## Troubleshooting sections with [[wikilink]] bullets",
+        "Under ## Decisions, [[2026-05-10-use-react-query]] is listed before [[2026-04-02-monorepo-structure]] (newest-first)"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "idempotent-including-across-dates",
+      "prompt": "Run migrate twice: once with -Date 2026-06-12, then again with a DIFFERENT -Date (e.g. 2026-09-30).",
+      "expected_output": "Both re-runs report rewritten: 0 and '_index.md: unchanged'. Crucially, a later run with a different date does NOT advance updated: on unchanged notes (updated only moves when a note's content actually changes).",
+      "files": ["fixtures/after/**"],
+      "assertions": [
+        "Second migrate run (same date) rewrites 0 notes and leaves _index.md unchanged",
+        "A third migrate run with a different -Date still rewrites 0 notes (updated does not drift on no-op runs)"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "lint-flags-broken-wikilink",
+      "prompt": "Run: memory-bank-to-obsidian.ps1 -Path fixtures/after -Mode lint",
+      "expected_output": "Lint reports the unresolved [[ghost-decision]] link, names the note it lives in, and exits with code 1.",
+      "files": ["fixtures/after/**"],
+      "assertions": [
+        "Lint output contains a [broken] line naming [[ghost-decision]] in cors-preflight-failures.md",
+        "Lint exits non-zero (1) when at least one [[wikilink]] is broken",
+        "Lint is read-only — it does not modify any file"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "warns-on-duplicate-stems",
+      "prompt": "Run migrate against a bank with two notes sharing a basename in different folders (e.g. architecture/overview.md and patterns/overview.md).",
+      "expected_output": "The adapter emits a warning that the stem is duplicated across categories and that wikilinks to it resolve ambiguously (last one wins), telling the user to rename.",
+      "files": [],
+      "assertions": [
+        "A PowerShell warning naming the duplicate stem 'overview' is emitted",
+        "Migration still completes (the warning is non-fatal)"
+      ]
+    }
+  ]
+}

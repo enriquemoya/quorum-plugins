@@ -1,0 +1,56 @@
+{
+  "skill_name": "quorum-jira-story",
+  "evals": [
+    {
+      "id": 0,
+      "eval_name": "direct-invocation",
+      "prompt": "fetch PROJ-68433",
+      "expected_output": "Structured markdown summary of PROJ-68433 including summary, epic, sprint, points, status, assignee, user story, acceptance criteria, subtask table, subtask details, and comments.",
+      "files": [],
+      "assertions": [
+        {"id": "has_user_story_section", "description": "Output contains a '### User Story' section (requires skill to know customfield_10202)", "type": "string_match", "value": "### User Story"},
+        {"id": "has_acceptance_criteria_section", "description": "Output contains a '### Acceptance Criteria' section (requires skill to know customfield_10037)", "type": "string_match", "value": "### Acceptance Criteria"},
+        {"id": "has_subtasks_table", "description": "Output contains a '### Subtasks' section", "type": "string_match", "value": "### Subtasks"},
+        {"id": "has_subtask_details", "description": "Output contains a '### Subtask Details' section", "type": "string_match", "value": "### Subtask Details"},
+        {"id": "has_sprint_info", "description": "Output contains sprint info (requires customfield_10006)", "type": "string_match", "value": "Sprint"},
+        {"id": "has_epic_info", "description": "Output contains Epic/parent context", "type": "string_match", "value": "Epic"},
+        {"id": "has_comments_section", "description": "Output contains a '### Comments' section", "type": "string_match", "value": "### Comments"},
+        {"id": "ticket_key_in_header", "description": "Output header includes PROJ-68433 key", "type": "string_match", "value": "PROJ-68433"}
+      ]
+    },
+    {
+      "id": 1,
+      "eval_name": "pre-implementation-phrasing",
+      "prompt": "I'm about to start work on PROJ-68433, load the story for me",
+      "expected_output": "Same structured summary as direct invocation — the skill should trigger even with natural-language pre-implementation phrasing.",
+      "files": [],
+      "assertions": [
+        {"id": "has_user_story_section", "description": "Output contains a '### User Story' section (requires skill to know customfield_10202)", "type": "string_match", "value": "### User Story"},
+        {"id": "has_acceptance_criteria_section", "description": "Output contains a '### Acceptance Criteria' section (requires skill to know customfield_10037)", "type": "string_match", "value": "### Acceptance Criteria"},
+        {"id": "has_subtasks_table", "description": "Output contains a '### Subtasks' section", "type": "string_match", "value": "### Subtasks"},
+        {"id": "has_subtask_details", "description": "Output contains a '### Subtask Details' section", "type": "string_match", "value": "### Subtask Details"},
+        {"id": "has_sprint_info", "description": "Output contains sprint info (requires customfield_10006)", "type": "string_match", "value": "Sprint"},
+        {"id": "has_epic_info", "description": "Output contains Epic/parent context", "type": "string_match", "value": "Epic"},
+        {"id": "has_comments_section", "description": "Output contains a '### Comments' section", "type": "string_match", "value": "### Comments"},
+        {"id": "ticket_key_in_header", "description": "Output header includes PROJ-68433 key", "type": "string_match", "value": "PROJ-68433"}
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "verbose-review-request",
+      "prompt": "pull up the Jira story for PROJ-68433 and walk me through the acceptance criteria and what the subtasks are",
+      "expected_output": "Full structured summary with acceptance criteria and subtasks rendered clearly — should follow the skill output template even with extra user instruction context.",
+      "files": [],
+      "assertions": [
+        {"id": "has_user_story_section", "description": "Output contains a '### User Story' section (requires skill to know customfield_10202)", "type": "string_match", "value": "### User Story"},
+        {"id": "has_acceptance_criteria_section", "description": "Output contains a '### Acceptance Criteria' section (requires skill to know customfield_10037)", "type": "string_match", "value": "### Acceptance Criteria"},
+        {"id": "has_subtasks_table", "description": "Output contains a '### Subtasks' section", "type": "string_match", "value": "### Subtasks"},
+        {"id": "has_subtask_details", "description": "Output contains a '### Subtask Details' section", "type": "string_match", "value": "### Subtask Details"},
+        {"id": "has_sprint_info", "description": "Output contains sprint info (requires customfield_10006)", "type": "string_match", "value": "Sprint"},
+        {"id": "has_epic_info", "description": "Output contains Epic/parent context", "type": "string_match", "value": "Epic"},
+        {"id": "has_comments_section", "description": "Output contains a '### Comments' section", "type": "string_match", "value": "### Comments"},
+        {"id": "ticket_key_in_header", "description": "Output header includes PROJ-68433 key", "type": "string_match", "value": "PROJ-68433"}
+      ]
+    }
+  ]
+}
