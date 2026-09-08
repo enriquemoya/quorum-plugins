@@ -84,15 +84,21 @@ The same rule shows up throughout:
 | [`docs/plugin-authoring.md`](docs/plugin-authoring.md) | How to add a plugin or extend an existing one |
 | [`plugins/quorum-orchestrator/PROFILE_SCHEMA.md`](plugins/quorum-orchestrator/PROFILE_SCHEMA.md) | The `profile.yml` contract |
 
-## Provenance
+## What this is, and what it is not
 
-These plugins began as an internal toolkit I built for a previous employer. This
-repository is a **rebuilt, domain-neutral template**: every reference to that
-company, its clients, its partners, its ticket keys, and its internal
-architecture has been removed, and the plugins that were inseparable from their
-domain (database SMEs bound to a specific schema, partner-specific integration
-knowledge, a build recipe tied to one CI pipeline) were dropped rather than
-disguised. What remains is the process — which is the part that transfers.
+This is a **domain-neutral template**. Nothing here carries knowledge of a
+particular codebase: the process is in the plugin, the stack facts are in the
+consumer repo's `profile.yml`, and `/quorum-init` writes that file by reading
+the repository it is installed into.
+
+Anything that could not survive that separation is absent rather than
+generalised — a database expert bound to one schema, integration knowledge
+specific to one partner, a build recipe written for one CI pipeline. Each of
+those looks reusable and is not: the shape transfers, the content does not, and
+a template shipping one project's content as another's default is worse than
+shipping nothing, because the default is invisible until it is wrong.
+
+What remains is the process, which is the part that transfers.
 
 ## Contributing
 

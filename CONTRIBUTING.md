@@ -57,3 +57,29 @@ the bump means users keep running the old text.
   passes, and so does the same check on every `plugin.json`
 - No absolute local paths, no company names, no ticket keys, no credentials —
   examples use placeholders (`PROJ-1234`, `<your-org>`, `Contoso.*`)
+
+## Checks
+
+```
+python3 scripts/check.py          # everything
+python3 scripts/check.py --list   # name the checks and what each is for
+```
+
+Eight structural checks, standard library only, run in CI on every push and
+pull request. They decide things a reader cannot: that every command the router
+names exists, that the three files defining the pipeline's states agree, that
+every `{{profile.*}}` placeholder is defined in the schema, that a plugin's
+version matches the marketplace's, and that nothing in the tree names where
+this code came from.
+
+Every one of them exists because that specific thing was wrong at some point
+and was found by hand, late. The provenance check found a claim in this
+README on the day it was written.
+
+`evals/evals.json` covers the other half — whether a skill behaves correctly
+when a model reads it. That is judged by a model and needs one to run; these
+are decided by a script and run on every commit. Neither replaces the other.
+
+**A check that never fails is not a check.** Before trusting a new one, break
+the thing it guards and watch it fail.
+

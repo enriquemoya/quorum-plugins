@@ -1,0 +1,32 @@
+name: check
+
+# The plugins are markdown: nothing compiles, so nothing catches a router that
+# names a command nobody wrote, a state that drifted between the three files
+# defining it, or a marketplace version that fell behind its own manifest.
+# scripts/check.py decides those. `evals/` judges the other half — whether a
+# skill behaves — and needs a model, so it does not run here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  structural:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The provenance check reads git-tracked files; a shallow clone is
+          # enough, but the checkout must be complete rather than sparse.
+          fetch-depth: 1
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: PyYAML
+        # Only the example-profile parse needs it. The script skips that half
+        # and reports the skip when it is absent, so this is an enhancement
+        # rather than a dependency.
+        run: pip install --quiet pyyaml
+      - name: structural checks
+        run: python3 scripts/check.py
