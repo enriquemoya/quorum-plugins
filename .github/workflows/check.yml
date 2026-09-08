@@ -30,3 +30,10 @@ jobs:
         run: pip install --quiet pyyaml
       - name: structural checks
         run: python3 scripts/check.py
+
+      - name: end-to-end walk
+        # Builds a polyglot repository and walks the pipeline over it. Four of
+        # its assertions pin defects a manual walk found; one runs a real
+        # command twice to prove the pipe hides a failure, rather than
+        # restating that it does.
+        run: python3 scripts/e2e.py

@@ -80,6 +80,24 @@ README on the day it was written.
 when a model reads it. That is judged by a model and needs one to run; these
 are decided by a script and run on every commit. Neither replaces the other.
 
+```
+python3 scripts/e2e.py            # build a repo, walk the pipeline over it
+python3 scripts/e2e.py --keep     # leave the test bed for inspection
+```
+
+`check.py` decides whether the documents agree with each other. `e2e.py` asks
+whether following them works: it builds a polyglot repository, parses the
+routing table out of the router rather than restating it, and walks a unit to
+MERGED. Four of its assertions pin defects the first manual walk found, and one
+of those runs a real command twice — directly and through a pipe — so the
+assertion rests on a measurement rather than on the claim being repeated.
+
 **A check that never fails is not a check.** Before trusting a new one, break
-the thing it guards and watch it fail.
+the thing it guards and watch it fail. Both suites were verified that way:
+four injected defects produce seven findings in `check.py`, and reverting the
+four fixes produces seven failures in `e2e.py`.
+
+**Assertions about prose must normalise whitespace first.** The first version
+of `e2e.py` grepped for a sentence the source had wrapped mid-phrase and
+reported a present fix as missing — it was testing the line width.
 
