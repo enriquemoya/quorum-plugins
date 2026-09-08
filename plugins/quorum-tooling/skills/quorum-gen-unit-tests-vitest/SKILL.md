@@ -323,8 +323,8 @@ const budget = new BudgetBuilder()
 
 // Contact
 const contact = new ContactBuilder()
-  .withName('John Doe')
-  .withEmail('john@example.com')
+  .withName('Test User')
+  .withEmail('test.user@example.com')
   .build();
 
 // Channel
@@ -353,7 +353,7 @@ import { fillForm, submitForm, clickElement, elementExists, getElementText } fro
 // Fill multiple inputs by data-testid
 await fillForm(wrapper, {
   'email-input': 'user@example.com',
-  'name-input': 'John Doe',
+  'name-input': 'Test User',
 });
 
 // Submit form

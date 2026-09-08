@@ -6,9 +6,11 @@ description: Maintain a project memory bank of patterns, decisions, architecture
 
 # Memory Bank
 
-Maintain a per-project memory bank that documents patterns, decisions, architecture, and troubleshooting solutions. The memory bank lives in each project's `.claude/memory-bank/` directory and serves as persistent context for Claude Code across sessions.
+Maintain a per-project memory bank that documents patterns, decisions, architecture, and troubleshooting solutions. It is persistent context for Claude Code across sessions: what the code actually does, why it was decided that way, and what has already gone wrong.
 
-The bank is plain Markdown that can also open as an **Obsidian vault** — see Obsidian Mode below. When that upgrade is in place, write cross-references in the `## Related` section as `[[wikilinks]]` (Obsidian resolves them by filename and builds a backlink graph); keep external links (Jira, PRs, URLs) as standard Markdown links.
+The bank is plain Markdown throughout. Where it lives and what shape the notes take are set once by `/quorum-init` and recorded in `.claude/profile.yml` — in the repository and committed with the code, or in an Obsidian vault outside it. See *Where the bank lives* below and resolve both before writing anything.
+
+Under the Obsidian flavours the notes gain YAML frontmatter, `[[wikilinks]]` in each `## Related` section, and a generated `_index.md`. Nothing depends on the Obsidian app: agents still read the bank with Grep, and the vault features are a human convenience layered on plain files. Keep external links (tracker tickets, PRs, URLs) as standard Markdown links — a wikilink only resolves inside the vault.
 
 ## Usage
 
@@ -24,7 +26,7 @@ The bank is plain Markdown that can also open as an **Obsidian vault** — see O
 ## Memory Bank Structure
 
 ```
-.claude/memory-bank/
+<memory-bank>/
 ├── architecture/       # System structure, component relationships, data flow
 ├── decisions/          # Technical decisions and ADRs (Architecture Decision Records)
 ├── patterns/           # Reusable code patterns and conventions
@@ -37,6 +39,33 @@ Each category may also contain an `_archived/` subdirectory for obsolete content
 
 Read `.claude/quorum-config.json` if it exists to get the `ApplicationName`. Use this in summaries and reports. If it doesn't exist, infer the project name from the repository root directory name.
 
+## Where the bank lives, and in what flavour
+
+Resolve both from `.claude/profile.yml` before doing anything, in every mode:
+
+| Question | Field | Default when absent |
+|---|---|---|
+| Is there a bank at all? | `memory_bank.enabled` | `true` |
+| Where is it? | `paths.memory_bank` | `.claude/memory-bank` |
+| What flavour? | `memory_bank.mode` | `local` |
+| Which vault? | `memory_bank.vault.*` | not applicable |
+
+`paths.memory_bank` is the answer to *where* in all three modes — under `vault`
+it points into the vault, which is what lets every agent that already reads it
+keep working unchanged. `memory_bank.mode` only says what shape the notes take.
+
+**`enabled: false` means stop.** The repository decided once that it does not
+keep a bank; asking again each session is how a recorded decision gets undone
+by attrition. Say the bank is disabled and where to change it, then stop.
+
+**`mode: obsidian` or `vault` means every note you write carries frontmatter
+and `[[wikilinks]]` from the moment it is written** — do not write plain notes
+and convert later. A bank half in one shape and half in the other has to be
+migrated exactly once more than one written correctly.
+
+When there is no profile at all, use the defaults above and say which ones you
+assumed. Guessing silently is how a second bank appears in a second location.
+
 ---
 
 ## Init Mode
@@ -45,12 +74,16 @@ When the argument is `init`:
 
 1. **Create the directory structure:**
    ```
-   .claude/memory-bank/
-   .claude/memory-bank/architecture/
-   .claude/memory-bank/decisions/
-   .claude/memory-bank/patterns/
-   .claude/memory-bank/troubleshooting/
+   <memory-bank>/
+   <memory-bank>/architecture/
+   <memory-bank>/decisions/
+   <memory-bank>/patterns/
+   <memory-bank>/troubleshooting/
    ```
+
+   where `<memory-bank>` is the path resolved above — NOT a literal
+   `.claude/memory-bank`, which would put the bank back in the repository for
+   every operator who chose a vault.
 
 2. **Start from the profile, not from scratch.**
 
@@ -64,6 +97,12 @@ When the argument is `init`:
    be a scan rather than a record, and nothing downstream will share its
    conclusions.
 
+   `/quorum-init` also settles WHERE the bank goes and in what flavour, with the
+   trade stated (in-repo notes are reviewed with the code and travel with a
+   clone; a vault survives across repositories and appears in no diff). Running
+   `init` here without that decision defaults to `local` in this repository —
+   which is a fine default and a poor surprise, so name it.
+
 3. **Scan for what the profile does not cover:**
    - Entry points and how the application starts
    - Module boundaries and what each one owns
@@ -73,7 +112,7 @@ When the argument is `init`:
 
 4. **Create initial architecture doc:**
 
-   Write `.claude/memory-bank/architecture/overview.md`:
+   Write `<memory-bank>/architecture/overview.md`:
    ```markdown
    # Project Overview: {ApplicationName}
 
@@ -180,7 +219,7 @@ Find real examples in the codebase:
 
 ### Step 3: Create Pattern Document
 
-**File:** `.claude/memory-bank/patterns/{pattern-name}.md` (kebab-case)
+**File:** `<memory-bank>/patterns/{pattern-name}.md` (kebab-case)
 
 ```markdown
 # Pattern: {Clear Pattern Name}
@@ -268,7 +307,7 @@ Ask the user:
 
 ### Step 2: Create Decision Document
 
-**File:** `.claude/memory-bank/decisions/YYYY-MM-DD-{title-slug}.md`
+**File:** `<memory-bank>/decisions/YYYY-MM-DD-{title-slug}.md`
 
 ```markdown
 # Decision: {Clear, Concise Title}
@@ -359,7 +398,7 @@ Analyze the topic to determine:
 
 ### Step 2: Search Memory Bank
 
-Search `.claude/memory-bank/` across all categories:
+Search `<memory-bank>/` across all categories:
 1. Use Glob to find relevant files by name
 2. Use Grep to search for keywords within files
 3. Read matching files to gather context
@@ -391,7 +430,7 @@ When the argument is `cleanup`:
 
 ### Step 1: Review Current State
 
-List all content in `.claude/memory-bank/` and categorize each item as:
+List all content in `<memory-bank>/` and categorize each item as:
 - **Active and current** — keep
 - **Completed/stable** — candidate for archival
 - **Outdated** — should be archived
@@ -409,10 +448,10 @@ Look for:
 
 Ensure `_archived/` subdirectories exist in each category:
 ```
-.claude/memory-bank/decisions/_archived/
-.claude/memory-bank/patterns/_archived/
-.claude/memory-bank/architecture/_archived/
-.claude/memory-bank/troubleshooting/_archived/
+<memory-bank>/decisions/_archived/
+<memory-bank>/patterns/_archived/
+<memory-bank>/architecture/_archived/
+<memory-bank>/troubleshooting/_archived/
 ```
 
 ### Step 4: Archive Content
@@ -490,7 +529,7 @@ The script ships with this skill. Resolve its path at runtime — **never type a
 
 ### Step 2: Resolve the memory-bank path
 
-Use `{{profile.paths.memory_bank}}` from `.claude/profile.yml`; default to `.claude/memory-bank` when null/missing.
+Use the path resolved in *Where the bank lives* above — `{{profile.paths.memory_bank}}`, defaulting to `.claude/memory-bank`. Under `mode: vault` this is a path outside the repository, and that is correct: the adapter rewrites notes wherever they are.
 
 ### Step 3: Run
 
@@ -515,17 +554,17 @@ Prefer `pwsh` (PowerShell 7, cross-platform); on Windows-only setups `powershell
 ## Document Templates
 
 ### Pattern Template
-**File:** `.claude/memory-bank/patterns/{pattern-name}.md`
+**File:** `<memory-bank>/patterns/{pattern-name}.md`
 
 See the full template in the Add Pattern Mode section above.
 
 ### Decision Template
-**File:** `.claude/memory-bank/decisions/YYYY-MM-DD-{title}.md`
+**File:** `<memory-bank>/decisions/YYYY-MM-DD-{title}.md`
 
 See the full template in the Decision Mode section above.
 
 ### Architecture Template
-**File:** `.claude/memory-bank/architecture/{component}.md`
+**File:** `<memory-bank>/architecture/{component}.md`
 
 ```markdown
 # {Component/System Name}
@@ -548,7 +587,7 @@ See the full template in the Decision Mode section above.
 ```
 
 ### Troubleshooting Template
-**File:** `.claude/memory-bank/troubleshooting/{issue-name}.md`
+**File:** `<memory-bank>/troubleshooting/{issue-name}.md`
 
 ```markdown
 # {Problem Title}

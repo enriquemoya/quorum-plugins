@@ -13,7 +13,7 @@
       "name": "quorum-orchestrator",
       "source": "./plugins/quorum-orchestrator",
       "description": "End-to-end ticket delivery orchestrator: fetch \u2192 analyze \u2192 plan \u2192 implement \u2192 test \u2192 review \u2192 PR, with a human approval gate at every phase. Stack-agnostic via profile.yml; depends on quorum-tooling.",
-      "version": "1.2.1",
+      "version": "1.4.0",
       "author": {
         "name": "Enrique Moya"
       },
@@ -31,7 +31,7 @@
       "name": "quorum-tooling",
       "source": "./plugins/quorum-tooling",
       "description": "Portable developer tooling: code review, SQL migration review (idempotency, destructive ops, lock/rewrite risk), unit-test generators (.NET 4.7.2 / .NET 9 / Jasmine / Vitest), a memory bank with an Obsidian adapter, manual QA test cases, sprint numbering, and branch naming. Stack-agnostic via profile.yml.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Enrique Moya"
       },

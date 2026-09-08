@@ -55,6 +55,71 @@ conventional patterns:
 | `*_pb2.py`, `*.pb.go` | protobuf |
 | `migrations/**` (framework-dependent) | ORM migrations — ask; some are hand-edited |
 
+## Components — what the tree says about its own parts
+
+A component owns a build, a test suite, or a deployable. These files NAME the
+components, which is why they are read before anything is inferred:
+
+| File | Names |
+|---|---|
+| `pnpm-workspace.yaml`, `package.json` `workspaces` | JS/TS packages |
+| `nx.json`, `turbo.json`, `lerna.json` | the same, plus a task graph |
+| `*.sln` `Project(...)` entries | .NET projects and their paths |
+| `Cargo.toml` `[workspace] members` | Rust crates |
+| `go.work` `use` directives | Go modules |
+| `settings.gradle*` `include` | Gradle subprojects |
+| `pyproject.toml` `[tool.uv.workspace]` / `[tool.poetry.group]` | Python members |
+
+When none exists, one level below each source root, take directories holding a
+manifest, a test directory, a `Dockerfile`, or an entry point. When that yields
+nothing, the repository is ONE component — a valid answer that beats inventing
+four.
+
+`depends_on` comes from manifests only. An import you read in one file is not a
+dependency edge; a partial graph presented as whole is worse than none.
+
+## Entry points
+
+| Signal | Kind |
+|---|---|
+| `scripts.start` / `scripts.dev` target | whatever it launches |
+| `Program.cs`, `main.go`, `cmd/*/main.go`, `__main__.py`, `src/main.*` | process entry |
+| route registration, `[ApiController]`, `@Controller`, FastAPI `APIRouter` | http |
+| queue/consumer registration, `@Scheduled`, cron yaml | worker / job |
+| `index.html`, an app-shell mount | ui |
+| a package with only exports and no runner | library |
+
+## Datastores and external services
+
+Read what the process CONNECTS to, never what a README mentions.
+
+| Signal | Establishes |
+|---|---|
+| `docker-compose*.yml` services | datastores present in development |
+| driver/ORM dependencies (`pg`, `Npgsql`, `redis`, `mongoose`, `sqlalchemy`) | the store actually spoken to |
+| connection-string KEYS in config/env samples | the store, and nothing else |
+| SDK packages (`stripe`, `@aws-sdk/*`, `sendgrid`, `auth0`) | third-party services |
+
+Record the dependency, never the credential: `postgres` not a host, `s3` not a
+bucket, `oidc` not a tenant. Discovery frequently runs against someone else's
+repository and writes to a committed file.
+
+## Characteristics
+
+| Signal | Characteristic |
+|---|---|
+| `.github/workflows/*`, `.gitlab-ci.yml`, `azure-pipelines.yml`, `bitbucket-pipelines.yml`, `Jenkinsfile` | `ci` |
+| `Dockerfile*`, `docker-compose*.yml` | `containerised` |
+| `*.tf`, `*.bicep`, `cdk.json`, `serverless.yml` | `infra_as_code` |
+| `openapi.*`, `swagger.*`, `*.graphql`, `*.proto` | `api_contract` |
+| `migrations/`, `Migrations/`, `alembic.ini`, `prisma/migrations` | `migrations` |
+| locale folders, `i18n` dependency | `i18n` |
+| auth middleware, `oidc`/`jwt`/`saml` dependency | `auth` — the MECHANISM only |
+
+Absent is a finding. Write `false` when you looked and found nothing, `null`
+when you did not look. Those lead to different next steps, and a report that
+renders them alike destroys the distinction.
+
 ## Reading a monorepo
 
 Several manifests in one tree is a layout, not a contradiction. Record where

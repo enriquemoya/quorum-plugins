@@ -34,9 +34,13 @@ Plugins are installed once per machine; **configuration is per repo.**
 
 1. **`.claude/profile.yml`** — run **`/quorum-init`** in the repo. It reads the
    tree, works out the stack, test tooling, commands and layout from what is
-   actually there, shows you the evidence for each value it proposes, asks about
-   the few things no file can answer, and writes the profile. Re-running it is
-   safe: values you set by hand are kept.
+   actually there, maps the components and the cross-cutting characteristics
+   (entry points, datastores, CI, containers, generated code), shows you the
+   evidence for each value it proposes, asks about the few things no file can
+   answer, and writes the profile. It finishes by settling where the memory
+   bank lives — in the repo, in the repo Obsidian-flavoured, or in an external
+   vault — and taking its first step. Re-running it is safe: values you set by
+   hand are kept.
 
    Writing it by hand is still supported — start from
    [`plugins/quorum-orchestrator/profile.example.yml`](plugins/quorum-orchestrator/profile.example.yml)

@@ -95,6 +95,85 @@ roles:
   e2e-tests-gen: null
   qa-handoff: null
 
+# ─── Stack inventory ─────────────────────────────────────────────────────
+# What `/quorum-init` found when it read this repository. This block is a
+# RECORD, not a switch: nothing branches on it. It exists so the discovery
+# that produced the roles above is inspectable, and so the memory bank and
+# the orchestrator can describe the system without re-deriving it — two
+# answers to "what is this repo" that disagree are worse than one.
+#
+# Every entry carries the evidence it came from. An entry with no evidence
+# is a guess someone typed, and should be deleted rather than trusted.
+stack:
+  # Languages actually built, not merely present. A stray `.ts` file in a
+  # C# repo is not a TypeScript language entry.
+  #   - name: TypeScript
+  #     version: "5.4"          # from the toolchain, null when unpinned
+  #     evidence: "tsconfig.json + typescript@5.4 in devDependencies"
+  languages: []
+
+  # What runs the built artifact: node 20, net9.0, python 3.12, jvm 21.
+  runtimes: []
+
+  # npm / pnpm / yarn / bun / nuget / uv / poetry / pip / go / cargo / maven.
+  # Take it from the LOCKFILE present, not from what the README suggests.
+  package_managers: []
+
+  # Frameworks and the layer each one occupies, so "Vue + ASP.NET" reads as
+  # two layers rather than one confused stack.
+  #   - name: Vue
+  #     version: "3.4"
+  #     layer: ui               # ui | api | worker | data | infra | test
+  #     evidence: "vue@3.4 in dependencies"
+  frameworks: []
+
+  # Data stores the code actually talks to. Read compose files, connection
+  # strings, ORM configs and driver dependencies — a `postgres` service in
+  # docker-compose is evidence; a `# TODO: maybe redis` comment is not.
+  datastores: []
+
+  # Third-party services the code calls out to at runtime (payment, auth,
+  # mail, object storage, feature flags). Names the DEPENDENCY, never a
+  # credential, an account id, a tenant or an endpoint that identifies one.
+  external_services: []
+
+  # Where execution begins. One entry per way in.
+  #   - kind: http             # http | cli | worker | ui | job | library
+  #     path: src/main.ts
+  #     evidence: "scripts.start runs it"
+  entry_points: []
+
+  # The parts a change lands in. This is the map a newcomer needs and the
+  # one thing no manifest states, so it is assembled from the tree: a
+  # component is a directory that owns its own build, its own tests, or its
+  # own deployable — not every folder.
+  #   - name: web
+  #     path: apps/web
+  #     kind: ui                # ui | api | worker | lib | infra | tests
+  #     language: TypeScript
+  #     tests: apps/web/src/**/*.spec.ts
+  #     depends_on: [shared]    # only when the manifest states it
+  components: []
+
+  # Cross-cutting characteristics that change how work is planned. Recorded
+  # only when observed; `null` means "not looked for" and `false` means
+  # "looked for and absent" — those are different and the difference matters.
+  characteristics:
+    monorepo: null            # { tool: pnpm|nx|turbo|lerna|dotnet-sln, workspaces: [...] }
+    containerised: null       # { dockerfiles: [...], compose: [...] }
+    ci: null                  # { provider: ..., config: path, jobs: [...] }
+    infra_as_code: null       # { tool: terraform|bicep|cdk, path: ... }
+    api_contract: null        # { kind: openapi|graphql|proto, path: ... }
+    i18n: null                # { framework: ..., locales_path: ... }
+    auth: null                # the MECHANISM (oidc, session, api-key), never a provider account
+    migrations: null          # { tool: ef|alembic|prisma|flyway, path: ... }
+    generated_code: null      # { globs: [...] } — mirrors paths.no_hand_edit
+
+  # When this inventory was taken, and against which commit. A stack record
+  # with no date silently becomes a claim about a tree that no longer exists.
+  discovered_on: null         # ISO date
+  discovered_at_ref: null     # git rev at discovery time
+
 # ─── Paths ───────────────────────────────────────────────────────────────
 # Repo-specific paths the orchestrator + agents need at runtime.
 paths:
@@ -148,6 +227,44 @@ paths:
   # etc.). Empty array (default) disables the protection.
   # .NET API example: ["*.Designer.cs", "*.edml", "*.Diagram1.view"]
   no_hand_edit: []
+
+# ─── Memory bank ─────────────────────────────────────────────────────────
+# WHERE the bank lives is `paths.memory_bank` above — every agent already
+# reads that, and it stays the one answer to that question. This block says
+# WHAT FLAVOUR the bank is and, when it lives outside the repository, which
+# vault holds it.
+memory_bank:
+  # `false` skips every memory-bank step everywhere. A repo that does not
+  # want one should say so once, here, rather than declining the prompt in
+  # each session.
+  enabled: true
+
+  # local    — plain Markdown inside the repo, committed with the code.
+  #            The default, and the right answer when the knowledge is about
+  #            THIS codebase and should travel with a clone.
+  # obsidian — the same in-repo location, Obsidian-flavoured: YAML
+  #            frontmatter, `[[wikilinks]]` in `## Related`, a generated
+  #            `_index.md`. Still committed, still readable by Grep; the
+  #            vault features are a human convenience layered on top.
+  # vault    — the bank lives OUTSIDE the repository, in an Obsidian vault
+  #            that may span several projects. `paths.memory_bank` then
+  #            points at the per-project folder inside that vault, so every
+  #            consumer keeps working unchanged.
+  #
+  # Choosing `vault` moves knowledge out of version control. That is a real
+  # trade — it survives across repos and is not reviewed with the code — and
+  # `/quorum-init` states it before asking rather than after.
+  mode: local
+
+  # Only read when `mode: vault`.
+  vault:
+    path: null                # absolute path to the vault root, or $QUORUM_VAULT
+    project_folder: null      # folder inside the vault for THIS project
+
+  # Set by `/quorum-init` when it seeds the bank, so a later run can tell an
+  # empty bank from one deliberately left empty.
+  seeded: false
+  seeded_on: null
 
 # ─── Commands ────────────────────────────────────────────────────────────
 # Shell commands the orchestrator runs at well-known steps. `null` skips

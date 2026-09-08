@@ -40,8 +40,9 @@ to prevent.
 
 `/quorum-init` writes that profile for you. It reads the repository, works out
 the stack, test tooling, commands and layout from manifests and lockfiles rather
-than folder names, and shows you the evidence behind every value before writing
-it. Where the evidence runs out — your tracker, your ticket prefix — it asks
+than folder names, maps what the repository is made OF — its components, entry
+points, datastores and cross-cutting characteristics — and shows you the
+evidence behind every value before writing it. Where the evidence runs out — your tracker, your ticket prefix — it asks
 instead of defaulting. Nothing here is pinned to a stack: a Go repository with
 most roles left null is a valid profile, and the skills that do not apply skip
 themselves silently.
@@ -58,8 +59,10 @@ The same rule shows up throughout:
 ## Getting started
 
 1. **Install** the marketplace and the plugins you want (above).
-2. **Run `/quorum-init`** in your repository. It discovers the stack and writes
-   `.claude/profile.yml`, showing its evidence as it goes. Review what it
+2. **Run `/quorum-init`** in your repository. It discovers the stack and the
+   component map, writes `.claude/profile.yml` showing its evidence as it goes,
+   then asks where the memory bank should live — committed with the code, or in
+   an Obsidian vault outside it — and seeds it from what it found. Review what it
    proposes — it is a proposal, and you are the one who knows which parts of
    your own repository it read wrong. The schema is at
    [`PROFILE_SCHEMA.md`](plugins/quorum-orchestrator/PROFILE_SCHEMA.md) if you
