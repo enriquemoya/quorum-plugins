@@ -43,6 +43,7 @@ last_audit:
   proposal_ref: null          # runs/<slug>/iter-NN-proposal.yml
   governance_version: null    # which rules produced this verdict
   panel: null                 # cpd | single-provider
+  panel_reason: null          # why it degraded, when it did
   evidence_digest: null       # for same-evidence-thrice detection
 
 last_impl: { commit: null }
