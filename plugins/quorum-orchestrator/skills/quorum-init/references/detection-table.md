@@ -70,10 +70,18 @@ components, which is why they are read before anything is inferred:
 | `settings.gradle*` `include` | Gradle subprojects |
 | `pyproject.toml` `[tool.uv.workspace]` / `[tool.poetry.group]` | Python members |
 
-When none exists, one level below each source root, take directories holding a
-manifest, a test directory, a `Dockerfile`, or an entry point. When that yields
-nothing, the repository is ONE component — a valid answer that beats inventing
-four.
+**A workspace declaration is authoritative for its OWN ecosystem, and blind to
+every other.** `pnpm-workspace.yaml` names the JS packages; it cannot name the
+Python worker beside them, and a repo with `apps/web`, `apps/api` and
+`workers/` will declare two of its three components. Take the declaration, then
+sweep the rest of the tree for what it could not see.
+
+Whether a declaration exists or not, sweep one level below each source root and
+take directories holding a manifest, a test directory, a `Dockerfile`, or an
+entry point. When that yields nothing beyond the declared set, say so — a
+declaration that turned out to be complete is a finding worth recording, not a
+step to skip. When it yields nothing at all, the repository is ONE component: a
+valid answer that beats inventing four.
 
 `depends_on` comes from manifests only. An import you read in one file is not a
 dependency edge; a partial graph presented as whole is worse than none.

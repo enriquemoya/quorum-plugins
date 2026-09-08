@@ -127,10 +127,12 @@ three and is.
 
 Look in this order and stop as soon as the tree names its own parts:
 
-1. **Workspace declarations name the components for you** — `pnpm-workspace.yaml`,
-   `package.json` `workspaces`, `nx.json`, `turbo.json`, `lerna.json`, a `.sln`
-   `Project(...)` list, `Cargo.toml` `[workspace] members`, `go.work`. When one
-   exists, it IS the component list; do not second-guess it.
+1. **Workspace declarations name the components — of their own ecosystem** —
+   `pnpm-workspace.yaml`, `package.json` `workspaces`, `nx.json`, `turbo.json`,
+   `lerna.json`, a `.sln` `Project(...)` list, `Cargo.toml` `[workspace]
+   members`, `go.work`. Take what one declares without second-guessing it, then
+   **keep sweeping**: a JS workspace cannot name a Python worker sitting beside
+   it, so a polyglot repo declares some of its components and hides the rest.
 2. **Otherwise, one level down from each source root**, take directories that
    contain a manifest, a test directory, a `Dockerfile`, or an entry point.
 3. **Otherwise the repository is one component.** Say so. A single-component

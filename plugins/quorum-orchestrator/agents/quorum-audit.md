@@ -92,6 +92,12 @@ The panel is not the whole audit. Run these yourself, deterministically:
   or `{{profile.observed.verified_commands}}` where a profile command is null.
   **A VERIFIED verdict is forbidden when the gate is red, stale, or missing.**
   Record the exit codes and log paths.
+
+  **Take the exit code from the command, not from a pipeline.** Redirect to a
+  file and read it afterwards; `<command> | tail -40` reports `tail`'s status,
+  so a build that died with 127 records as 0 and this rule passes something
+  that never ran. Distinguish 127 (toolchain missing) from a genuine failure —
+  they send the operator to different places.
 - **Requirement traceability table.** `| requirement | evidence (file:line) |
   PASS/FAIL |`. A FAIL row forbids VERIFIED unless a matching entry exists in
   `accepted_conditions`.

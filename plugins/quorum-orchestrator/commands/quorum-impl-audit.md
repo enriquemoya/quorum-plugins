@@ -27,9 +27,31 @@ Before any judging, run the verification gate:
 {{profile.commands.lint}}         or  observed.verified_commands[purpose=lint]
 ```
 
+**Capture the exit code of the COMMAND, never of a pipeline.** This gate asks
+for the last lines of output, and the natural way to get them is
+`<command> 2>&1 | tail -40` — which reports `tail`'s exit status. A command that
+died with 127 reports 0 through that pipe, and the rule below then passes a
+build that never ran.
+
+Run the command first, then read the file:
+
+```bash
+<command> >gate.log 2>&1; rc=$?      # rc is the command's
+tail -40 gate.log                     # output, separately
+```
+
+`set -o pipefail` also works where the shell supports it. What does not work is
+trusting `$?` after a pipe, and this was verified rather than assumed: a
+missing binary exits 127 directly, 0 through `| tail`, and 127 again with
+pipefail set.
+
 **A `VERIFIED` verdict is forbidden when the gate is red, stale, or missing.**
 Record exit codes and log paths in the verdict's first section. A non-zero exit
 becomes a high-severity blocking finding with `target_step: impl`.
+
+**Exit 127 is not a red build — it is a missing toolchain**, and the two want
+different findings. Say which: "the test command is not installed here" sends
+the operator to their environment, "three tests fail" sends them to the code.
 
 A clean verdict over a failing build is the single outcome that makes every
 future verdict worthless — after it, nobody has reason to believe the next one.

@@ -142,6 +142,13 @@ TRIAGE ─► DRAFT_PRD ─► PRD_READY ─────────────
 | any | — | `>= 3` | `STUCK` | `STUCK` |
 | any | same evidence 3× | — | `STUCK` | `STUCK` |
 
+**Rows are evaluated top to bottom and the FIRST match wins — except that the
+constitution row and the two `STUCK` rows override any row above them.** A
+blocking finding that cites an article matches row 3 (loop) and row 4 (halt);
+row 4 governs. Without that stated, a reader applies the first match and an
+agent loops on a constitutional violation, which is the one outcome the article
+weight exists to prevent.
+
 ### Never automatic, in either mode
 
 1. **A constitution violation.** The constitution is law; a finding citing an

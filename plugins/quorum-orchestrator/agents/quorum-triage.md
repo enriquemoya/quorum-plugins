@@ -19,7 +19,12 @@ back to `/quorum-orchestrate`.
 
 ## The question that decides origin
 
-**Is the problem statement settled?**
+**First: is the ticket path even available?** It needs `roles.tracker` to be
+non-null — otherwise there is nothing to fetch a ticket from, and `origin:
+ticket` hands `/quorum-analyze` no input. Say so and take the spec path;
+`complexity: simple` is what keeps it short for small work.
+
+Then: **is the problem statement settled?**
 
 Not "is this small" — small work can rest on an unsettled problem, and large
 work can be a mechanical application of a decision already made.
