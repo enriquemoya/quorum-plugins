@@ -489,7 +489,7 @@ Write `unittests_{n}.md` to the review output directory:
 ```markdown
 # Unit Test Generation Summary - Sprint {sprint}
 **Branch:** {branch_name}
-**Ticket:** [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX)
+**Ticket:** [PROJ-XXXXX]({{ticket_url}})
 **Generated:** {date}
 **Base Branch:** {base_branch}
 **Application:** {ApplicationName}
@@ -542,7 +542,7 @@ After writing the summary document to disk:
 3. **Post comment:** Use `addCommentToJiraIssue` MCP tool to post the summary document as a comment on the ticket
 4. **Comment format:** Prefix the content with a header: `## Unit Test Generation Summary (Auto-Generated)\nGenerated from branch: {branch_name}\n\n` followed by the full summary document content
 5. **No ticket found:** If no PROJ-XXXXX ticket was found in the branch name or commits, skip Jira posting and inform the user: "No Jira ticket found - skipping Jira comment. Unit test summary saved to: {filepath}"
-6. **Success message:** After posting, show: "Unit tests generated and summary posted to [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) and saved to: {filepath}"
+6. **Success message:** After posting, show: "Unit tests generated and summary posted to [PROJ-XXXXX]({{ticket_url}}) and saved to: {filepath}"
 
 ---
 

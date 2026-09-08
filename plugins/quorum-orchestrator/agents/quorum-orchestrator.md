@@ -497,7 +497,9 @@ Say "go" to start implementation, or continue adjusting the plan.
    **(a) Build / type-check**
 
    - **If `{{profile.commands.type_check}}` is non-null:** run the command. Capture the exit code and the last ~40 lines of output for the gate summary.
-   - **If `{{profile.commands.type_check}}` is null:** best-effort fallback — probe these common build commands in order and run the first one that exists in the repo: `npm run type-check`, `npm run build`, `dotnet build`, `tsc --noEmit`, `mvn compile`. Record which one ran so the Gate 4 summary can label the result `(fallback — no explicit profile command)`.
+   - **If `{{profile.commands.type_check}}` is null:** look in `{{profile.observed.verified_commands}}` for an entry whose `purpose` is `type_check` and run that. These are commands `/quorum-init` RAN and saw succeed in this repository, recorded with their evidence — not a list of the commands whoever wrote this agent happened to know. Label the result `(from discovery — no explicit profile command)`.
+
+     This used to probe `npm run type-check`, `npm run build`, `dotnet build`, `tsc --noEmit`, `mvn compile` in order. That list is a stack assumption wearing a fallback's clothes: it works in the five ecosystems it names and silently reports "no verification possible" in every other, which reads as "this repo cannot be built" rather than "nobody taught me how".
    - **If neither the profile command nor any fallback matches:** announce `⚠️ no compile verification possible — review the diff carefully` in the Gate 4 summary. Do NOT silently skip; the warning must be loud.
    - **On non-zero exit:** HARD STOP before Gate 4. Surface the captured last-40-lines output and ask the human: `Fix and retry, accept-as-known and continue, or abort?` The orchestrator MUST NOT auto-advance to Gate 4 with a known-bad build.
    - Record the outcome (✅ clean / ⚠️ skipped / ❌ accepted-with-risk / ✅ clean-after-retry) for the Gate 4 summary.
@@ -505,7 +507,7 @@ Say "go" to start implementation, or continue adjusting the plan.
    **(b) Lint check**
 
    - **If `{{profile.commands.lint}}` is non-null:** run the command. Capture the exit code and the last ~40 lines of output for the gate summary.
-   - **If `{{profile.commands.lint}}` is null:** best-effort fallback for Node repos — if a `package.json` exists at the repo root AND it declares a `lint` script (check via `node -p "require('./package.json').scripts && require('./package.json').scripts.lint"` or equivalent), run `npm run lint`. Record the result as `(fallback — no explicit profile command)`. For non-Node repos with null `profile.commands.lint`, skip this sub-check silently (lint isn't a universal concept and announcing skips for every Python / Karate / .NET project that doesn't configure one would be noise).
+   - **If `{{profile.commands.lint}}` is null:** look in `{{profile.observed.verified_commands}}` for a `lint` entry and run that. When there is none, skip this sub-check silently — lint is not a universal concept, and announcing a skip for every repository that deliberately configures no linter is noise, not information.
    - **On non-zero exit:** HARD STOP before Gate 4. Same fix / accept-with-risk / abort prompt as the build sub-check. Lint failures should NOT auto-advance any more than build failures should.
    - Record the outcome (✅ clean / ⏭️ skipped (non-Node, no profile command) / ❌ accepted-with-risk / ✅ clean-after-retry) for the Gate 4 summary.
 
@@ -523,8 +525,8 @@ Files modified:
 Plan completion: {N/M} items complete
   {any items deferred and why}
 
-Build check: {✅ clean ({command that ran}) | ✅ clean (fallback — {command that ran}) | ⚠️ no verification possible (profile.commands.type_check null AND no fallback matched) | ✅ clean-after-retry ({command}) | ❌ accepted-with-risk ({command} — human acknowledged risk)}
-Lint check:  {✅ clean ({command that ran}) | ✅ clean (fallback — npm run lint) | ⏭️ skipped (non-Node, no profile.commands.lint) | ✅ clean-after-retry ({command}) | ❌ accepted-with-risk ({command} — human acknowledged risk)}
+Build check: {✅ clean ({command that ran}) | ✅ clean (from discovery — {command that ran}) | ⚠️ no verification possible (no type_check command configured or discovered) | ✅ clean-after-retry ({command}) | ❌ accepted-with-risk ({command} — human acknowledged risk)}
+Lint check:  {✅ clean ({command that ran}) | ✅ clean (from discovery — {command that ran}) | ⏭️ skipped (no lint command configured or discovered) | ✅ clean-after-retry ({command}) | ❌ accepted-with-risk ({command} — human acknowledged risk)}
 UI test-id attributes added: {list or "None — no UI changes" or "⏭️ Skipped (no ui_glob in profile)"}
 Memory bank updates needed: {list or "None"}
 Deviations from plan: {list or "None"}
@@ -852,7 +854,7 @@ Delivery Checklist (local artifacts confirmed at Sub-gate 7a):
 External actions (Sub-phase 7b outcome):
   [1] addCommentToJiraIssue → investigation prompt on {TICKET-KEY} → {✅ posted (comment {id}) | ⏭️ skipped-by-human}
   [2] addCommentToJiraIssue → validation report on {TICKET-KEY} → {✅ posted (comment {id}) | ⏭️ none generated | ⏭️ skipped-by-human}
-  [3] createJiraIssue → "Review Automation Tests" → {🎫 [{SUBTASK-KEY}](https://{atlassian.host}/browse/{SUBTASK-KEY}) | ⚠️ failed-then-skipped: {error} | ⏭️ skipped-by-human}
+  [3] createJiraIssue → "Review Automation Tests" → {🎫 [{SUBTASK-KEY}]({{ticket_url}} → {SUBTASK-KEY}) | ⚠️ failed-then-skipped: {error} | ⏭️ skipped-by-human}
   [4] git push origin {branch} → {✅ pushed (new SHA: {short-sha}) | ⚠️ failed-then-retried: {error} | ⏭️ skipped-by-human (branch already in sync)}
   [5+] (any future external actions)
 

@@ -110,25 +110,35 @@ git --no-pager diff --name-status {BASE_BRANCH}..HEAD
 
 Classify each changed file by glob:
 
-| Bucket | Match (extend per consumer stack) |
+| Bucket | Match |
 |---|---|
-| Unit / component | `*.spec.ts`, `*.spec.tsx`, `*.test.ts`, `*_test.py`, `*Tests.cs`, `*Spec.scala`, … |
-| E2E | files under `{{profile.paths.e2e_spec_root}}` (resolved under `{{profile.paths.e2e_repo}}` when cross-repo) |
+| Unit / component | `{{profile.observed.test_files.unit_glob}}` |
+| E2E | `{{profile.observed.test_files.e2e_glob}}`, resolved under `{{profile.paths.e2e_repo}}` when cross-repo |
 | Integration | uncommon; consult `{{role:integration-tests-gen}}` if defined |
 
-For each test file, extract individual test-case titles using whichever
-of these patterns matches the file:
+When a glob is null, that bucket is empty and the handoff says so. Do not
+substitute a guess — "probably `*.spec.ts`" is how a handoff ends up listing
+zero scenarios from a repository that has hundreds.
 
-- Mocha / Vitest / Jest / Cypress: lines matching `it\(['"](.+?)['"]`
-- Playwright / Bun: `test\(['"](.+?)['"]`
-- NUnit / xUnit (.cs): `\[Test(Case)?\]` or `\[Fact\]` annotations + the
-  following method name on the next non-blank line
-- pytest: `def test_(\w+)`
-- Karate / Gherkin: `^\s*Scenario:\s+(.+)$`
+For each test file, extract the test-case titles using
+`{{profile.observed.test_name_extraction}}`. It is a list; take the FIRST
+entry whose `applies_to` glob matches the file, and use its `regex` — which
+has exactly one capture group, the test name.
 
-For each test case, also derive a 1-line "what it asserts" hint from the
-test body's first `expect(`, `assert`, `should`, or `Then` line. If the
-hint cannot be derived reasonably, leave blank rather than guessing.
+**When no entry matches the file, skip that file and say it was skipped.**
+This agent used to carry its own table of framework regexes — Mocha, xUnit,
+pytest, Gherkin — which is a list of the stacks whoever wrote it happened to
+know. A repository outside that list got silently zero scenarios, and a
+repository inside it got them by luck rather than by configuration.
+`/quorum-init` discovers the patterns from the tests that are actually there
+and records them with the match count it saw; a bucket it could not read is
+reported as unread, which is a fact an operator can act on.
+
+For each test case, also derive a one-line "what it asserts" hint from the
+test body's first assertion line. What an assertion looks like is
+framework-specific, so take it from the same extraction entry when it carries
+an `assertion_hint` regex, and leave the hint blank otherwise. Blank is a
+better answer than a hint derived from a pattern that does not apply.
 
 ### Step 3 — (removed)
 
@@ -163,7 +173,7 @@ Artifact" pointer, a "consult the markdown in the repo" hint, or any
 ```markdown
 # Review Automation Tests — {TICKET_KEY}: {TICKET_SUMMARY}
 
-**Ticket:** [{TICKET_KEY}](https://{{profile.tracker.host}}/browse/{TICKET_KEY})
+**Ticket:** [{TICKET_KEY}]({{ticket_url}})
 **Branch:** `{current-branch}` → `{BASE_BRANCH}`
 **Generated:** {YYYY-MM-DD} by orchestrator Phase 7
 
@@ -200,17 +210,17 @@ QA reads most carefully — be explicit about steps and expected outcomes.
 
 **Preconditions** _(specific to this test)_
 
-- {e.g. "Active PMC has at least one community"}
-- {e.g. "AI chat shell is closed at test start"}
+- {e.g. "the account under test has at least one record"}
+- {e.g. "the panel is closed at test start"}
 
 **Steps**
 
-1. {Step derived from the test body — describe in user-action terms, not Cypress chains. E.g. "Open the AI chat shell from the header"}
+1. {Step derived from the test body — describe in user-action terms, never as framework calls. E.g. "Open the chat panel from the header", not the selector chain that did it}
 2. {…}
 
 **Expected**
 
-- {Assertion derived from the spec's `expect(...)` / `should(...)` / `Then` clauses — describe in user-observable terms}
+- {Assertion derived from the test's assertion lines — describe in user-observable terms}
 - {…}
 
 ---

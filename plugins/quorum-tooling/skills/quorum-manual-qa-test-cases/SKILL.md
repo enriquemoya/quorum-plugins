@@ -131,7 +131,7 @@ Write the test case document to the output file with this structure:
 ```markdown
 # Manual QA Test Cases - Sprint {sprint}
 **Branch:** {branch_name}
-**Ticket:** [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX)
+**Ticket:** [PROJ-XXXXX]({{ticket_url}})
 **Generated:** {date}
 **Base Branch:** {base_branch}
 **Application:** {ApplicationName}
@@ -145,16 +145,16 @@ Write the test case document to the output file with this structure:
 Tickets this work is built on top of or related to. Review these for additional testing context.
 
 ### Parent Epic/Story
-- [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) - {summary} ({status})
+- [PROJ-XXXXX]({{ticket_url}}) - {summary} ({status})
 
 ### Directly Linked Issues
-- [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) - {summary} ({status}) — {link type}
+- [PROJ-XXXXX]({{ticket_url}}) - {summary} ({status}) — {link type}
 
 ### Sibling Stories (same parent)
-- [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) - {summary} ({status})
+- [PROJ-XXXXX]({{ticket_url}}) - {summary} ({status})
 
 ### Related Tickets (from comments & search)
-- [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) - {summary} — {why it's relevant}
+- [PROJ-XXXXX]({{ticket_url}}) - {summary} — {why it's relevant}
 
 ### Key Context from Comments
 {Brief summary of relevant context found in ticket comments — background, constraints, testing notes from the team}
@@ -248,7 +248,7 @@ After writing the test case document to disk:
 3. **Post comment:** Use `addCommentToJiraIssue` MCP tool to post the **full test case document** as a comment on the ticket (everything from the output document: summary, related stories, checklist, priority matrix, detailed test cases, regression checks, and files changed reference)
 4. **Comment format:** Prefix the content with a header: `## Manual QA Test Cases (Auto-Generated)\nGenerated from branch: {branch_name}\n\n` followed by the full document content
 5. **No ticket found:** If no PROJ-XXXXX ticket was found in the branch name or commits, skip Jira posting and inform the user: "⚠️ No Jira ticket found - skipping Jira comment. Test cases saved to: {filepath}"
-6. **Success message:** After posting, show: "✅ Manual QA test cases posted to [PROJ-XXXXX](https://your-org.atlassian.net/browse/PROJ-XXXXX) and saved to: {filepath}"
+6. **Success message:** After posting, show: "✅ Manual QA test cases posted to [PROJ-XXXXX]({{ticket_url}}) and saved to: {filepath}"
 
 ## Key Requirements
 - **Focus on testable behavior:** Generate test cases for observable behavior, not implementation details

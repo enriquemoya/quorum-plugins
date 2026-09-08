@@ -266,6 +266,67 @@ memory_bank:
   seeded: false
   seeded_on: null
 
+# ─── Observed conventions ────────────────────────────────────────────────
+# What this repository DOES, discovered by `/quorum-init` from the code.
+#
+# Named `observed`, not `conventions`, because `roles.conventions` already
+# exists and means something else: a SKILL that knows an organisation's
+# naming and PR conventions. This block holds FACTS measured from this
+# repository's own code. Two different things sharing one word at two
+# nesting levels is how a reader ends up configuring the wrong one.
+#
+# The split between this block and the memory bank is deliberate and worth
+# stating, because getting it backwards is what produced the hardcoding this
+# block removes:
+#
+#   * A convention an agent BRANCHES ON belongs here — it has to be
+#     machine-readable, and an agent that cannot read it will guess, and a
+#     guess is where "if it's a .ts file assume Vitest" comes from.
+#   * A convention an agent READS belongs in the memory bank's
+#     `patterns/conventions.md` — naming, error handling, component shape.
+#     Prose is the right form for those, and a schema field would flatten them.
+#
+# Every entry carries its evidence, for the same reason the stack inventory
+# does: a convention asserted without an example is a preference.
+observed:
+  # How to FIND tests. Globs, not framework names — an agent that needs to
+  # locate the tests for a changed file should never have to know what runs
+  # them.
+  test_files:
+    unit_glob: null           # e.g. "src/**/*.spec.ts", "tests/test_*.py"
+    e2e_glob: null            # e.g. "cypress/e2e/**/*.cy.ts"
+    colocated: null           # true when tests sit beside the source file
+    evidence: null
+
+  # How to READ a test name out of a test file, so a QA handoff can list the
+  # scenarios a spec covers without the publisher knowing any framework.
+  #
+  # A LIST, because a polyglot repo has more than one answer and the right one
+  # depends on the file. First entry whose `applies_to` glob matches the file
+  # wins; when none matches, the scenario list is skipped and said to be
+  # skipped — never guessed at with a regex that happens to be lying around.
+  #
+  # `regex` must have exactly ONE capture group: the test name.
+  #   - applies_to: "**/*.spec.ts"
+  #     regex: "(?:it|test)\\(['\"](.+?)['\"]"
+  #     evidence: "24 matches across 6 spec files"
+  test_name_extraction: []
+
+  # Commands `/quorum-init` actually RAN and saw succeed, in the order it
+  # found them. This is what replaces "probe the usual suspects": the usual
+  # suspects are a stack assumption, and a recorded successful run is not.
+  # Empty means nothing was verified — which is a fine answer that leads to
+  # "skipped, unverified" rather than to a wrong command.
+  verified_commands: []       # [{ purpose: type_check|test_unit|lint, command, evidence }]
+
+  # Anything else discovery established that an agent must branch on. Open
+  # vocabulary on purpose: a fixed field list is itself a stack assumption,
+  # and the next repository will have a convention this schema never imagined.
+  #   - name: migrations-are-generated
+  #     value: true
+  #     evidence: "Migrations/ has 40 files, all with a generated header"
+  other: []
+
 # ─── Commands ────────────────────────────────────────────────────────────
 # Shell commands the orchestrator runs at well-known steps. `null` skips
 # the corresponding step entirely.
@@ -284,6 +345,17 @@ git:
 tracker:
   # Read by whichever skill `roles.tracker` names. With `roles.tracker: null`
   # this block is ignored entirely.
+  # How to build a link to a ticket. THE one place a ticket URL is formed —
+  # `{key}` is substituted, nothing else is assumed. Before this existed, two
+  # skills built Atlassian URLs by hand, which made "works with any tracker"
+  # true of the schema and false of the output.
+  #   Jira:    "https://your-org.atlassian.net/browse/{key}"
+  #   GitHub:  "https://github.com/org/repo/issues/{key}"
+  #   Linear:  "https://linear.app/org/issue/{key}"
+  # `null` renders the key as plain text with no link, which is correct for a
+  # tracker nobody can reach by URL and honest for one nobody configured.
+  browse_url_template: null
+
   # Tracker host (e.g. "your-org.atlassian.net").
   # Used by the PR template command to build ticket
   # links. `null` produces a `YOUR-JIRA-HOST` placeholder so the human
@@ -372,6 +444,52 @@ code_review:
 
 ---
 
+---
+
+## Required fields
+
+Almost every field here is optional, and that is the point: `null` means "skip
+this concern", so a repository that has no tracker, no E2E tier and no linter
+gets a working profile with most of it empty.
+
+But some fields are **required once something else is switched on**. A tracker
+role with no way to build a ticket URL is not a smaller configuration; it is a
+broken one, and it fails at the moment of use rather than at the moment of
+setup. Those conditional requirements are listed here so `/quorum-init` can ask
+about exactly them, and so a hand-edited profile can be checked against the
+same list.
+
+| Field | Required when | What breaks without it |
+|---|---|---|
+| `git.default_base_branch` | always | PRs target the wrong branch, and diffs are computed against the wrong base |
+| `tracker.browse_url_template` | `roles.tracker` is non-null | every ticket reference renders as bare text; nothing links |
+| `tracker.host` | the tracker skill reaches an API | the tracker skill cannot fetch or post; Phase 1 has no ticket |
+| `ticket_prefix` | `roles.tracker` is non-null | ticket keys cannot be recognised in branch names or commit messages |
+| `observed.test_name_extraction` | `roles.qa-handoff` is non-null | the handoff lists zero scenarios from a repository full of tests |
+| `observed.test_files.unit_glob` | `roles.unit-tests-gen` is non-null | the generator cannot tell where its output belongs |
+| `paths.e2e_spec_root` | `roles.e2e-patterns` or `paths.e2e_repo` is set | Phase 5's E2E steps have no directory to scan or scaffold into |
+| `memory_bank.vault.path` | `memory_bank.mode` is `vault` | the bank has no location; notes would fall back into the repo |
+| `memory_bank.vault.project_folder` | `memory_bank.mode` is `vault` | every project writes to the vault root and the vault stops being navigable |
+| `paths.ui_glob` | `code_review.extra_rules` names UI rules | the rules are declared and never applied to anything |
+
+**Nothing is required unconditionally except the first row.** A requirement
+that cannot be satisfied is a requirement that stops the tool installing into
+a repository it was meant to serve, so every other row is reachable only by
+turning something on.
+
+### What happens when a required answer is missing
+
+The profile stays coherent: **the dependent feature is switched off, not left
+half-configured.** If the operator cannot supply a ticket URL template, then
+`roles.tracker` is set to `null` and the profile records why. It does not keep
+a tracker role that will produce broken links on every PR.
+
+This is the rule that makes the whole schema safe to read: a non-null value is
+a promise that the concern is configured. A field that is set while its
+requirements are missing turns every `if non-null` check downstream into a
+lie, which is worse than the concern being absent — absent is handled
+everywhere, half-configured is handled nowhere.
+
 ## Resolution rules
 
 When a shared file contains `{{profile.X}}`:
@@ -383,6 +501,12 @@ When a shared file contains `{{profile.X}}`:
    in the gate summary so the human knows what was skipped.
 4. **`{{role:NAME}}`** is sugar for `{{profile.roles.NAME}}` and, when
    non-null, the value is the skill filename (without `.md`) to delegate to.
+5. **`{{ticket_url}}`** is DERIVED, not a field: substitute the ticket key
+   into `{{profile.tracker.browse_url_template}}`. When the template is null,
+   render the key as plain text with no link. It exists because nine files
+   used to build `https://<host>/browse/<KEY>` by hand, which quietly made
+   every one of them a Jira file — and a repository on GitHub Issues got a
+   link that 404s rather than one that is absent.
 
 ### Worked example
 

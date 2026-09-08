@@ -103,12 +103,27 @@ When the argument is `init`:
    `init` here without that decision defaults to `local` in this repository —
    which is a fine default and a poor surprise, so name it.
 
-3. **Scan for what the profile does not cover:**
-   - Entry points and how the application starts
-   - Module boundaries and what each one owns
-   - Data flow between the main components
-   - Patterns visible in the code — with a file and line for each, because a
-     convention stated without an example is a preference
+3. **Scan only for what the profile does not cover.**
+
+   When `/quorum-init` has run, the profile already holds the component map,
+   the entry points, the datastores, the characteristics, and the
+   machine-readable conventions (test globs, test-name extraction, verified
+   commands). **Read them; do not re-derive them.** This skill used to discover
+   all of that itself, which meant two skills could reach different conclusions
+   about the same repository and neither could tell which was current.
+
+   What is genuinely left for this step:
+   - **Data flow between components** — how a request or a job actually moves
+     through the parts the profile names. The profile records the parts; it
+     does not record the traffic between them.
+   - **The prose conventions Step 2 observed but did not flatten** — naming,
+     error handling, component shape, import ordering. If discovery recorded
+     them, write those; if it did not, derive them here with a file and line
+     for each, because a convention stated without an example is a preference.
+
+   When there is no profile at all, do the whole scan here and say so — the
+   result is a scan rather than a shared record, and nothing downstream will
+   agree with it.
 
 4. **Create initial architecture doc:**
 

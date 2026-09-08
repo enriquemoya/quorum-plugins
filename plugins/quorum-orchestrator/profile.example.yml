@@ -29,6 +29,61 @@ roles:
   docs:                   null    # WHERE long-form notes go. null = the memory
                                   # bank alone. e.g. quorum-obsidian-vault
 
+# ─── Stack inventory ──────────────────────────────────────────────────────
+# Written by /quorum-init from evidence. A RECORD, not a switch — nothing
+# branches on it. Every entry carries the evidence it came from; an entry
+# without evidence is a guess someone typed.
+stack:
+  languages:        []            # [{name, version, evidence}]
+  runtimes:         []            # node 20 / net9.0 / python 3.12
+  package_managers: []            # taken from the LOCKFILE present
+  frameworks:       []            # [{name, version, layer, evidence}]
+  datastores:       []            # what the process connects to, never a host
+  external_services: []           # the dependency, never a credential
+  entry_points:     []            # [{kind, path, evidence}]
+  components:       []            # [{name, path, kind, language, tests, depends_on}]
+  characteristics:
+    monorepo:        null         # null = not examined; false = examined, absent
+    containerised:   null
+    ci:              null
+    infra_as_code:   null
+    api_contract:    null
+    i18n:            null
+    auth:            null         # the MECHANISM, never a provider account
+    migrations:      null
+    generated_code:  null         # must agree with paths.no_hand_edit
+  discovered_on:     null
+  discovered_at_ref: null
+
+# ─── Observed conventions ─────────────────────────────────────────────────
+# Facts measured from THIS repo's code. Named `observed`, not `conventions`,
+# because roles.conventions above already means a SKILL. Machine-readable
+# half only — the prose half lives in the memory bank.
+observed:
+  test_files:
+    unit_glob:  null              # e.g. "src/**/*.spec.ts", "tests/test_*.py"
+    e2e_glob:   null
+    colocated:  null              # true when tests sit beside the source
+    evidence:   null
+  test_name_extraction: []        # [{applies_to, regex (ONE capture group), evidence}]
+                                  # empty = tests could not be parsed; the QA
+                                  # handoff then says "unread" instead of listing
+                                  # nothing and looking complete
+  verified_commands:    []        # [{purpose, command, evidence}] — commands
+                                  # /quorum-init RAN and saw succeed
+  other:                []        # [{name, value, evidence}] — open vocabulary
+
+# ─── Memory bank ──────────────────────────────────────────────────────────
+# WHERE it lives is paths.memory_bank. This says what FLAVOUR, and which vault.
+memory_bank:
+  enabled: true                   # false skips every memory-bank step
+  mode:    local                  # local | obsidian | vault
+  vault:
+    path:           null          # only read when mode: vault
+    project_folder: null
+  seeded:    false
+  seeded_on: null
+
 # ─── Paths ────────────────────────────────────────────────────────────────
 paths:
   ui_glob:        null            # e.g. "src/modules/*/{views,components}/**/*.vue"
@@ -62,6 +117,14 @@ tracker:
                                   # your project actually accepts.
   ticket_prefix: null             # e.g. "PROJ", "ENG" — the key prefix that
                                   # marks a branch or commit as ticketed
+  browse_url_template: null       # THE one place a ticket URL is built.
+                                  # "{key}" is substituted; nothing else is
+                                  # assumed. Jira:   ".../browse/{key}"
+                                  #          GitHub: ".../issues/{key}"
+                                  #          Linear: ".../issue/{key}"
+                                  # null renders the key as plain text — which
+                                  # beats a guessed host that 404s.
+                                  # REQUIRED when roles.tracker is non-null.
   fields: {}                      # tracker-specific field ids the orchestrator
                                   # resolves once at fetch time and passes down,
                                   # so no sub-agent has to know the tracker's

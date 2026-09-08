@@ -58,7 +58,7 @@ Display the result:
 ```
 Branch created: {branch_name}
 Source branch: {source_branch}
-Ticket: PROJ-XXXXX (https://your-org.atlassian.net/browse/PROJ-XXXXX)
+Ticket: PROJ-XXXXX ({{ticket_url}})
 ```
 
 ## Description Formatting Rules

@@ -158,6 +158,47 @@ infrastructure-as-code, an API contract file (OpenAPI/GraphQL/proto), the
 migration tool, i18n, the auth mechanism, and the generated-code globs (which
 must agree with `paths.no_hand_edit` — one list, written twice, will drift).
 
+### Conventions — what the code already does
+
+The memory bank used to derive this on its own, which meant two skills could
+reach different conclusions about the same repository. Discovery does it once,
+here, and the bank consumes the result.
+
+Split what you find by **who uses it**, because the two halves want different
+forms:
+
+**Machine-readable → `observed:` in the profile.** These are the ones an
+agent BRANCHES on, and an agent that cannot read a convention will assume one:
+
+- **Where tests live.** A glob, derived from where test files actually are —
+  `observed.test_files.unit_glob`, `e2e_glob`, and whether they sit beside
+  the source. Take it from the files present, not from the runner's default.
+- **How to read a test's name.** Open several real test files and find the
+  line shape that carries the name. Record it as a regex with exactly one
+  capture group, scoped by an `applies_to` glob, **with the match count you
+  observed**. A polyglot repo needs more than one entry; a repo whose tests you
+  could not parse needs none, and "none" is the honest answer that makes the QA
+  handoff say "unread" instead of listing nothing and looking complete.
+- **Commands that actually run.** Do not record a command because a manifest
+  declares it. Run it. `observed.verified_commands` holds what succeeded,
+  with evidence — that is what lets downstream phases stop probing a list of
+  ecosystems they happen to know.
+
+**Prose → the memory bank, in Step 7.** Naming, error handling, component
+shape, import ordering, how state is organised, what a module's public surface
+looks like. These are read by a human or an agent about to write code, and
+flattening them into schema fields would lose exactly what makes them useful.
+
+**Cite a file and line for every convention, in both halves.** A convention
+without an example is a preference, and the difference matters most to the
+session that inherits it and cannot re-derive it. Three real citations beat
+twelve confident assertions.
+
+**Report frequency, not just existence.** "18 of 20 spec files use `describe`
++ `it`" is a convention; "one file does" is a file. Say which you found, and
+where a repository is genuinely inconsistent, record that as the finding rather
+than picking the more common half and presenting it as the rule.
+
 **`null` and `false` are different answers.** `null` means the concern was not
 examined; `false` means it was examined and is absent. "No CI" that nobody
 checked and "no CI" that someone confirmed lead to different next steps, so
@@ -198,22 +239,89 @@ a table nobody can audit. Note the last two rows: `false` and `null` occupy the
 same column and mean opposite things, so render them differently or the
 distinction the schema draws dies in the report.
 
-## Step 4 — Ask about what is left
 
-Ask only about fields you could not settle from evidence. Group the questions;
-do not walk the operator through the schema field by field.
+### Say which bundled skills this repository will use
 
-Typical remainder: the tracker host and ticket prefix, the primary stack when a
-repository is genuinely dual, whether E2E lives elsewhere, and any component
-whose kind the tree did not make obvious.
+End the report with the shortlist, because a marketplace of four plugins
+installs a lot of things and most of them are irrelevant to any one
+repository:
 
-The memory bank is NOT part of this round. It is a decision with a trade rather
-than a fact you failed to find, so it gets Step 6 to itself instead of a line in
-a list of leftovers.
+```
+Will be used:
+  quorum-gen-unit-tests-vitest    roles.unit-tests-gen
+  quorum-code-review              always
+  quorum-memory-bank              memory_bank.enabled
 
-For every question, say what happens if they skip it. Most fields are optional
-and null means "this concern does not apply" — an operator who knows that can
-skip three questions instead of inventing three answers.
+Inert here (no role points at them — installed, never invoked):
+  quorum-gen-unit-tests-dotnet9   no .NET in this repo
+  quorum-gen-unit-tests-jasmine   no Jasmine/Karma configured
+  quorum-sql-review               no migrations directory found
+
+Would be needed, not bundled:
+  a pytest generator               pytest is configured; roles.unit-tests-gen
+                                   stays null and Phase 5 skips generation
+```
+
+The third group is the one that matters. A role pointing at a skill that does
+not exist fails at the moment of use, which is the worst time to find out — so
+leave the role `null`, name the gap here, and let the operator decide whether
+to write the generator or live without that step. Do not force the closest
+bundled match: a Vitest generator aimed at a pytest suite produces confident
+nonsense.
+
+Nothing needs uninstalling. A skill no role names is never invoked; it costs
+nothing but the confusion of appearing in a list, and naming it inert here is
+what removes that.
+
+## Step 4 — Run the questionnaire
+
+Not "ask about what is left" — a questionnaire, driven by the **Required
+fields** table in `PROFILE_SCHEMA.md`. That table is the source of truth for
+what has to be answered; this step walks it.
+
+The rule it encodes: a field is required **only once something else is switched
+on**. Discovery decides most of those switches, so the questionnaire is short
+in a simple repository and long in a rich one — which is the right shape, and
+not something to shorten by guessing.
+
+**Build the question set:**
+
+1. Take every row of the Required-fields table whose *"required when"*
+   condition now holds, given what Steps 1-3 established.
+2. Drop the rows discovery already settled with evidence.
+3. What remains is the questionnaire. Ask it in ONE grouped pass — a tracker
+   block, an E2E block, a testing block — never field-by-field down the schema.
+
+**For every question, state three things:**
+
+- what the value is for,
+- what happens if they skip it,
+- and the default, when there is one worth defaulting to.
+
+An operator who is told "skip this and ticket links render as plain keys" can
+skip three questions confidently. One who is asked "tracker host?" with no
+context invents an answer, and an invented answer is indistinguishable from a
+measured one once it is in the file.
+
+**Ask for the shape, not the vendor.** `tracker.browse_url_template` is
+`https://…/{key}`; it is not "your Jira host". A question phrased around one
+vendor gets a vendor-shaped answer, and the operator on GitHub Issues or Linear
+either answers wrong or concludes the tool is not for them. Show two or three
+concrete templates from different trackers so the shape is obvious.
+
+**A skipped required answer switches its feature OFF.** This is the part that
+keeps the profile honest: if the operator cannot supply the ticket URL
+template, set `roles.tracker: null` and say so — do not leave a tracker role
+that will emit broken links on every PR. Half-configured is worse than absent,
+because absent is handled everywhere downstream and half-configured is handled
+nowhere.
+
+Record every skip and its consequence in the Step 3 report, so the operator
+sees the shape of what they turned off rather than discovering it three phases
+later.
+
+**The memory bank is not part of this round.** It is a decision with a trade,
+not a fact you failed to find, so it gets Step 6 to itself.
 
 ## Step 5 — Write the profile
 
@@ -298,11 +406,14 @@ rather than leaving a skeleton:
   languages, runtimes, frameworks, the component map, entry points, datastores,
   and the characteristics. This is the discovery report in its durable form,
   and it is the reason the inventory was recorded in the profile: the two must
-  say the same thing.
-- **`patterns/conventions.md`** — what the code actually does. Test file
-  naming, component structure, import ordering, error handling. Cite the files
-  you read for each one; a convention asserted without an example is a
-  preference, and the next session cannot tell them apart.
+  say the same thing. If they diverge later, the profile is the machine's
+  answer and this document is the human's — reconcile rather than picking.
+- **`patterns/conventions.md`** — the PROSE half of the conventions found in
+  Step 2: naming, component structure, import ordering, error handling, how
+  state is organised. Write what Step 2 observed, with its citations. Do not
+  re-scan for them here — a second pass produces a second opinion, and two
+  documents disagreeing about the same repository is the failure this
+  consolidation removes.
 - **`decisions/`** — empty unless discovery found a decision already written
   down somewhere (an ADR folder, a design doc). Do not invent ADRs for choices
   you merely observed; "uses Postgres" is a fact for `architecture/`, not a
