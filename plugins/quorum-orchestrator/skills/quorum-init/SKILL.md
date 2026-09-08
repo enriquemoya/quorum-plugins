@@ -395,7 +395,58 @@ If the operator declines a bank, write `enabled: false` and stop. That is a
 recorded decision; leaving the block out entirely means the next session asks
 again.
 
-## Step 7 — Take the first step
+## Step 7 — Scaffold the constitution
+
+The pipeline's audits cannot run without one. `quorum-audit` stops and routes
+back here when `{{profile.governance.constitution}}` is absent — it can still
+check traceability, but not whether the work violates anything this project
+refuses to do, and a verdict silently missing half the audit is worse than none.
+
+Copy the plugin's `governance/rules/CONSTITUTION.template.md` to
+`.claude/governance/rules/CONSTITUTION.md`. **It ships with no articles**, and
+that is the one file scaffolded into the repo — everything else in
+`governance/` stays in the plugin, because a repo-local copy of a file nobody
+edited goes stale silently.
+
+Then ask for the articles.
+
+**Ask for refusals, not values.** "What must this system never do?" gets an
+article. "What do we care about?" gets a mission statement, and a mission
+statement fires on nothing.
+
+The test to apply to every candidate, and to say out loud:
+
+> Could an auditor point at a file and a line and say *"this violates
+> article N"*?
+
+If not, it is a convention and belongs in the memory bank. Recording it here
+instead gives it blocking weight it cannot carry, and an auditor that fires on
+unfalsifiable articles is one people learn to override.
+
+Three prompts that tend to surface real ones:
+
+- **What would make you refuse to ship, however good the code was?**
+- **What has gone wrong before that must not recur?** — an incident is the
+  best source of an article, because the consequence is already known.
+- **What does this domain forbid?** Regulatory, contractual, or safety
+  constraints are articles by construction; they were written by somebody else
+  and this project only has to not violate them.
+
+Write **few**. A constitution with twenty articles is one nobody reads, and
+every article is blocking in both audits and both autonomy modes. Starting with
+two that matter beats twenty that mostly do not.
+
+For each, record `Applies to: all | spec | ticket`. A hotfix routed through the
+ticket path is not shaping the product, and holding it to product-shaping
+articles produces noise rather than safety. Default `all`; narrow with a reason.
+
+**An empty constitution is a valid answer, said out loud.** Write the file with
+no articles, tell the operator the audits will check traceability and the data
+rules but nothing project-specific, and record that they chose this. A file
+with articles nobody meant is worse than a file with none — the first misfires
+on real work, the second only under-checks.
+
+## Step 8 — Take the first step
 
 Ask before this; it writes files.
 
