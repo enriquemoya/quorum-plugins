@@ -55,6 +55,28 @@ stack:
   discovered_on:     null
   discovered_at_ref: null
 
+# ─── Autonomy ─────────────────────────────────────────────────────────────
+# human = stop at every gate. agent = decide routine outcomes from the matrix
+# in PIPELINE.md, escalate the rest. No --agent flag: `--human` forces a single
+# run to stop, which is the direction that is safe to make easy.
+autonomy:
+  mode: human                     # human | agent
+  agent:
+    max_iterations_per_unit: 3    # audit rounds per UNIT, both gates together
+    queue:
+      on_escalation: park-and-continue
+      retry_parked: true
+
+# ─── Governance ───────────────────────────────────────────────────────────
+# Plugin ships defaults; a file present in the repo overrides the default of
+# the same name. Only the constitution is scaffolded at install.
+governance:
+  constitution:  ".claude/governance/rules/CONSTITUTION.md"   # REQUIRED for audits
+  rules_dir:     ".claude/governance/rules"
+  workflows_dir: ".claude/governance/workflows"
+  specs_dir:     ".claude/specs"
+  runs_dir:      ".claude/runs"
+
 # ─── Observed conventions ─────────────────────────────────────────────────
 # Facts measured from THIS repo's code. Named `observed`, not `conventions`,
 # because roles.conventions above already means a SKILL. Machine-readable

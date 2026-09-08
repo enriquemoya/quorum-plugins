@@ -266,6 +266,64 @@ memory_bank:
   seeded: false
   seeded_on: null
 
+# ─── Autonomy ─────────────────────────────────────────────────────────────
+# How much the pipeline asks. `human` stops at every gate; `agent` decides the
+# routine outcomes from the decision matrix in PIPELINE.md and escalates the
+# rest.
+#
+# There is no `--agent` flag. Switching autonomy ON is a standing decision
+# recorded here; a per-run flag would make it an accident. `--human` forces a
+# single run to stop at every gate, which is the direction that is safe to make
+# easy.
+autonomy:
+  mode: human               # human | agent
+
+  # The frontier is fixed, not configured: everything before PRD_READY is
+  # human in both modes. An agent that writes the PRD defines the problem AND
+  # the solution, which is where an autonomous system errs most expensively and
+  # least visibly.
+
+  agent:
+    # Audit rounds allowed per UNIT, both gates together — not per gate.
+    # Three scope-audit rounds therefore leave none for the implementation
+    # audit, and that unit reaches STUCK without ever implementing. Intended: a
+    # scope revised three times without converging is a PRD problem, and
+    # spending the rest of the budget on code built from it wastes the run.
+    #
+    # The counter lives in status.yml. An agent that counts its own iterations
+    # has no cap, because a fresh context starts at zero and the loop the cap
+    # exists to stop is what produces fresh contexts.
+    max_iterations_per_unit: 3
+
+    # Batch behaviour for `/quorum-orchestrate --queue`.
+    queue:
+      # Run every eligible unit and report, rather than halting on the first
+      # escalation. Halting early wastes an unattended session; the report is
+      # what makes the run reviewable.
+      on_escalation: park-and-continue    # park-and-continue | halt
+      # Retry parked units in a second pass — a human may resolve one while the
+      # queue is still running. Ends when a full pass advances nothing.
+      retry_parked: true
+
+# ─── Governance ───────────────────────────────────────────────────────────
+# Where the rules that judge this project live. The plugin ships defaults;
+# anything present in the consumer repo OVERRIDES the plugin default of the
+# same name. Nothing is copied at install except the constitution template — a
+# repo-local copy of a file nobody edited is a file that goes stale silently.
+governance:
+  # The project's articles. REQUIRED before any audit can run: an audit with no
+  # constitution can still check traceability, but it cannot check whether the
+  # work violates anything this project refuses to do.
+  constitution: ".claude/governance/rules/CONSTITUTION.md"
+
+  # Optional overrides. Empty means "use the plugin's defaults for everything".
+  rules_dir:     ".claude/governance/rules"
+  workflows_dir: ".claude/governance/workflows"
+
+  # Where the pipeline keeps units of work and the evidence about them.
+  specs_dir: ".claude/specs"
+  runs_dir:  ".claude/runs"
+
 # ─── Observed conventions ────────────────────────────────────────────────
 # What this repository DOES, discovered by `/quorum-init` from the code.
 #

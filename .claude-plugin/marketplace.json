@@ -12,19 +12,20 @@
     {
       "name": "quorum-orchestrator",
       "source": "./plugins/quorum-orchestrator",
-      "description": "End-to-end ticket delivery orchestrator: fetch \u2192 analyze \u2192 plan \u2192 implement \u2192 test \u2192 review \u2192 PR, with a human approval gate at every phase. Stack-agnostic via profile.yml; depends on quorum-tooling.",
-      "version": "1.4.0",
+      "description": "Governed delivery pipeline with triage, product shaping, two audit gates and a state machine in status.yml. Runs supervised or autonomous, one unit or a batch. Stack-agnostic via profile.yml.",
+      "version": "1.5.0",
       "author": {
         "name": "Enrique Moya"
       },
       "category": "productivity",
       "keywords": [
         "orchestrator",
-        "delivery",
         "pipeline",
-        "workflow",
-        "jira",
-        "tickets"
+        "governance",
+        "prd",
+        "spec",
+        "audit",
+        "autonomy"
       ]
     },
     {
