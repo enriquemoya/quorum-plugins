@@ -251,6 +251,42 @@ def _manifests() -> None:
             fail(rel(market_path), f"lists {name}, which has no plugin.json")
 
 
+@check("artefact homes — durable ones are committed, transit ones are not")
+def _artefact_homes() -> None:
+    """A blanket `.claude/` ignore leaves the pipeline running and recording
+    nothing.
+
+    Found by dogfooding: this repository ignored `.claude/`, so the profile,
+    the constitution and three units of work were written, were correct, and
+    were invisible to every other checkout. Every stage worked, which is what
+    made it silent.
+
+    The two halves are deliberate opposites. Durable artefacts are committed
+    with the code they govern; transit artefacts belong to the tracker or the
+    PR and must never be.
+    """
+    if not (ROOT / ".claude").exists():
+        return  # not a consumer of itself; nothing to check
+
+    durable = [".claude/profile.yml", ".claude/governance", ".claude/specs", ".claude/runs"]
+    transit = [".claude/prompts", ".claude/validations", ".claude/pr-templates", ".claude/qa-handoff"]
+
+    def ignored(path: str) -> bool:
+        return (
+            subprocess.run(
+                ["git", "-C", str(ROOT), "check-ignore", "-q", path], capture_output=True
+            ).returncode
+            == 0
+        )
+
+    for path in durable:
+        if (ROOT / path).exists() and ignored(path):
+            fail(path, "is gitignored, but it is the record this pipeline keeps")
+    for path in transit:
+        if (ROOT / path).exists() and not ignored(path):
+            fail(path, "is committed, but its durable home is the tracker or the PR")
+
+
 # --------------------------------------------------------------------------
 # 6. frontmatter
 # --------------------------------------------------------------------------

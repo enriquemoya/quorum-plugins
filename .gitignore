@@ -2,5 +2,18 @@
 node_modules/
 __pycache__/
 *.pyc
-.claude/
+.claude/*
+# Durable artefacts are committed with the code they govern: the profile the
+# pipeline resolves, the articles it enforces, the units of work and the
+# evidence behind each verdict. Ignoring them would make status.yml a source of
+# truth only this checkout can see.
+!.claude/profile.yml
+!.claude/governance/
+!.claude/specs/
+!.claude/runs/
+# Transit artefacts stay out — their durable home is the tracker or the PR.
+.claude/prompts/
+.claude/validations/
+.claude/pr-templates/
+.claude/qa-handoff/
 *.log

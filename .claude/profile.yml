@@ -1,0 +1,93 @@
+# .claude/profile.yml — written by /quorum-init reading this repository.
+# This marketplace is a consumer of its own orchestrator: the pipeline that
+# ships here is the pipeline that builds here.
+
+roles:
+  # Nothing bundled fits a repository whose product is markdown. Null means
+  # "skip this concern" and every stage announces the skip.
+  primary-stack-expert: null
+  unit-tests-gen:       null    # ← the suites are hand-written scripts, not generated
+  e2e-patterns:         null
+  tracker:              null    # ← no tracker configured: the ticket path is unavailable
+  qa-handoff:           null
+  conventions:          null
+
+stack:
+  languages:
+    - { name: Markdown, version: null, evidence: "112 of 132 tracked files" }
+    - { name: Python,   version: "3.12", evidence: "scripts/check.py, scripts/e2e.py; stdlib only" }
+    - { name: PowerShell, version: null, evidence: "3 .ps1 adapters under quorum-tooling skills" }
+  runtimes: [python3]
+  package_managers: []          # no manifest: the scripts import stdlib only
+  frameworks: []
+  datastores: []
+  external_services: []
+  entry_points:
+    - { kind: cli, path: scripts/check.py, evidence: "structural checks; run in CI" }
+    - { kind: cli, path: scripts/e2e.py,   evidence: "end-to-end walk; run in CI" }
+  components:
+    - { name: quorum-orchestrator,    path: plugins/quorum-orchestrator,    kind: lib, language: Markdown, depends_on: [quorum-tooling] }
+    - { name: quorum-tooling,         path: plugins/quorum-tooling,         kind: lib, language: Markdown, depends_on: [] }
+    - { name: quorum-workflows,       path: plugins/quorum-workflows,       kind: lib, language: Markdown, depends_on: [] }
+    - { name: quorum-integration-kit, path: plugins/quorum-integration-kit, kind: lib, language: Markdown, depends_on: [] }
+  characteristics:
+    monorepo:       { tool: claude-plugin-marketplace, workspaces: [plugins/*] }
+    containerised:  false       # looked for, absent
+    ci:             { provider: github-actions, config: .github/workflows/check.yml, jobs: [structural] }
+    infra_as_code:  false
+    api_contract:   false
+    i18n:           false
+    auth:           null        # not examined — nothing here authenticates
+    migrations:     false
+    generated_code: false
+  discovered_on: "2026-09-08"
+
+observed:
+  test_files:
+    unit_glob: null             # no conventional test files; the suites ARE the tests
+    e2e_glob:  null
+    colocated: null
+    evidence: "scripts/{check,e2e}.py hold every assertion; no test file convention exists"
+  test_name_extraction: []      # nothing to parse: assertions are function calls, not named cases
+  verified_commands:
+    - { purpose: test_unit, command: "python3 scripts/check.py", evidence: "ran, exit 0, 8 checks" }
+    - { purpose: test_unit, command: "python3 scripts/e2e.py",   evidence: "ran, exit 0, 22 assertions" }
+  other:
+    - { name: product-is-prose, value: true, evidence: "112/132 files are markdown; nothing compiles, so every guarantee needs an assertion in a script" }
+
+memory_bank:
+  enabled: true
+  mode: local
+  vault: { path: null, project_folder: null }
+  seeded: false
+  seeded_on: null
+
+governance:
+  constitution:  ".claude/governance/rules/CONSTITUTION.md"
+  rules_dir:     ".claude/governance/rules"
+  workflows_dir: ".claude/governance/workflows"
+  specs_dir:     ".claude/specs"
+  runs_dir:      ".claude/runs"
+
+autonomy:
+  mode: agent
+  agent:
+    max_iterations_per_unit: 3
+    queue: { on_escalation: park-and-continue, retry_parked: true }
+
+paths:
+  memory_bank:  ".claude/memory-bank"
+  no_hand_edit: []
+  reviews:      ".claude/reviews"
+
+commands:
+  type_check: null              # nothing to type-check
+  test_unit:  "python3 scripts/check.py && python3 scripts/e2e.py"
+  lint:       null              # no linter configured
+
+git:
+  default_base_branch: main
+
+tracker:
+  browse_url_template: null     # REQUIRED only when roles.tracker is non-null
+  ticket_prefix: null

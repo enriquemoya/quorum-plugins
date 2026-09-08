@@ -1,0 +1,17 @@
+slug: implement-phases
+origin: spec
+complexity: complex
+status: DRAFT_PRD
+created: 2026-09-08
+updated: 2026-09-08
+history:
+  - { at: 2026-09-08T10:00Z, from: null, to: TRIAGE, actor: human, note: "created — dogfood run: the pipeline builds its own missing pieces" }
+  - { at: 2026-09-08T10:05Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (roles.tracker null, ticket path unavailable); complexity complex" }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: human

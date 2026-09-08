@@ -397,6 +397,34 @@ If the operator declines a bank, write `enabled: false` and stop. That is a
 recorded decision; leaving the block out entirely means the next session asks
 again.
 
+**Check that the durable artefacts are not gitignored.** `.claude/` is a
+common blanket ignore, and under one the pipeline still runs — it writes
+`status.yml`, the audits write their verdicts, and none of it is committed. A
+source of truth only one checkout can see is not one, and the failure is silent
+because every stage works.
+
+Run the check rather than reading the file: `git check-ignore -v` on each of
+`profile.yml`, the governance dir, the specs dir and the runs dir. Where one is
+ignored, show the rule that ignores it and offer the narrowing:
+
+```gitignore
+.claude/*
+!.claude/profile.yml
+!.claude/governance/
+!.claude/specs/
+!.claude/runs/
+.claude/prompts/          # transit: durable home is the tracker or the PR
+.claude/validations/
+.claude/pr-templates/
+.claude/qa-handoff/
+```
+
+The two halves pull in opposite directions and both are deliberate. Durable
+artefacts are committed with the code they govern; transit artefacts have their
+home elsewhere and must never be. The orchestrator already appends the second
+half; nobody was checking the first, which is how a repo can be fully wired and
+keep no record.
+
 ## Step 7 — Scaffold the constitution
 
 The pipeline's audits cannot run without one. `quorum-audit` stops and routes
