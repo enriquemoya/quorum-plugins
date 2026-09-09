@@ -385,6 +385,55 @@ def _fences() -> None:
 # --------------------------------------------------------------------------
 
 
+@check("install paths — the parent is a search root, its children are not")
+def _install_paths() -> None:
+    """A path naming a directory INSIDE ~/.claude/plugins is the defect.
+
+    The parent is the one stable thing: it survived the layout below it
+    changing from ``cache/<marketplace>/<plugin>/<hash>/`` to
+    ``marketplaces/<marketplace>/plugins/<plugin>/``. Naming a child pins this
+    repository to someone else's internal layout, which was already wrong in
+    eight tracked files before anything checked for it — and wrong silently,
+    because a Glob rooted at a directory that does not exist returns no
+    matches rather than an error.
+
+    Getting the parent/child distinction wrong here fails every runtime file
+    or none of them, so it is the whole check.
+    """
+    # ``~``/``$HOME``/``%USERPROFILE%``/an absolute home, then .claude/plugins,
+    # then a separator and at least one more name component.
+    # The home prefix is OPTIONAL on purpose. The phrasing this check was
+    # written for was "your home `.claude/plugins/cache` directory" — no tilde,
+    # no slash, the home named in prose instead. A first version required the
+    # prefix and let that exact sentence through; it was caught by reverting the
+    # fix and watching the check stay green.
+    child = re.compile(
+        r"\.claude[/\\]plugins[/\\]([A-Za-z0-9_.-]+)"
+    )
+    # The two documents whose job is to describe the layout. The allowance is
+    # narrowed to the shape actually observed: the expelled ``cache`` spelling
+    # cannot come back here either.
+    allowed = {"INSTALL.md": {"marketplaces"}, "docs/plugin-authoring.md": {"marketplaces"}}
+    # This file must contain the pattern it forbids. A guard in this repository
+    # already shipped once without excluding itself, and passed while untracked.
+    myself = Path(__file__).name
+
+    for path in tracked():
+        if path.name == myself:
+            continue
+        body = text(path)
+        if body is None:
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        permitted = allowed.get(rel, set())
+        for n, line in enumerate(body.splitlines(), 1):
+            for m in child.finditer(line):
+                seg = m.group(1)
+                if seg in permitted:
+                    continue
+                fail(f"{rel}:{n}", f"names '{seg}' inside ~/.claude/plugins — Glob the parent instead")
+
+
 @check("example profile — parses, and covers every schema block")
 def _example_profile() -> None:
     """The example is what people copy, so a block missing from it is a block

@@ -1,0 +1,43 @@
+slug: installed-paths
+origin: spec
+complexity: medium
+status: IN_PROGRESS
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T02:30Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
+      note: "Tasks implemented. The scope audit escalated and rewrote the approach
+             twice before anything was edited. First draft — correct cache/ to
+             marketplaces/ — rejected: the layout changed once silently already.
+             Second draft — echo $CLAUDE_PLUGIN_ROOT with a Glob fallback — rejected
+             on the sharper ground that in these layers an empty echo is
+             indistinguishable from the variable never being injected, so the primary
+             branch is unfalsifiable and the fallback fires silently: the original
+             defect in a new shape. What shipped is a Glob rooted at the parent, with
+             both the no-match and the multiple-match STOP. Verifying the second draft
+             also disproved its premise: the platform binary substitutes that variable
+             in hook commands and MCP config only, and the documentation example that
+             suggested otherwise is a shell execution, not prose substitution." }
+  - { at: 2026-09-09T02:00Z, from: DRAFTING_TASKS, to: SCOPE_AUDIT, actor: agent,
+      note: "scope audit dispatched, three families, short brief. The seat that timed
+             out three times on a 189-line brief returned on this one — recorded as an
+             observation, not a rule; n is one." }
+  - { at: 2026-09-09T01:30Z, from: DRAFT_PRD, to: DRAFTING_TASKS, actor: agent, note: "requirements and tasks written" }
+  - { at: 2026-09-09T01:25Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity medium — mechanical edit, the judgement is which mechanism per layer" }
+  - { at: 2026-09-09T01:20Z, from: null, to: TRIAGE, actor: agent,
+      note: "created by the installation wave. Eight tracked files root a Glob at
+             ~/.claude/plugins/cache/, which does not exist; installed plugins live
+             under plugins/marketplaces/<mkt>/plugins/<plugin>/ with no version
+             segment. /quorum-implement cannot locate its own orchestrator agent in a
+             real install. First defect found by checking against an installed
+             marketplace rather than a checkout." }
+in_flight: true
+audit_iterations: 1
+last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u6-scope,
+              governance_version: null, panel: cpd, panel_reason: "three families",
+              evidence_digest: ".claude/runs/installed-paths/u6-scope" }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: agent

@@ -75,25 +75,48 @@ git clone https://github.com/enriquemoya/quorum-plugins.git ~/dev/quorum-plugins
 /plugin marketplace add ~/dev/quorum-plugins
 ```
 
-Claude Code serves plugins from a **cache**, not from your working tree. After
-editing a plugin, sync it and reload, or the change is a silent no-op:
+Claude Code serves plugins from an installed copy, not from your working tree.
+After editing a plugin, sync that copy and reload, or the change is a silent
+no-op.
+
+**Do not type the destination from memory.** The layout under
+`~/.claude/plugins` has changed at least once — an earlier shape was
+`cache/<marketplace>/<plugin>/<hash>/`, the shape observed now is
+`marketplaces/<marketplace>/plugins/<plugin>/` with no version or hash segment.
+Anything written here about the inside of that directory is **observed, not
+contracted**: it was true when it was checked and nothing in this repository
+would notice if it stopped being.
+
+So find it rather than construct it:
 
 ```bash
-cp -R ~/dev/quorum-plugins/plugins/<plugin>/* \
-      ~/.claude/plugins/cache/quorum-plugins/<plugin>/<version>/
+# POSIX
+DEST=$(dirname "$(find ~/.claude/plugins -path '*/<plugin>/*/.claude-plugin/plugin.json' | head -1)")
+[ -n "$DEST" ] && cp -R ~/dev/quorum-plugins/plugins/<plugin>/* "$(dirname "$DEST")/"
 ```
-
-Then restart Claude Code. Windows equivalent:
 
 ```powershell
-Copy-Item "$HOME\dev\quorum-plugins\plugins\<plugin>\*" `
-          "$env:USERPROFILE\.claude\plugins\cache\quorum-plugins\<plugin>\<version>\" `
-          -Recurse -Force
+# Windows
+$m = Get-ChildItem "$env:USERPROFILE\.claude\plugins" -Recurse -Filter plugin.json |
+     Where-Object { $_.FullName -like "*\<plugin>\*" }
+if ($m.Count -eq 1) {
+  Copy-Item "$HOME\dev\quorum-plugins\plugins\<plugin>\*" $m[0].Directory.Parent.FullName -Recurse -Force
+}
 ```
 
+If the search returns **nothing**, stop — the plugin is not installed, and
+copying into a guessed path produces a directory that looks right and loads
+never. If it returns **more than one**, stop and look: two layouts can coexist
+under that root, and syncing into one while Claude Code reads the other is the
+same silent no-op with extra steps.
+
+Then restart Claude Code.
+
 Bump the plugin's `version` in its `.claude-plugin/plugin.json` when you change
-behavior — the cache path is version-keyed, and a stale path is the usual reason
-an edit appears not to take.
+behaviour. That is worth doing for the marketplace listing and for anyone
+reading a diff — note that it is **not** what makes an edit take effect, which
+an earlier version of this document claimed on the strength of a version-keyed
+path that the observed layout does not have.
 
 ## Troubleshooting
 

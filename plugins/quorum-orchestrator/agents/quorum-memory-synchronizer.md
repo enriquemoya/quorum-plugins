@@ -155,7 +155,7 @@ Clean up outdated information.
 
 ### Step 5: Normalize to Obsidian
 
-After updating notes, upgrade the bank in place so links and frontmatter stay Obsidian-navigable. Resolve the adapter — Glob for `**/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1` (fallback: `~/.claude/plugins/cache/quorum-plugins/quorum-tooling/<version>/skills/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1`) — then run it on the bank:
+After updating notes, upgrade the bank in place so links and frontmatter stay Obsidian-navigable. Resolve it: Glob `path` `~/.claude/plugins` — the **parent**, never a directory inside it — with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1`. The middle `**` is load-bearing: one layout puts a version segment between the plugin and its subdirectory. Exactly one match: use it. None, or more than one: STOP and report what you found — two layouts can coexist under that root, and picking one silently is how the wrong file gets read confidently — then run it on the bank:
 
 ```
 pwsh -NoProfile -File <adapter> -Path {{profile.paths.memory_bank}}

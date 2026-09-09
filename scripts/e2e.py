@@ -395,6 +395,61 @@ def test_panel_detects_configured_but_unreachable() -> None:
     )
 
 
+def test_bundled_files_are_resolved_not_guessed() -> None:
+    """Six files locate a bundled file at run time. All six must do it the same way.
+
+    An earlier draft of this fix would have repaired the command and left the
+    other five resolving to nothing — the literal fallback deleted, the Glob
+    still rooted nowhere. The uniformity is the point, so it is asserted per
+    file rather than in aggregate.
+
+    The middle ``**`` is checked because a smoke run showed a narrower pattern
+    finding one layout while a second candidate sat unseen under the same root:
+    a quieter version of the defect this replaced.
+    """
+    runtime = [
+        ("plugins/quorum-orchestrator/commands/quorum-implement.md", "quorum-orchestrator"),
+        ("plugins/quorum-orchestrator/agents/quorum-decision-documenter.md", "quorum-memory-bank"),
+        ("plugins/quorum-orchestrator/agents/quorum-memory-synchronizer.md", "quorum-memory-bank"),
+        ("plugins/quorum-orchestrator/agents/quorum-pattern-documenter.md", "quorum-memory-bank"),
+        ("plugins/quorum-tooling/skills/quorum-memory-bank/SKILL.md", "quorum-memory-bank"),
+        ("plugins/quorum-workflows/skills/quorum-agent-journal/SKILL.md", "quorum-obsidian-vault"),
+    ]
+    for rel, plugin in runtime:
+        body = flat((ROOT / rel).read_text(encoding="utf-8"))
+        short = rel.rsplit("/", 1)[-1]
+        if short == "SKILL.md":
+            short = rel.rsplit("/", 2)[-2] + "/SKILL.md"
+        assert_that(
+            "~/.claude/plugins`" in body or "~/.claude/plugins " in body,
+            f"{short} roots its search at the parent",
+            "not at a directory inside it",
+        )
+        assert_that(
+            f"**/{plugin}/**/" in body,
+            f"{short} keeps the middle ** in its pattern",
+            "a version segment can sit between the plugin and its subdirectory",
+        )
+        assert_that(
+            "STOP and report" in body,
+            f"{short} stops rather than guessing",
+            "no match, or more than one",
+        )
+    for rel, _ in runtime:
+        body = flat((ROOT / rel).read_text(encoding="utf-8")).lower()
+        short = rel.rsplit("/", 1)[-1]
+        if short == "SKILL.md":
+            short = rel.rsplit("/", 2)[-2] + "/SKILL.md"
+        # Lower-cased on purpose: both "More than one match:" and "or more than
+        # one:" are correct prose, and an assertion that pins the capitalisation
+        # tests the sentence position rather than the rule.
+        assert_that(
+            "more than one" in body,
+            f"{short} names the multiple-match case",
+            "two layouts can coexist under one root",
+        )
+
+
 def main() -> int:
     keep = "--keep" in sys.argv
     bed = Path(tempfile.mkdtemp(prefix="quorum-e2e-"))
@@ -411,6 +466,7 @@ def main() -> int:
         test_governance_corrections()
         test_preconditions_are_measured()
         test_panel_detects_configured_but_unreachable()
+        test_bundled_files_are_resolved_not_guessed()
 
         width = max(len(n) for _, n, _ in RESULTS)
         for ok, name, detail in RESULTS:

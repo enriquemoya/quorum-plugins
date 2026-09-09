@@ -90,10 +90,20 @@ If you find yourself about to skip a phase or gate, STOP and re-read the agent d
 1. Validate the ticket key format (`PROJ-NNNNN`)
 2. Check for `--resume` flag → look for existing artifacts
 3. Parse optional flags
-4. **Read the orchestrator agent definition** — this is your operating manual for the entire pipeline. It ships **inside the `quorum-orchestrator` plugin** and is **NOT** present in the consumer repo, so do **not** try to read `.claude/agents/quorum-orchestrator.md` from the repo root — that path does not exist there and the read will fail. Locate the bundled file with a Glob **rooted at the plugin cache** — a default, project-rooted Glob will NOT find it (the plugin is installed under your home directory, outside the repo):
-   - Glob `path`: your home `.claude/plugins/cache` directory (e.g. `C:\Users\<you>\.claude\plugins\cache`; macOS/Linux `~/.claude/plugins/cache`)
-   - Glob `pattern`: `**/quorum-orchestrator/**/agents/quorum-orchestrator.md`
-   - Read the single match (e.g. `…/.claude/plugins/cache/quorum-plugins/quorum-orchestrator/<version>/agents/quorum-orchestrator.md`). The `<version>` and marketplace-name segments are resolved by the Glob, so this stays version- and install-agnostic.
+4. **Read the orchestrator agent definition** — this is your operating manual for the entire pipeline. It ships **inside the `quorum-orchestrator` plugin** and is **NOT** present in the consumer repo, so do **not** try to read `.claude/agents/quorum-orchestrator.md` from the repo root — that path does not exist there and the read will fail. Resolve it:
+   - Glob `path`: `~/.claude/plugins` — the **parent**. Do not name a directory
+     inside it. The layout below it has already changed once (`cache/` became
+     `marketplaces/`), silently, and a path naming either is correct until it
+     is not.
+   - Glob `pattern`: `**/quorum-orchestrator/**/agents/quorum-orchestrator.md`.
+     The `**` in the middle is load-bearing: one layout puts a version segment
+     between the plugin and `agents`, and a pattern without it finds the other
+     layout only — confidently, while a second candidate sits unseen.
+   - **Exactly one match:** read it.
+   - **No match:** STOP and report. Never guess a path.
+   - **More than one match:** STOP and report every one. Two layouts can
+     coexist under the same root, and choosing between them silently is how the
+     wrong file gets read with confidence.
 
 ### Execution
 

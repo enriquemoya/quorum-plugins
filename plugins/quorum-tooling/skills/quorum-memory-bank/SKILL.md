@@ -540,7 +540,7 @@ It does three things:
 
 ### Step 1: Resolve the adapter script
 
-The script ships with this skill. Resolve its path at runtime — **never type a literal cache path:** Glob for `**/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1` and use that absolute path (fallback: `~/.claude/plugins/cache/quorum-plugins/quorum-tooling/<version>/skills/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1`). If neither resolves, STOP and report.
+The script ships with this skill. **Resolve it at runtime — never type an install path:** Glob `path` `~/.claude/plugins` — the **parent**, never a directory inside it, because the layout below it has already changed once and silently — with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1`. The middle `**` is load-bearing: one layout puts a version segment between the plugin and its subdirectory, and a pattern without it finds the other layout only. Exactly one match: use that absolute path. None, or more than one: STOP and report what you found — the adapter is best-effort, but reading the wrong copy of it is not.
 
 ### Step 2: Resolve the memory-bank path
 
