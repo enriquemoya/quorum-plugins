@@ -28,10 +28,36 @@ is required, and it is what the original document already used: **only the root
 was ever wrong.** A fix that narrowed the pattern while correcting the root
 would have traded a loud failure for a quiet one.
 
-## What this smoke does NOT establish
+## Against a real install
 
-It ran against a fixture, not against this marketplace installed. Installing a
-marketplace is a slash command, which an agent cannot invoke. The remaining
-step is one real install plus one resolution, recorded here.
+The marketplace was then installed and both instructions run against it. The
+installed copy is the published one, which still carries the defect, so the two
+could be compared on the same tree:
 
-Until that exists, AC2 is text that has been exercised only in reproduction.
+| Instruction | Glob root | Matches |
+|---|---|---|
+| as published | `~/.claude/plugins/cache` | **0, and no error** — the root does not exist |
+| as corrected | `~/.claude/plugins` | 1 |
+
+Three resolutions were exercised, one per distinct target, all returning exactly
+one match at `marketplaces/quorum-plugins/plugins/<plugin>/…`:
+
+```
+quorum-orchestrator  → agents/quorum-orchestrator.md
+quorum-memory-bank   → scripts/memory-bank-to-obsidian.ps1
+quorum-obsidian-vault → scripts/scaffold_vault.ps1
+```
+
+The zero-match row is the whole point. A Glob rooted at a directory that does
+not exist is not an error, so every one of these lookups had been failing
+silently for as long as the instruction existed, and an agent following it would
+report that it could not find its operating manual rather than that the
+instruction was wrong.
+
+## What this still does not establish
+
+The multiple-match branch has been exercised only against a fixture: a single
+install has one layout. It stays in the text because the two layouts *can*
+coexist, and because a resolution that picks silently between two candidates is
+the failure this unit exists to prevent — but nobody has watched it fire on a
+real machine.

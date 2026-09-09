@@ -5,6 +5,12 @@ status: IN_PROGRESS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T03:40Z, from: IN_PROGRESS, to: IN_PROGRESS, actor: human,
+      note: "AC5 closed. The marketplace was installed and both instructions run against
+             it. Published instruction: 0 matches and no error. Corrected instruction: 1
+             match, at marketplaces/quorum-plugins/plugins/<plugin>/. Three targets, three
+             single matches. The multiple-match branch remains fixture-only — one install
+             has one layout — and is recorded as such rather than as verified." }
   - { at: 2026-09-09T03:20Z, from: IN_PROGRESS, to: IN_PROGRESS, actor: agent,
       note: "The check grew a records exemption. It passed at commit time and failed
              immediately after, because this unit's own spec files were still untracked
