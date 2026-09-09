@@ -31,7 +31,7 @@
 
 Amendment (impl audit, iteration 1): T2 and T3 gained `scripts/e2e.py`. AC7
 required assertions and no task declared where they would live, so the work was
-in scope and the file set was not — a containment finding against my own task
+in scope and the file set was not — a containment finding against the task
 list rather than against the change. Recorded here rather than corrected
 silently: a file set edited without a note is how bookkeeping drifts.
 

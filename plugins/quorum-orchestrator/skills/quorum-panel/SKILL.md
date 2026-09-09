@@ -120,13 +120,38 @@ quorum cpd-resume --debate "<debate-id>" \
 
 # → .quorum/reviews/<debate-id>/round2.json
 
-# Verdict. Exits 2 on an incomplete debate and is never forced.
+# Verdict. Refuses on an incomplete debate and is never forced.
 quorum cpd-conclude --debate "<debate-id>"
 ```
 
 **A non-zero exit from `cpd-conclude` is the verdict.** Do not work around it,
 do not summarise the rounds by hand, do not record a verdict it declined to
 render. An incomplete debate producing no verdict is the feature.
+
+Observed, not assumed: a debate with round 1 complete and round 2 absent exits
+`2`, writes nothing to stdout, and names the missing pairings on stderr. Read
+the exit code from the command itself — `cpd-conclude ... | tail` reports
+`tail`'s status, which is `0`, and that pipe has swallowed this refusal in
+practice.
+
+### Embed the severity contract even though the layer appends it
+
+`cpd-run` dispatches with the severity floor set, so the layer appends the
+findings contract to every brief on its own. Embed it in the brief as well.
+
+Both, and the reason is a measurement rather than a theory: one panel followed
+the contract in 2 of 3 replies with the appended copy alone and 3 of 3 once the
+brief carried it too. That is a single observation on one panel — it is why to
+embed, not proof that embedding causes it. Do not restate it as a rate, and do
+not "deduplicate" the two copies.
+
+### Never fence the findings block
+
+The terminal `- severity: ...` lines and the `verdict:` line go in the reply
+body, unfenced, with nothing between them. A fenced block reads as a quoted
+example: its findings are discarded while the verdict still counts, so the
+panel records a seat that voted on nothing. This is the failure mode the
+appended contract now warns against, and briefs should say it too.
 
 **One rebuttal per critic.** Never a merged one: a single rebuttal answered by
 everybody collapses the independent signal that having several families bought.

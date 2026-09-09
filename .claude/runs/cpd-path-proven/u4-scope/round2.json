@@ -1,0 +1,50 @@
+[
+  {
+    "decision_id": "u4-scope",
+    "critic_model": "opencode-go/grok-4.6",
+    "critic_family": "grok",
+    "session_id": "ses_f7b723042ffeCmapBg9VIcSmIj",
+    "verdict": "pass",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/grok-4.6",
+    "finding_count": 1,
+    "duration_ms": 99343,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "Withdraw. What remains is a documentation change wearing a unit's clothes.\n\nWith finding 3 gone, the taken remainder is: cite exit 2 beside `IncompleteDebateError`, record that append already exists and embed still measured 2/3 \u2192 3/3, and attribute the transcripts as pre-unit evidence. None of those changes what a panel does. The skill already forbids suppressing the incomplete-debate refusal, already requires embed, and already notes that dispatch appends. The new text is why those rules are not ceremonial. That is calibration and knowledge writeback, not a correction.\n\nA correction unit is for a procedure or engine that was wrong. The only run contradiction that changed seating, voting, or completeness left this unit. Completing a \u201ccorrection unit\u201d whose diff is two citations will read as closing the loop the runs opened, while the empty-seat defect stays in the deferred unit. That is the clothes.\n\nDo not hold it under a quieter name (\u201cnarrowed correction,\u201d \u201cdocs unit\u201d). LIGHT work has no plan; the commit and PR body are the record. Land the two skill sentences (and the transcript attribution, if any plan line still names those debates) as writeback \u2014 `quorum knowledge add` / harvest from the transcripts, and a LIGHT skill edit if the skill should carry the measurements. Withdraw this unit. Do not skip the sentences when you withdraw; skip the unit machinery.\n\nFalsifier: a remaining procedure change that is not finding 3 (a new classify step, halt, or verb). There is not one in the taken set.\n\n- severity: minor \u2014 Remaining work is calibration/writeback, not a correction; withdraw the unit and still land the two skill sentences as LIGHT\nverdict: pass",
+    "resumed_from": "ses_f7b723042ffeCmapBg9VIcSmIj",
+    "round1_decision_id": "u4-scope-R0"
+  },
+  {
+    "decision_id": "u4-scope",
+    "critic_model": "opencode-go/gpt-5.6-luna",
+    "critic_family": "gpt",
+    "session_id": "ses_f7b722a25ffeivgm6dlPCI5xPZ",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/gpt-5.6-luna",
+    "finding_count": 2,
+    "duration_ms": 14068,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "Severity: high  \nMechanism: Pre-fix transcripts establish historical behavior, not that the corrected engine still exhibits the same behavior; using them as current evidence can encode an obsolete contract into the skill.  \nFailure mode: The skill is corrected from behavior the engine no longer has, or claims validation that was never performed against the fixed engine.  \nDetection signal: Compare transcript engine versions/commits with the fix and run a post-fix probe for the affected behavior.  \nFalsifier: Post-fix runs reproduce the relevant behavior, or the skill explicitly labels the statement as historical and version-scoped.  \nRecommendation: Keep the historical correction, but version-scope it and require post-fix evidence before treating it as a current invariant.\n\nSeverity: high  \nMechanism: If finding 3 changes seat recognition, retirement, or counting, it reimplements the deferred engine defect rather than merely correcting skill guidance.  \nFailure mode: This unit passes while silently absorbing the deferred unit\u2019s acceptance criteria and potentially conflicting with its eventual engine fix.  \nDetection signal: The unit or skill diff changes seat totals, verdict eligibility, retirement semantics, or related engine behavior.  \nFalsifier: Finding 3 is reduced to documenting the observed shape and deferring all counting/retirement semantics to the separate unit.  \nRecommendation: Remove finding 3 from this unit\u2019s behavioral scope; retain only a narrowly versioned observation or cross-reference.\n\n- severity: major \u2014 Pre-fix transcripts cannot alone validate the post-fix skill contract.\n- severity: major \u2014 Finding 3 must be narrowed to observation or deferred entirely, not implement seat semantics.\nverdict: concerns",
+    "resumed_from": "ses_f7b722a25ffeivgm6dlPCI5xPZ",
+    "round1_decision_id": "u4-scope-R1"
+  },
+  {
+    "decision_id": "u4-scope",
+    "critic_model": "opencode-go/kimi-k3",
+    "critic_family": "kimi",
+    "session_id": "ses_f7b68dde7ffet95P4pY0Cu74RQ",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/kimi-k3",
+    "finding_count": 1,
+    "duration_ms": 9309,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "Hold is conditional, not a demand for re-observation. Anchoring each citation to an engine state is exactly the falsifier my finding asked for: the transcript commit pinned next to the claim. But there is one claim in the correction set that cannot inherit anything, and you have not shown it post-fix: the incomplete-debate refusal itself. That is the unit's load-bearing measurement \u2014 \"observed at exit 2 with no verdict rendered.\" If that observation predates the fix, the skill is stating as current behavior something taken from a different engine, regardless of how well the citation is labeled.\n\nSo the question reduces to one fact you have not stated: does at least one refusal observation postdate the fix?\n\nIf yes \u2014 cite that transcript, anchored, and the provenance finding closes. The 2/3\u21923/3 datum needs no re-observation precisely because you rephrased it as observation-under-that-engine, not a claim about the current one. That asymmetry is the point: anchoring rescues descriptive evidence, it cannot rescue a behavioral claim that says \"the engine does this\" present-tense.\n\nIf no \u2014 one minimal incomplete debate on the current engine is required. Not five; the refusal is a single dispatch with a missing token. This is the cheap re-observation I flagged, and it is now the only open item in the major.\n\nThe minors are all disposed: finding 3 correctly exits the unit (with the mode-portability rule traveling with the inheriting unit as an acceptance condition, not a note), the n=1 phrasing fix removes the dedup invitation, and the amended spec makes the gate falsifiable again.\n\n- severity: major \u2014 refusal measurement closes only if an anchored post-fix refusal observation exists; if not, one minimal re-observation is the remaining work\nverdict: concerns",
+    "resumed_from": "ses_f7b68dde7ffet95P4pY0Cu74RQ",
+    "round1_decision_id": "u4-scope-R2"
+  }
+]
