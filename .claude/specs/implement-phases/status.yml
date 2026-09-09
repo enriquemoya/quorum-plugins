@@ -1,16 +1,51 @@
 slug: implement-phases
 origin: spec
 complexity: complex
-status: PRD_READY
+status: NEEDS_REVISION
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T00:40Z, from: SCOPE_AUDIT, to: NEEDS_REVISION, actor: agent,
+      note: "escalate. Two blockers, raised independently by both responding families:
+             the spec cited Article 3 while leaving four of its own criteria as
+             guarantees with no assertion, and T3's keep-whatever clause was unbounded
+             (unique work cannot name a supplement). Both taken — every criterion is
+             now marked guarantee or description, and the keep-set is closed to one
+             item. The three deferred flag decisions were also decided here rather
+             than in implementation; one critic caught that keeping --complexity
+             contradicts AC4. The revision answering the remaining major landed after
+             the rebuttals, so the escalation is stale in substance and real in
+             protocol. Implementation is NOT taken: run_mode is human, and a --human
+             unit stops at every gate. The decision is whether the revised spec clears
+             the gate or needs a second audit iteration." }
+  - { at: 2026-09-09T00:20Z, from: SCOPE_AUDIT, to: SCOPE_AUDIT, actor: agent,
+      note: "panel narrowed to two families. One seat recorded dispatch_failure three
+             times on a 189-line brief, timing out at 600s; the engine labelled it
+             rather than counting it as a vote. Cause measured: no timeout binary on
+             PATH, so the shell-level cap was not applied — the engine warned about
+             exactly this and coreutils was installed, after which the cap applied and
+             the seat still timed out. Key retired with a reason so the debate could
+             conclude; the verdict must be read as two families, not three." }
+  - { at: 2026-09-08T23:05Z, from: DRAFTING_TASKS, to: SCOPE_AUDIT, actor: agent,
+      note: "scope audit dispatched, panel cpd, three families. Brief carries nine
+             contradictions between the document and the pipeline, and asks six
+             questions the spec cannot answer about itself — including whether
+             scoping the Article 2 fix to one file is allowed while 41 tracked files
+             keep the product name. None is under governance/, so Article 1 is clean;
+             the article-2 question is whether a driver's name leaking into the
+             abstract layer is the same violation as naming a product outright." }
+  - { at: 2026-09-08T23:00Z, from: PRD_READY, to: DRAFTING_TASKS, actor: agent,
+      note: "requirements and tasks written; complexity complex was set at triage
+             and is read from here, not re-derived" }
   - { at: 2026-09-08T10:00Z, from: null, to: TRIAGE, actor: human, note: "created — dogfood run: the pipeline builds its own missing pieces" }
   - { at: 2026-09-08T11:00Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved" }
   - { at: 2026-09-08T10:05Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (roles.tracker null, ticket path unavailable); complexity complex" }
 in_flight: true
-audit_iterations: 0
-last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+audit_iterations: 1
+last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u5-scope,
+              governance_version: null, panel: cpd,
+              panel_reason: "two families, not three — the third seat timed out on this brief three times and was retired with a recorded reason",
+              evidence_digest: ".claude/runs/implement-phases/u5-scope" }
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null

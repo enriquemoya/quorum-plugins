@@ -1,6 +1,6 @@
 {
   "name": "quorum-orchestrator",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "description": "Governed delivery pipeline. A unit of work enters through triage, takes the spec path (PRD -> requirements -> architecture -> design -> tasks) or the ticket path (fetch -> analyze), converges at a scope audit, then implementation -> implementation audit -> delivery. State lives in status.yml and is never inferred from prose; /quorum-orchestrate routes on it, one unit or a whole queue in a session. Autonomy is a profile setting: `human` stops at every gate, `agent` decides routine outcomes from a decision matrix and escalates constitution violations, scope promotions and delivery. Stack-agnostic via .claude/profile.yml, which /quorum-init writes from the repository. Both audit gates convene an adversarial critic panel -- cross-provider through the Quorum engine when it is installed, same-provider subagents otherwise, with which one ran recorded on the verdict. Ships the pipeline, its stage agents, both auditors, the governance defaults and an empty constitution template \u2014 the articles are the project's.",
   "author": {
     "name": "Enrique Moya"

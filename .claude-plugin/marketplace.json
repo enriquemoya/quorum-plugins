@@ -13,7 +13,7 @@
       "name": "quorum-orchestrator",
       "source": "./plugins/quorum-orchestrator",
       "description": "Governed delivery pipeline with triage, product shaping, two audit gates and a state machine in status.yml. Runs supervised or autonomous, one unit or a batch. Stack-agnostic via profile.yml.",
-      "version": "2.0.0",
+      "version": "2.1.0",
       "author": {
         "name": "Enrique Moya"
       },

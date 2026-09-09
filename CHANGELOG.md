@@ -1,0 +1,104 @@
+# Changelog
+
+All notable changes to this marketplace are documented here. The format follows
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); each plugin is
+versioned independently and its version lives in `marketplace.json`.
+
+A note on what "tested" means here. The product is prose — nothing compiles —
+so a guarantee with no assertion is a sentence. Two suites enforce that:
+`scripts/check.py` (10 checks over every tracked file) and `scripts/e2e.py` (43
+assertions over the documents' contracts). Both were built by injecting defects
+and watching them fail. Anything below that is *not* covered by them says so.
+
+## [Unreleased]
+
+### quorum-orchestrator 2.1.0
+
+Everything here came out of running the pipeline on this repository — writing
+specs for its own missing pieces and putting each through the cross-provider
+panel. Five debates, three model families, and the panel rejected the proposed
+fix in four of them, each time producing something better than what was
+proposed.
+
+#### Changed
+
+- **`quorum-status`: `BLOCKED` requires a probe that ran.** A `BLOCKED` claim
+  now carries the invocation, its exit code, what it observed and when. There
+  is deliberately no cannot-probe state: a precondition that could not be
+  measured leaves the unit un-blocked rather than blocked on a guess. This
+  correction exists because a unit in this very repository was declared
+  `BLOCKED` on inferred evidence — an absent config file and unset environment
+  variables — while seven models were reachable the whole time.
+
+- **`quorum-panel`: detection asks the engine instead of reimplementing it.**
+  Four distinct causes plus two indeterminate outcomes, where there had been a
+  single boolean. A catalogue listing is explicitly rejected as the
+  reachability test — presence is not reachability — and an unusable diagnostic
+  is indeterminate, never "unconfigured". The fallback is open by default: a
+  detection that cannot decide runs the degraded panel and says so, rather than
+  refusing.
+
+- **`quorum-panel`: the CPD path states measurements, not properties.** The
+  incomplete-debate refusal now appears with its exit code, its empty stdout
+  and its stderr message, re-observed on the current engine rather than
+  inherited from a transcript that predates a change to the appended contract.
+  The severity contract is described as appended by the dispatch layer *and*
+  embedded by the author, both. The terminal findings block is never fenced.
+
+- **`GLOBAL.md`: preconditions are measured, never inferred.** Names both
+  shapes that caused the false `BLOCKED`: an absent configuration file and an
+  unset environment variable, neither of which is evidence of anything.
+
+- **`SPEC_STANDARD.md`: the task line format is fixed.** The task's own line
+  carries `files:` and `AC:`, with prose indented beneath it. The previous
+  wording described a shape no task in this repository actually had.
+
+#### Added
+
+- **`PIPELINE.md`** — the process anchor. Nine stages, two origins (ticket and
+  spec), a 23-state machine, and a decision matrix with declared row
+  precedence: the constitution row and the two `STUCK` rows override any row
+  above them. Five things are never automatic in either autonomy mode — a
+  constitution violation, a scope promotion, delivery, `STUCK`, and a
+  single-provider verdict advancing past the implementation audit.
+
+- **`/quorum-orchestrate`** — the single entry point, which routes and never
+  executes. `--queue` derives its batch from `status.yml` rather than a stored
+  list, drops units whose dependencies are unmerged, and refuses to run two
+  units whose file sets fall in the same profile component.
+
+- **A constitution for this repository** — three articles, each checkable by
+  pointing at a file and a line. Article 3 is the one that shapes everything
+  else: no guarantee without an assertion that has been *watched failing*.
+
+- **Skill evals** for `quorum-init`, `quorum-panel` and `quorum-status`.
+
+- **A precondition sweep in `scripts/check.py`**, which reports and never
+  corrects — a repaired state file is a state file someone guessed at.
+
+#### Known, recorded, not fixed
+
+These are written down as units with specs rather than left as intentions:
+
+- **`implement-phases`** — `/quorum-implement` still runs the seven phases it
+  had when it *was* the entry point, five of which the pipeline now does
+  upstream. The spec is written and its scope audit escalated; the
+  implementation is a human gate and has not been taken. **Not tested, not
+  changed.**
+- **`verdict-credit-on-ambiguity`** — a seat whose reply carries no verdict
+  token records `concerns` with zero findings and votes anyway. Deferred with
+  evidence; it collides with never-shrink and `debate_complete` and needs its
+  own unit.
+- **One product name still appears in 41 tracked files.** None is under
+  `governance/`, and the repository does integrate with that product through a
+  driver skill, so the violation is narrower than it looks: the name leaks from
+  the driver into layers that must work with any tracker or none. The sweep is
+  its own unit.
+
+#### What is not covered by the suites
+
+The suites check the documents. They do not run a pipeline end to end against a
+real repository, and they cannot: a full run costs model calls across several
+providers. The cross-provider path was exercised by hand — six debates, three
+families — and the transcripts are committed under `.claude/runs/` so a reader
+can check the claims without re-spending them.

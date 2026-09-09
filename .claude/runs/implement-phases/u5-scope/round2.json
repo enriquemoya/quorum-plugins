@@ -1,0 +1,39 @@
+[
+  {
+    "decision_id": "u5-scope",
+    "critic_model": "opencode-go/grok-4.6",
+    "critic_family": "grok",
+    "session_id": "ses_f7b5a8ad5ffe4GEKgqBou0C32U",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/grok-4.6",
+    "finding_count": 2,
+    "duration_ms": 145201,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "Neither hold nor withdraw on the keep-set.\n\nThe unit was opened to make `/quorum-implement` describe the stage it is, and to delete what the pipeline already did. That work is T1\u2013T7: slug and flags, read `status.yml`, replace fetch/plan with reads, dry-run, role not product, `tasks.md` as plan, assertions. Closing AC3 to one survivor bounds T3; it does not replace T3. T3 is still the replacement (read the unit\u2019s artifacts; `tasks.md` is the plan). The prompt file is the exception list. Treating \u201ckeep-set of one\u201d as the task is how a reconciliation would shrink to a rewrite \u2014 so do not let T3\u2019s wording collapse to that sentence.\n\nWithdraw would leave the nine contradictions in place. The 190-line rewrite is the product; it was never a reason to close the unit.\n\nThe AC3 close itself is the right harder reading: one named keep, anything else unique is a finding against the unit, not a clause inside it. That is a closed set and can be asserted (prompt file named as the sole survivor of the replaced phases; those phases described as reads).\n\nTaken resolutions that hold: AC8 covering every remaining guarantee; AC4/AC5 as mechanical document assertions; AC7 as the `AC:` suffix plus ids that exist in `requirements.md`; watched-failure evidence in the commit message; null-tracker disposition as transient, not committed, announced at the gate. Do not treat `check.py`\u2019s transit-artefact rule as AC6\u2019s assertion unless those two artifacts are named members of that set \u2014 use it as the reason they are not committed, and still assert what this file says on a null tracker.\n\nNot taken, and still in the way of READY: T1 still says decide `--complexity` / `--resume` / `--include-subtasks` per flag. AC4 already decides `--complexity` (it cannot remain an auto-detect or silent re-derive). The other two are still unspecified. That is the invocation contract this unit was opened to fix (finding 2). Hold READY until T1 names keep or delete for each; do not hold because the keep-set has one item.\n\nAC5: assert the positive text (\u201cstops before the first write\u201d), not only the absence of a phase number. A deleted or all-phases dry-run would pass a negative-only check.\n\n- severity: major \u2014 T1 still defers --resume/--include-subtasks (and does not explicitly delete --complexity under AC4), so the invocation contract remains an undecided spec\n- severity: minor \u2014 an AC5 assertion that only forbids a phase number can pass a dry-run that never states it stops before the first write\nverdict: concerns",
+    "resumed_from": "ses_f7b5a8ad5ffe4GEKgqBou0C32U",
+    "round1_decision_id": "u5-scope-R0"
+  },
+  {
+    "decision_id": "u5-scope",
+    "critic_model": "opencode-go/gpt-5.6-luna",
+    "critic_family": "gpt",
+    "session_id": "ses_f7b5a84b3ffeNvq0DjXzjviZTn",
+    "verdict": "pass",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/gpt-5.6-luna",
+    "finding_count": 0,
+    "duration_ms": 12001,
+    "failure_reason": null,
+    "severity_parse": "no_records",
+    "critic_text": "That reading is correct, not a rationalisation. Article 2 bans naming products the repository does not integrate with; it does not ban names in integration-specific driver files. The remaining sweep should therefore target product names leaking into tracker-agnostic layers, including this command, while allowing legitimate driver-specific references.\n\nWith the keep-set, flag decisions, assertion rule, and gate-count requirement now explicit, the prior findings are resolved. The revised scope is bounded and reviewable.\n\nverdict: pass",
+    "resumed_from": "ses_f7b5a84b3ffeNvq0DjXzjviZTn",
+    "round1_decision_id": "u5-scope-R1"
+  },
+  {
+    "decision_id": "u5-scope-R2",
+    "round1_decision_id": "u5-scope-R2",
+    "skipped": "failed round-1 (no session)"
+  }
+]
