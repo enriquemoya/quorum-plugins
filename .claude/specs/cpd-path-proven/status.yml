@@ -1,10 +1,21 @@
 slug: cpd-path-proven
 origin: spec
 complexity: medium
-status: NEEDS_REVISION
+status: ABANDONED
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T01:10Z, from: NEEDS_REVISION, to: ABANDONED, actor: human,
+      note: "Withdrawn on the scope audit's own reasoning, not for lack of value. One
+             critic held that a diff of three sentences is documentation writeback
+             wearing a unit's clothes, and that completing it would read as closing the
+             loop the runs opened while the actual defect sits in a deferred unit. The
+             deliverable already landed as LIGHT writeback in commit b2d23c7 — three
+             corrections to the CPD path and the anchored evidence under
+             .claude/runs/cpd-path-proven/. ABANDONED here means the unit is withdrawn,
+             not that the work was dropped. The state file and the diff disagreed until
+             this entry: the tasks were committed while the unit sat at NEEDS_REVISION,
+             which is recorded rather than backdated." }
   - { at: 2026-09-08T22:40Z, from: SCOPE_AUDIT, to: NEEDS_REVISION, actor: agent,
       note: "scope audit u4-scope concluded `escalate`, and the escalation is the panel
              disagreeing about whether this is a unit. One critic: the remaining diff is
@@ -29,7 +40,7 @@ history:
   - { at: 2026-09-08T10:00Z, from: null, to: TRIAGE, actor: human, note: "created — dogfood run: the pipeline builds its own missing pieces" }
   - { at: 2026-09-08T11:00Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved" }
   - { at: 2026-09-08T10:05Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (roles.tracker null, ticket path unavailable); complexity medium" }
-in_flight: true
+in_flight: false
 audit_iterations: 1
 last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u4-scope,
               governance_version: null, panel: cpd, panel_reason: "three families, opencode-go",

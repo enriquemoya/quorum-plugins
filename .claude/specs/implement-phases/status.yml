@@ -1,10 +1,27 @@
 slug: implement-phases
 origin: spec
 complexity: complex
-status: NEEDS_REVISION
+status: READY_WITH_CONDITIONS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T01:10Z, from: NEEDS_REVISION, to: READY_WITH_CONDITIONS, actor: human,
+      note: "Gate passed, no second audit iteration. Each finding is closed by a named
+             change, and the trail is here rather than implied by the advance:
+             blocker (both families) 'AC8 leaves criteria unasserted' → every criterion
+             now marked guarantee or description, AC8 covers all six guarantees;
+             blocker (both) 'keep-whatever is unbounded' → keep-set closed to the prompt
+             file; major (grok) 'T1 defers three flags, and keeping --complexity
+             contradicts AC4' → all three deleted in the spec with per-flag reasons;
+             major (gpt) 'AC6/T5 conflict on null-tracker durability' → resolved against
+             AC6's wording, the artifacts are transient and not committed; major (both)
+             'AC7 undefined' → mapping made mechanical against the task-line AC: suffix;
+             minor (grok) 'AC5 negative-only assertion' → AC5 re-promoted and asserted
+             positively; minor (gpt) 'T6 does not say where watched-failure evidence
+             lives' → the commit message, which is where Article 3 sends an auditor.
+             The revision answering the last major landed AFTER the rebuttals, so the
+             escalate verdict is real in protocol and stale in substance. Recorded as
+             conditions rather than as a clean READY." }
   - { at: 2026-09-09T00:40Z, from: SCOPE_AUDIT, to: NEEDS_REVISION, actor: agent,
       note: "escalate. Two blockers, raised independently by both responding families:
              the spec cited Article 3 while leaving four of its own criteria as
@@ -49,5 +66,20 @@ last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u5-scope,
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null
-accepted_conditions: []
+accepted_conditions:
+  - "AC3 and AC5 were demoted from guarantee to description where no script can
+     produce their failing case; AC5 was then re-promoted with a positive
+     assertion after a critic showed a negative-only check passes a file where
+     the flag was deleted. Any later claim that AC3 is asserted is false."
+  - "The keep-set from the removed phases is closed to exactly one item, the
+     prompt file. Anything else found to be unique during implementation is a
+     NEW finding against this unit, not an addition to the set."
+  - "check.py's transit-artefact rule is the reason the two artifacts are not
+     committed, NOT the assertion for AC6 — it does not name them. AC6 needs its
+     own assertion."
+  - "The panel ran with two families, not three. The verdict is to be read as
+     narrower than configured."
+  - "Article 2 stays open. This unit clears one file; 41 tracked files keep the
+     product name. Completing this unit is not evidence the article is cleared."
+
 run_mode: human
