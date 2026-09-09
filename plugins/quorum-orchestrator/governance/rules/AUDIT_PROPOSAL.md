@@ -26,6 +26,7 @@ findings:
     description: "<what is wrong>"
     proposed_fix:
       target_step: triage | prd | spec | architecture | design | tasks | impl
+                 | governance          # ← the rule itself is wrong
       change: "<what to change>"
 
 recommended_transition: "<from> -> <to>"
@@ -47,3 +48,16 @@ recommended_transition: "<from> -> <to>"
 - **`target_step` must be a stage the routing table can reach from here.** A
   proposal that routes backwards past the agent frontier (`prd`) is an
   escalation, not a loop, and requires a human in either mode.
+- **`target_step: governance` means the RULE is wrong, not the work.** No stage
+  owns a governance rule, so this target routes to a human in both autonomy
+  modes and does not loop the current unit. The finding is recorded against the
+  unit that surfaced it and the correction becomes its own unit of work.
+
+  This exists because an audit found a defect in the task format it was
+  enforcing and had nowhere to put it. Fixing the rule from inside a unit the
+  rule governs is the scope creep the containment check forbids, so the choice
+  was between recording it with a null target and losing it. Neither is a route.
+
+  A `governance` target never blocks the unit that raised it. That unit is
+  judged against the rules in force; the rule changing is a separate decision
+  with its own gates.

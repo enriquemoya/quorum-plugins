@@ -78,9 +78,30 @@ with a date in it ships that date to every unit created from it.
 | `DELIVERING` | PR open, tracker updating | `MERGED` |
 | `MERGED` | terminal | — |
 | `ABANDONED` / `SUPERSEDED` | terminal | — |
+| `BLOCKED` | an external precondition is missing — **not the unit's fault** | any, once the precondition is met |
 | `STUCK` | loop control fired — **human only** | any, by a human |
 
 Terminal states refuse every transition except by an explicit human note.
+
+**`BLOCKED` is not terminal and is not `STUCK`.** `ABANDONED` and `SUPERSEDED`
+are decisions somebody made; `STUCK` is this unit having exhausted its audit
+budget. A unit that cannot proceed because a credential, a service or a tool is
+absent has done nothing wrong and has nothing left to try — borrowing `STUCK`
+for it would report a loop that never happened, and the iteration count would
+say so.
+
+A `BLOCKED` unit records what is missing:
+
+```yaml
+status: BLOCKED
+blocked_on: "a second model family — the panel needs cross-provider dispatch"
+```
+
+It is excluded from the queue, like `STUCK`, but for a reason a human can act on
+somewhere other than this repository. The router reports the precondition rather
+than asking for intervention.
+
+
 
 ## Transitions
 
@@ -136,7 +157,7 @@ the iteration count alone would not catch it inside the cap.
 2. keep: status ∈ { PRD_READY, DRAFTING_*, SCOPE_AUDIT, READY*, IN_PROGRESS,
                     IMPL_AUDIT, NEEDS_*, VERIFIED* }
         ∧ profile.autonomy.mode == agent
-        ∧ not terminal, not STUCK
+        ∧ not terminal, not STUCK, not BLOCKED
 3. drop: any unit whose depends_on includes a slug that is not MERGED
 4. order topologically by depends_on; a cycle HALTs and names the cycle
 5. exclude from concurrency: units whose task file sets fall in the same

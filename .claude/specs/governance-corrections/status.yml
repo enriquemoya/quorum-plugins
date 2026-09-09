@@ -1,0 +1,19 @@
+slug: governance-corrections
+origin: spec
+complexity: medium
+status: VERIFIED
+created: 2026-09-08
+updated: 2026-09-08
+history:
+  - { at: 2026-09-08T12:50Z, from: IN_PROGRESS, to: VERIFIED, actor: human, note: "impl audit iter 2: 3 gates green, 4/4 AC pass, no blockers" }
+  - { at: 2026-09-08T12:00Z, from: null, to: TRIAGE, actor: agent, note: "created from three findings of the dogfood run" }
+  - { at: 2026-09-08T12:02Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (no tracker); medium — three governance files, no rollback risk" }
+  - { at: 2026-09-08T12:05Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved — start A, close the pending items" }
+in_flight: true
+audit_iterations: 2
+last_audit: { step: impl-audit, verdict: VERIFIED, iter: 2, proposal_ref: null, governance_version: "quorum-orchestrator@2.0.0", panel: single-provider, panel_reason: "engine not installed", evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: human

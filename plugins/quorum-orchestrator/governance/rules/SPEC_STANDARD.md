@@ -36,5 +36,30 @@ the batch queue measures it against `profile.stack.components` to decide which
 units may not run concurrently.
 
 ```markdown
-- [ ] T1: <what> — files: <path>, <path> — AC: <criterion id>
+- [ ] T1: <short what> — files: <path>, <path> — AC: <criterion id>
+      <the prose, indented, on as many lines as it needs>
 ```
+
+**The task's own line carries `files:` and `AC:`, and nothing wraps it.** Prose
+goes on indented continuation lines beneath. This is not a style preference: a
+line-by-line reader finds neither field once the line wraps, and both the
+executor and the queue are line-by-line readers.
+
+The first unit run through this pipeline wrote five tasks, wrapped all five for
+readability, and none of them parsed. The description was the part that made
+them long, so the description is the part that moves.
+
+Keep the `what` short enough that the line survives its own paths. When it
+cannot — a task with six files — that is a task doing two things, and splitting
+it costs less than a format nobody can read.
+
+A parser reads:
+
+```
+- [ ] (T\d+): .+? — files: (.+?) — AC: (.+)$
+```
+
+and ignores every indented line beneath. Anything that does not match that
+pattern is not a task; it is prose someone started with a checkbox.
+
+

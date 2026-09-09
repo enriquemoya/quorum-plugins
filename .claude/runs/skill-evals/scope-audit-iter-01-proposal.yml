@@ -1,0 +1,42 @@
+slug: skill-evals
+step: scope-audit
+iter: 1
+verdict: NEEDS_REVISION
+governance_version: "quorum-orchestrator@2.0.0"
+panel: single-provider
+panel_reason: "engine not installed"
+evidence_digest: "tasks.md:8,13,18,23,28"
+findings:
+  - id: F-01
+    severity: high
+    blocking: true
+    evidence: ".claude/specs/skill-evals/tasks.md:8"
+    constitution_article: null
+    description: >-
+      No task in this file parses. SPEC_STANDARD.md defines a task as one line
+      carrying `files:` and `AC:`; every task here wraps, so a line-by-line read
+      finds neither. The executor reads `files:` to know what to touch and the
+      batch queue reads it to decide which units may not run concurrently —
+      both get nothing.
+    proposed_fix:
+      target_step: tasks
+      change: >-
+        Rewrite each task so `files:` and `AC:` are on the task's own line,
+        moving the prose description to an indented continuation beneath it.
+  - id: F-02
+    severity: medium
+    blocking: false
+    evidence: "plugins/quorum-orchestrator/governance/rules/SPEC_STANDARD.md:38"
+    constitution_article: null
+    description: >-
+      The standard's own format is what makes F-01 possible: a single-line task
+      is unwritable once it carries more than one path, so every real tasks.md
+      will hit this. The rule needs either a continuation syntax or an explicit
+      refusal to wrap, and it has neither.
+    proposed_fix:
+      target_step: null      # ← no stage owns a governance rule
+      change: >-
+        Out of this unit's scope. Needs its own unit of work; recorded here
+        rather than fixed, because changing a governance rule from inside a unit
+        that the rule governs is the scope creep the containment check forbids.
+recommended_transition: "SCOPE_AUDIT -> NEEDS_REVISION"

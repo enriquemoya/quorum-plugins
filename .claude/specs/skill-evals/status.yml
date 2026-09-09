@@ -1,17 +1,23 @@
 slug: skill-evals
 origin: spec
 complexity: simple
-status: DRAFT_PRD
+status: VERIFIED_WITH_CONDITIONS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-08T11:40Z, from: IN_PROGRESS, to: VERIFIED_WITH_CONDITIONS, actor: agent, note: "impl audit iter 3: gate green, 5/5 AC pass, no blockers" }
+  - { at: 2026-09-08T11:22Z, from: NEEDS_REVISION, to: READY, actor: agent, note: "scope audit iter 2: F-01 resolved, no blockers fired" }
+  - { at: 2026-09-08T11:15Z, from: DRAFTING_TASKS, to: NEEDS_REVISION, actor: agent, note: "scope audit iter 1: F-01 blocking (tasks unparseable)" }
+  - { at: 2026-09-08T11:08Z, from: DRAFTING_SPEC, to: DRAFTING_TASKS, actor: agent, note: "5 tasks, 3 phases; arch+design skipped (simple)" }
+  - { at: 2026-09-08T11:05Z, from: PRD_READY, to: DRAFTING_SPEC, actor: agent, note: "requirements written; 5 acceptance criteria" }
   - { at: 2026-09-08T10:00Z, from: null, to: TRIAGE, actor: human, note: "created — dogfood run: the pipeline builds its own missing pieces" }
+  - { at: 2026-09-08T11:00Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved" }
   - { at: 2026-09-08T10:05Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (roles.tracker null, ticket path unavailable); complexity simple" }
-in_flight: false
-audit_iterations: 0
-last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+in_flight: true
+audit_iterations: 3
+last_audit: { step: impl-audit, verdict: VERIFIED_WITH_CONDITIONS, iter: 3, proposal_ref: null, governance_version: "quorum-orchestrator@2.0.0", panel: single-provider, panel_reason: "engine not installed", evidence_digest: null }
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null
-accepted_conditions: []
+accepted_conditions: ["4 of quorum-init 8 refusals uncovered", "all 20 evals never executed — need a model, outside CI"]
 run_mode: agent

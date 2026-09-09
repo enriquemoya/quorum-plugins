@@ -52,6 +52,7 @@ if it is missing or unparseable, BLOCK.
 | `NEEDS_FIX` | `/quorum-implement --fix`, carrying the proposal |
 | `VERIFIED` / `VERIFIED_WITH_CONDITIONS` | `/quorum-deliver` |
 | `DELIVERING` | finish delivery → `MERGED` |
+| `BLOCKED` | **HALT.** Report the precondition; retry when it is met. |
 | `STUCK` | **HALT.** Human only. |
 | `MERGED` / `ABANDONED` / `SUPERSEDED` | terminal — refuse |
 

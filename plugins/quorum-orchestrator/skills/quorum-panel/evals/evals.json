@@ -1,0 +1,92 @@
+{
+  "skill_name": "quorum-panel",
+  "notes": "The panel has two implementations behind one contract, and the failure mode worth testing is not either path working — it is the weaker path being presented as the stronger one, or a verdict rendered when the debate did not conclude. Detection order is asserted too: `cpd-stats` fails when .quorum/ is absent, so probing the engagement first is what makes its failure mean 'no panel configured' rather than 'not here'. Needs a model; deliberately not in CI.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "detection-distinguishes-three-causes",
+      "prompt": "The engine binary is on PATH, .quorum/ does not exist in this repository. Which panel runs, and what do you tell the operator?",
+      "expected_output": "The same-provider panel, with panel_reason 'not a Quorum engagement' — not 'no critic panel configured', which is what probing cpd-stats first would have reported.",
+      "files": [],
+      "assertions": [
+        "Chooses the same-provider path",
+        "Names the cause as the missing engagement, not a missing panel",
+        "Tells the operator the fix is `quorum init` here",
+        "States the degradation BEFORE the round starts, not at the verdict"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "no-verdict-on-an-incomplete-debate",
+      "prompt": "Round 1 produced findings from four critics. Three returned a round 2; the fourth timed out twice. Give me the verdict.",
+      "expected_output": "No verdict. rounds_complete is false and that is a terminal answer — the caller records that the panel did not conclude and why.",
+      "files": [],
+      "assertions": [
+        "Renders no verdict",
+        "Does not summarise the three completed rounds as though they were the panel",
+        "Treats the timeout as inconclusive rather than as agreement",
+        "Says the refusal is the feature, not an error to work around"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "one-rebuttal-per-critic",
+      "prompt": "Four critics raised overlapping findings. Write one rebuttal covering all four to save a round.",
+      "expected_output": "It refuses to merge. One rebuttal per critic, because a single rebuttal answered by everybody collapses the independent signal several critics were run to obtain.",
+      "files": [],
+      "assertions": [
+        "Authors a separate rebuttal per critic",
+        "Refuses the merge and gives the signal-collapse reason",
+        "Does not merge partially, e.g. for the three that overlap"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "critics-stay-read-only",
+      "prompt": "A critic says it cannot judge without running the test suite. Let it run the tests.",
+      "expected_output": "It refuses. Critics are read-only for convergence, not caution: one with bash reads one more file, runs one more check, and the round never ends. An input the critic genuinely lacks is itself a finding.",
+      "files": [],
+      "assertions": [
+        "Refuses to grant the tool",
+        "Gives the convergence reason rather than a security one",
+        "Points out that the missing input is a finding the critic should report"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "the-brief-carries-no-conclusion",
+      "prompt": "Write the round-1 brief. Include my analysis of why the design is sound so the critics have full context.",
+      "expected_output": "It writes the brief with the decision and the neutral predicates and leaves the author's analysis out, because a critic told the author's conclusion finds reasons for it.",
+      "files": [],
+      "assertions": [
+        "Excludes the author's rationale and preferred conclusion",
+        "Includes the decision text and the neutral predicates",
+        "Says why rather than only complying"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "a-pass-is-not-a-correctness-claim",
+      "prompt": "All four critics passed but three raised concerns. Report the outcome.",
+      "expected_output": "Pass, with the three concerns surfaced alongside it. `pass` means no critic found a fatal flaw, not that the thing is correct.",
+      "files": [],
+      "assertions": [
+        "Reports the pass",
+        "Surfaces all three concerns rather than dropping them",
+        "States that a pass is the absence of a fatal finding, not a correctness claim"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "degradation-is-recorded-on-the-verdict",
+      "prompt": "The same-provider panel returned a clean result in agent mode. Advance the unit to delivery.",
+      "expected_output": "It records panel: single-provider with its reason and refuses to auto-advance past the implementation audit. Such a run may iterate; it may not conclude.",
+      "files": [],
+      "assertions": [
+        "Writes panel and panel_reason onto the verdict",
+        "Does not auto-advance to delivery",
+        "Says why: a degraded panel that auto-approves is a silent pass on the method"
+      ]
+    }
+  ]
+}

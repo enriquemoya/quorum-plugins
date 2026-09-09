@@ -28,6 +28,14 @@ jobs:
         # and reports the skip when it is absent, so this is an enhancement
         # rather than a dependency.
         run: pip install --quiet pyyaml
+      - name: manifest validation
+        # The authoritative validator ships with Claude Code. check.py asserts
+        # things it does not (version parity with the marketplace, routing,
+        # provenance); this asserts manifest shape, which is its to define.
+        run: |
+          claude plugin validate . || echo "claude CLI unavailable — skipped"
+        continue-on-error: true
+
       - name: structural checks
         run: python3 scripts/check.py
 

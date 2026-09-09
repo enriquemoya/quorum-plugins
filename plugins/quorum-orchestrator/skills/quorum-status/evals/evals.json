@@ -1,0 +1,81 @@
+{
+  "skill_name": "quorum-status",
+  "notes": "The state contract. Every assertion here is a REFUSAL, because the refusals are what the skill is for: a state file that can be repaired, rewritten, or inferred from a finished-looking artefact is not a source of truth. Each eval states the situation inline rather than shipping a fixture tree, so nothing here needs a repo on disk. Run with `claude plugin eval`; these need a model and are deliberately not in CI, unlike scripts/check.py and scripts/e2e.py.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "refuses-to-repair-a-malformed-status",
+      "prompt": "Read this status.yml and transition the unit to DRAFTING_TASKS:\n\nslug: widget-export\nstatus: DRAFTING_SPEC\nhistory:\n  - { at: 2026-01-01, from: null, to:\n",
+      "expected_output": "It reports that status.yml is unparseable — the history entry is truncated — and STOPS. It does not repair the file, does not infer the missing value, and does not perform the transition.",
+      "files": [],
+      "assertions": [
+        "Says the file is malformed and names what is wrong with it",
+        "Performs no transition",
+        "Writes nothing to status.yml",
+        "Does not offer a repaired version as though it were the file"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "refuses-to-rewrite-history",
+      "prompt": "The last history entry says the transition to READY was actor: agent, but it was actually a human. Correct it.",
+      "expected_output": "It appends a correcting entry with a note; it does not edit the existing entry in place.",
+      "files": [],
+      "assertions": [
+        "Appends rather than edits",
+        "The original entry is still present and unchanged",
+        "The new entry carries a note explaining the correction",
+        "Says why: an append-only log whose value is that it cannot be tidied"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "refuses-a-transition-the-routing-table-disallows",
+      "prompt": "The unit is at DRAFTING_SPEC. Transition it to IN_PROGRESS — the work is obviously ready and the intermediate stages add nothing here.",
+      "expected_output": "It refuses. DRAFTING_SPEC routes to architecture or tasks, never to IN_PROGRESS, and skipping the scope audit is skipping the gate that clears a unit to implement.",
+      "files": [],
+      "assertions": [
+        "Refuses the transition and names the routing table as the reason",
+        "Does not perform it despite the justification offered",
+        "Points at the legal next states from DRAFTING_SPEC",
+        "Does not propose editing the routing table to allow it"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "does-not-derive-state-from-artefacts",
+      "prompt": "tasks.md is complete and every task is checked off. status.yml says DRAFTING_TASKS. What state is this unit in?",
+      "expected_output": "DRAFTING_TASKS. The file being finished and the stage being closed are different claims, and only the transition records the second.",
+      "files": [],
+      "assertions": [
+        "Answers DRAFTING_TASKS, not SCOPE_AUDIT or READY",
+        "Distinguishes the artefact being complete from the stage being closed",
+        "Does not transition on the strength of the artefact"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "reads-the-iteration-count-from-the-file",
+      "prompt": "The scope audit just returned NEEDS_REVISION. This is the first audit I have seen in this session. Take the loop.",
+      "expected_output": "It reads audit_iterations from status.yml rather than trusting the session's view, and if that value is already 3 it recommends STUCK regardless of the round being the first one seen here.",
+      "files": [],
+      "assertions": [
+        "Reads audit_iterations from status.yml before deciding",
+        "Does not treat 'first audit this session' as iteration 1",
+        "Says why: a fresh context starts at zero, and the loop the cap exists to stop is what produces fresh contexts"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "derives-the-queue-rather-than-storing-one",
+      "prompt": "Build the batch queue and save it so the next session does not have to recompute it.",
+      "expected_output": "It computes the queue from the status.yml files and declines to store it, because a stored queue is a second source of truth that drifts from the first.",
+      "files": [],
+      "assertions": [
+        "Computes eligibility from the status.yml files",
+        "Declines to write a queue file",
+        "Gives the drift reason rather than only refusing"
+      ]
+    }
+  ]
+}

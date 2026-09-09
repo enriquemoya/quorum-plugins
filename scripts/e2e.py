@@ -261,6 +261,48 @@ def test_gates_hold() -> None:
 # --------------------------------------------------------------------------
 
 
+def test_governance_corrections() -> None:
+    """The three defects the dogfood run found in the process itself.
+
+    Each is pinned because each was shipped: a consumer writing a real
+    `tasks.md` hits the first immediately, and the other two are holes an audit
+    falls into rather than defects it reports.
+    """
+    standard = doc("governance/rules/SPEC_STANDARD.md")
+    assert_that(
+        "nothing wraps it" in standard and "indented continuation" in standard,
+        "the task format states that the task line does not wrap",
+    )
+    # The format has to survive a task with three paths, which is what broke it.
+    sample = (
+        "- [ ] T7: wire the export job — files: a/one.ts, a/two.ts, w/three.py — AC: AC3, AC4\n"
+        "      Prose beneath, on as many lines as it needs.\n"
+    )
+    parsed = re.findall(r"- \[ \] (T\d+): .+? — files: (.+?) — AC: (.+)$", sample, re.M)
+    assert_that(
+        len(parsed) == 1 and len(parsed[0][1].split(",")) == 3,
+        "a three-path task parses under the corrected format",
+        f"{len(parsed)} parsed",
+    )
+
+    proposal = doc("governance/rules/AUDIT_PROPOSAL.md")
+    assert_that("| governance" in proposal, "a proposal can target the process itself")
+    assert_that(
+        "never blocks the unit that raised it" in proposal,
+        "a governance finding does not block the unit that found it",
+    )
+
+    status = doc("skills/quorum-status/SKILL.md")
+    assert_that("BLOCKED` is not terminal and is not `STUCK`" in status,
+                "BLOCKED is distinguished from STUCK")
+    assert_that("blocked_on:" in status, "a BLOCKED unit records what it is waiting for")
+    assert_that("not BLOCKED" in status, "the queue excludes BLOCKED units")
+    assert_that(
+        "BLOCKED" in doc("commands/quorum-orchestrate.md"),
+        "the router routes BLOCKED",
+    )
+
+
 def main() -> int:
     keep = "--keep" in sys.argv
     bed = Path(tempfile.mkdtemp(prefix="quorum-e2e-"))
@@ -274,6 +316,7 @@ def main() -> int:
         test_matrix_precedence()
         test_gate_exit_code(bed)
         test_gates_hold()
+        test_governance_corrections()
 
         width = max(len(n) for _, n, _ in RESULTS)
         for ok, name, detail in RESULTS:

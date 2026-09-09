@@ -1,0 +1,147 @@
+{
+  "skill_name": "quorum-init",
+  "notes": "Discovery writes the file every other skill resolves against, so the failure that matters is a confident wrong answer rather than a missing one \u2014 a null means 'skip this concern' and is handled everywhere, while a plausible invented value is handled nowhere. Four of these come from a dogfood run against a real polyglot repository; each names the situation that produced it. Needs a model. Note that `claude plugin eval` does not exist in every Claude Code version \u2014 where it is absent these are a specification of the behaviour rather than an executable suite, which is why nothing in CI depends on them.",
+  "evals": [
+    {
+      "id": 0,
+      "name": "sweeps-past-a-workspace-declaration",
+      "prompt": "package.json declares workspaces ['apps/web','apps/api']. The tree also holds workers/src/worker.py with no manifest. List the components.",
+      "expected_output": "Three: web, api, and workers. A workspace declaration is authoritative for its own ecosystem and blind to every other \u2014 a JS workspace cannot name a Python worker beside it.",
+      "files": [],
+      "assertions": [
+        "Reports three components, including workers",
+        "Takes the declaration as authoritative for the JS packages",
+        "Names the entry point as the evidence for workers",
+        "Explains that the declaration was incomplete rather than wrong"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "catches-gitignored-durable-artefacts",
+      "prompt": "Set up the pipeline here. The repository's .gitignore contains a line reading `.claude/`.",
+      "expected_output": "It reports that the durable artefacts \u2014 profile, governance, specs, runs \u2014 would be written and never committed, and offers the narrowing. It does not proceed as though the setup were complete.",
+      "files": [],
+      "assertions": [
+        "Runs git check-ignore against the durable paths rather than reading .gitignore by eye",
+        "Names the consequence: status.yml would be a source of truth only this checkout can see",
+        "Offers the narrowed pattern keeping transit artefacts ignored",
+        "Notes the failure is silent because every stage still succeeds"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "an-empty-constitution-is-a-valid-answer",
+      "prompt": "I do not want to write constitution articles. Skip that step.",
+      "expected_output": "It writes the file with no articles, records that this was chosen, and states what the audits will and will not check as a result. It does not invent articles and does not refuse to continue.",
+      "files": [],
+      "assertions": [
+        "Creates CONSTITUTION.md with no articles",
+        "Records the choice rather than leaving the file absent",
+        "Says the audits will check traceability and data rules but nothing project-specific",
+        "Invents no articles"
+      ]
+    },
+    {
+      "id": 3,
+      "name": "asks-for-refusals-not-values",
+      "prompt": "Help me write the constitution. We care about quality, performance, and good developer experience.",
+      "expected_output": "It says none of those is an article, applies the test \u2014 could an auditor point at a file and a line and say 'this violates article N' \u2014 and asks for refusals instead.",
+      "files": [],
+      "assertions": [
+        "Declines to turn the three values into articles",
+        "States the file-and-line test",
+        "Redirects the three toward the memory bank as conventions",
+        "Asks what would make the operator refuse to ship"
+      ]
+    },
+    {
+      "id": 4,
+      "name": "null-and-false-are-different-answers",
+      "prompt": "There is no i18n and I did not look at authentication. Record the characteristics.",
+      "expected_output": "i18n: false and auth: null. Examined-and-absent differs from not-examined, and the two lead to different next steps.",
+      "files": [],
+      "assertions": [
+        "Writes i18n: false",
+        "Writes auth: null",
+        "States the distinction rather than treating both as empty",
+        "Renders them differently in the report"
+      ]
+    },
+    {
+      "id": 5,
+      "name": "verified-commands-are-run-not-declared",
+      "prompt": "package.json scripts declares type-check, test:unit and lint. Record the verified commands.",
+      "expected_output": "It runs them and records what succeeded with its evidence. A declared script is not a verified command; that field means the command was executed and its exit code observed.",
+      "files": [],
+      "assertions": [
+        "Runs the commands rather than copying the scripts block",
+        "Records only what succeeded, with evidence",
+        "Reports a command that failed as a finding rather than omitting it",
+        "Takes the exit code from the command, not from a pipeline"
+      ]
+    },
+    {
+      "id": 6,
+      "name": "names-the-gap-rather-than-forcing-a-match",
+      "prompt": "This is a Go repository with a table-driven test suite. Which unit-test generator?",
+      "expected_output": "None is bundled. roles.unit-tests-gen stays null, the gap is named, and Phase 5 will skip generation and say so. It does not point the role at the closest bundled generator.",
+      "files": [],
+      "assertions": [
+        "Leaves roles.unit-tests-gen null",
+        "Names what would be needed",
+        "Refuses to substitute a Vitest or dotnet generator",
+        "Says a role pointing at a missing skill fails at the moment of use"
+      ]
+    },
+    {
+      "id": 7,
+      "name": "does-not-draft-what-a-later-stage-owns",
+      "prompt": "While you are reading the repo, draft the PRD for the first feature too \u2014 you already have the context.",
+      "expected_output": "It declines. Discovery classifies and records; the PRD is its own stage, always human-interactive, and writing it here would cross the agent frontier from inside a stage that sits before it.",
+      "files": [],
+      "assertions": [
+        "Declines to draft a PRD",
+        "Names the frontier rather than only refusing",
+        "Finishes discovery and hands back to the router"
+      ]
+    },
+    {
+      "id": 8,
+      "name": "does-not-enumerate-every-directory",
+      "prompt": "The repo has 40 directories under src/. List the components.",
+      "expected_output": "It applies the ownership test \u2014 a component owns a build, a test suite, or a deployable \u2014 and reports the few that qualify, saying the rest are directories.",
+      "files": [],
+      "assertions": [
+        "Reports far fewer than 40",
+        "States the ownership test as the reason",
+        "Does not list src/utils/ or similar as components",
+        "Says a map of forty folders hides the parts that matter"
+      ]
+    },
+    {
+      "id": 9,
+      "name": "does-not-create-a-vault",
+      "prompt": "Use vault mode for the memory bank. I do not have an Obsidian vault yet \u2014 set one up.",
+      "expected_output": "It declines to create a vault and offers local mode for today. Installing a plugin is not the moment to acquire a second tool, and an operator who has a vault knows where it is.",
+      "files": [],
+      "assertions": [
+        "Creates no vault",
+        "Offers local mode as the answer for today",
+        "Says vault mode stays available once a vault exists"
+      ]
+    },
+    {
+      "id": 10,
+      "name": "records-mechanisms-never-accounts",
+      "prompt": "The API authenticates against Auth0 tenant acme-prod.eu.auth0.com and reads a Postgres at db.internal:5432. Record the characteristics.",
+      "expected_output": "auth: oidc and a postgres datastore. The tenant and the host are not recorded \u2014 discovery frequently runs against a repository that is not yours, and the profile is a committed file.",
+      "files": [],
+      "assertions": [
+        "Records the mechanism, e.g. oidc",
+        "Records postgres as a datastore",
+        "Records NEITHER the tenant nor the host",
+        "Gives the committed-file reason"
+      ]
+    }
+  ]
+}

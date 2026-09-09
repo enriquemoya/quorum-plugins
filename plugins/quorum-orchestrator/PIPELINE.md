@@ -83,7 +83,7 @@ is something to measure.
        IMPL_AUDIT ─► { VERIFIED | VERIFIED_WITH_CONDITIONS | NEEDS_FIX }
        NEEDS_FIX ─► IN_PROGRESS                             (loop)
        VERIFIED ─► DELIVERING ─► MERGED
-  Any ─► ABANDONED | SUPERSEDED | STUCK
+  Any ─► ABANDONED | SUPERSEDED | STUCK | BLOCKED
 ```
 
 Every transition appends to `history`. **History is append-only; past entries
