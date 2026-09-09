@@ -414,6 +414,17 @@ def _install_paths() -> None:
     # narrowed to the shape actually observed: the expelled ``cache`` spelling
     # cannot come back here either.
     allowed = {"INSTALL.md": {"marketplaces"}, "docs/plugin-authoring.md": {"marketplaces"}}
+
+    # Records, not instructions. A spec narrating "cache/ became marketplaces/"
+    # has to name both; a critic transcript cannot be edited at all without
+    # ceasing to be evidence. Neither is a file an agent follows, so neither can
+    # send one to a directory that does not exist.
+    #
+    # This exemption exists because the check passed at commit time and failed
+    # immediately after: the spec files were still untracked, and ``tracked()``
+    # does not see untracked files. That is the second time in this codebase a
+    # guard has been green against files it was not yet reading.
+    records = (".claude/specs/", ".claude/runs/")
     # This file must contain the pattern it forbids. A guard in this repository
     # already shipped once without excluding itself, and passed while untracked.
     myself = Path(__file__).name
@@ -425,6 +436,8 @@ def _install_paths() -> None:
         if body is None:
             continue
         rel = path.relative_to(ROOT).as_posix()
+        if rel.startswith(records):
+            continue
         permitted = allowed.get(rel, set())
         for n, line in enumerate(body.splitlines(), 1):
             for m in child.finditer(line):

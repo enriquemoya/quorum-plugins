@@ -1,10 +1,22 @@
 slug: implement-phases
 origin: spec
 complexity: complex
-status: READY_WITH_CONDITIONS
+status: IN_PROGRESS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T03:20Z, from: READY_WITH_CONDITIONS, to: IN_PROGRESS, actor: agent,
+      note: "T1-T7 implemented. The stage is five phases and says so — it was seven with
+             eight stops, and a --human unit that changes how often it interrupts a
+             person may not do that silently. Fetch and plan became reads; the prompt
+             file is the whole keep-set, as the audit required. Three flags deleted with
+             per-flag reasons, --fix added, and the two lists now provably agree. An
+             external-action sub-gate was removed: it contradicted the Handoff section
+             two screens above it, which has always said this stage never delivers.
+             Twelve assertions added; five statements reverted one at a time and each
+             watched failing. Two reverts silently did not apply on the first attempt
+             because the sentences wrap mid-phrase — the same trap flat() exists for,
+             met from the other side." }
   - { at: 2026-09-09T01:10Z, from: NEEDS_REVISION, to: READY_WITH_CONDITIONS, actor: human,
       note: "Gate passed, no second audit iteration. Each finding is closed by a named
              change, and the trail is here rather than implied by the advance:

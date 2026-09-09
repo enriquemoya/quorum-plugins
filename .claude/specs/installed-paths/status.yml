@@ -5,6 +5,14 @@ status: IN_PROGRESS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T03:20Z, from: IN_PROGRESS, to: IN_PROGRESS, actor: agent,
+      note: "The check grew a records exemption. It passed at commit time and failed
+             immediately after, because this unit's own spec files were still untracked
+             and tracked() does not see untracked files — the second time in this
+             session a guard has been green against files it was not yet reading. Specs
+             and run transcripts are records, not instructions: a spec narrating
+             'cache became marketplaces' has to name both, and a critic transcript
+             cannot be edited without ceasing to be evidence." }
   - { at: 2026-09-09T02:30Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
       note: "Tasks implemented. The scope audit escalated and rewrote the approach
              twice before anything was edited. First draft — correct cache/ to

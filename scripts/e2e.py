@@ -450,6 +450,96 @@ def test_bundled_files_are_resolved_not_guessed() -> None:
         )
 
 
+def test_implementation_stage_matches_the_pipeline() -> None:
+    """The stage stopped being the entry point and kept the entry point's document.
+
+    Each assertion below pins one contradiction that was actually in the file:
+    a ticket key in the usage of a command whose frontmatter takes a slug, three
+    flags the frontmatter never declared beside a missing one the preconditions
+    depend on, a complexity derived here that triage already recorded, and a
+    dry-run defined by a phase number in a file whose phases were about to be
+    renumbered.
+    """
+    rel = "commands/quorum-implement.md"
+    body = doc(rel)
+    front = flat((PLUGIN / rel).read_text(encoding="utf-8").split("---")[1])
+
+    # AC1 — a slug, and the ticket key demoted to a field
+    assert_that(
+        not re.search(r"/quorum-\w+ [A-Z]{2,}-\d+", body),
+        "implement takes a slug, never a ticket key",
+        "units on the spec path have no key",
+    )
+    assert_that(
+        "carries its ticket key as a field" in body,
+        "the ticket key survives as a field of the unit",
+        "demoted, not deleted",
+    )
+
+    # AC2 — the two flag lists agree
+    documented = {m.group(1) for m in re.finditer(r"\| `(--[a-z0-9-]+)` \|", body)}
+    declared = set(re.findall(r"(--[a-z0-9-]+)", front))
+    assert_that(
+        documented == declared,
+        "declared flags and documented flags are the same set",
+        f"declared={sorted(declared)} documented={sorted(documented)}",
+    )
+    assert_that("--fix" in documented, "--fix is documented", "the preconditions depend on it")
+    for gone in ("--complexity", "--resume", "--include-subtasks"):
+        assert_that(gone not in documented, f"{gone} is gone", "decided per flag, in the spec")
+
+    # AC4 — complexity is read, and no procedure for deriving it remains
+    assert_that(
+        "no procedure here for computing it" in body,
+        "complexity is read from status.yml",
+        "a value derived here can disagree with the audited one",
+    )
+    assert_that(
+        "auto-detect" not in body.lower() and "classifies it" not in body,
+        "no complexity-derivation procedure survives",
+        "reading it and deriving it cannot both be true",
+    )
+
+    # AC5 — dry-run says what it stops before, not which phase
+    assert_that(
+        "before the first phase that writes" in body,
+        "dry-run is described by what it stops before",
+        "a phase number stops meaning what it says when phases are renumbered",
+    )
+
+    # AC6 — roles, not products; and the null-tracker case is stated
+    assert_that(
+        "{{role:tracker}}" in body,
+        "the tracker is a role",
+        "the profile models any tracker or none",
+    )
+    assert_that(
+        "roles.tracker: null" in body and "no durable home at all" in body,
+        "the null-tracker case has a stated answer",
+        "transient and uncommitted, announced at the gate",
+    )
+
+    # AC7 — tasks.md is the plan, and the claimed precondition is checked
+    assert_that(
+        "`tasks.md` is the plan" in body,
+        "tasks.md is the plan",
+        "it arrived audited; re-planning produces a worse second plan",
+    )
+    assert_that(
+        "naming criteria that\nexist in `requirements.md`" in flat(body)
+        or "naming criteria that exist in `requirements.md`" in body,
+        "the AC mapping is checked, not just claimed",
+        "the preconditions have always asserted it",
+    )
+
+    # the gate count, which a --human unit may not change silently
+    assert_that(
+        "five stops" in body,
+        "the stage states its own gate count",
+        "removing phases changes how often a person is interrupted",
+    )
+
+
 def main() -> int:
     keep = "--keep" in sys.argv
     bed = Path(tempfile.mkdtemp(prefix="quorum-e2e-"))
@@ -467,6 +557,7 @@ def main() -> int:
         test_preconditions_are_measured()
         test_panel_detects_configured_but_unreachable()
         test_bundled_files_are_resolved_not_guessed()
+        test_implementation_stage_matches_the_pipeline()
 
         width = max(len(n) for _, n, _ in RESULTS)
         for ok, name, detail in RESULTS:
