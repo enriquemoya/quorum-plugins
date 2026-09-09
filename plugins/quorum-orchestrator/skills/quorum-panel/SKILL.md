@@ -26,14 +26,71 @@ test -d .quorum                     || REASON="not a Quorum engagement"
 quorum cpd-stats >/dev/null 2>&1    || REASON="no critic panel configured"
 ```
 
-Three distinguishable causes, because the operator's next step differs for each
-— install the engine, run `quorum init` here, or configure a panel. A single
-boolean would tell them the panel was degraded and leave them to guess why.
+Then a fourth question the first three cannot answer: **the panel is
+configured — can its seats actually be reached?**
 
-| Outcome | Path | Record |
+That is the ordinary state between installing the engine and paying for a
+provider. The shipped default names paid seats and a fresh install has no
+credentials, so a panel that is fully configured and entirely unreachable is
+what most operators meet first. Without this probe it reports as "no critic
+panel configured", sending them to write a config that already exists.
+
+### Ask the engine; do not reimplement it
+
+Run `quorum doctor` and read the checks it already emits. Three of them draw
+distinctions a catalogue lookup cannot:
+
+| Check | Means | The operator's fix |
 |---|---|---|
-| all three pass | cross-provider | `panel: cpd` |
-| any fails | same-provider | `panel: single-provider`, with `panel_reason: <REASON>` |
+| `critic panel` fails | seats violate the harness gates | change the seats or the gates |
+| `panel catalog` warns | seats absent from the provider catalogue | a typo, or that tier is not offered |
+| `provider:<model>` fails | the seat exists and the dispatch fails | authenticate, or change tier |
+
+**Catalogue presence is not reachability.** A seat can be listed and
+unauthorised; only `provider:<model>` establishes it, because that check
+dispatches to the seat rather than looking it up. Reading the catalogue alone
+would report a reachable panel that cannot run a round.
+
+`provider:<model>` is per seat, so a partially reachable panel is
+representable. Report the reachable count and name the unreachable seats — a
+panel of three with one dead seat is not the same as a dead panel, and
+collapsing them loses the distinction that decides whether a round can run.
+
+### When the diagnostic cannot answer
+
+Two failures are not the panel being unreachable, and neither may be recorded
+as though it were:
+
+**The diagnostic did not run.** Missing binary, non-zero exit for its own
+reasons, no output. Record `panel_reason: "could not determine reachability"`
+and say what was tried. A probe that failed to run and a probe that observed
+absence are opposite conclusions.
+
+**The expected checks are not in the output.** The engine may rename or
+restructure its checks; this skill reads them by name and has no contract
+guaranteeing those names. When `critic panel`, `panel catalog` and
+`provider:` are all absent from a `doctor` run that otherwise succeeded, that
+is a version mismatch, not a reachable panel and not an unconfigured one.
+
+**The fallback is open, never closed.** Do not fall back to "no critic panel
+configured" — that is the wrong answer this whole probe exists to stop
+producing, and reaching it through a rename would restore the defect silently.
+Fall back to "could not determine", which is true.
+
+### What each outcome records
+
+| Outcome | Path | `panel_reason` |
+|---|---|---|
+| all four pass | cross-provider | *(null)* |
+| engine absent | same-provider | `engine not installed` |
+| not an engagement | same-provider | `not a Quorum engagement` |
+| no panel configured | same-provider | `no critic panel configured` |
+| configured, seats unreachable | same-provider | `panel configured but unreachable: <the doctor line>` |
+| diagnostic unusable | same-provider | `could not determine reachability: <what was tried>` |
+
+Four distinguishable causes plus two indeterminates, because the operator's
+next step differs for each — install the engine, run `quorum init`, configure a
+panel, authenticate, or look at why the diagnostic will not answer.
 
 State which path is running, and why, **before** the round starts. An operator
 who learns at the verdict that the panel was degraded has already spent the run.

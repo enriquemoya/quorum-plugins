@@ -20,6 +20,26 @@ placing a file of the same name in `.claude/governance/rules/`.
 - A verdict with no blockers says so explicitly, with the reason the set is
   empty. Silent passes are forbidden.
 
+## Preconditions are measured, never inferred
+
+A precondition is established by running a probe that invokes the capability
+being claimed. This binds every stage that evaluates one, not only the stage
+that classifies work.
+
+Two shapes are NOT evidence, because both were mistaken for it:
+
+- **An absent config file.** A missing config means nobody configured it, which
+  is a different claim from the capability being unreachable.
+- **An unset environment variable.** A tool with its own stored credentials
+  reaches providers no environment variable mentions.
+
+A probe records its invocation, its exit code and the time it ran. A non-zero
+exit is a broken probe, not an absent capability — those are opposite
+conclusions and they look identical in a summary.
+
+When no probe exists for a precondition, that is the finding. Say what was
+tried and escalate; do not assert the precondition in either direction.
+
 ## Determinism
 
 - The same inputs produce the same verdict within a governance version.

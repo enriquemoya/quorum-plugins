@@ -287,6 +287,39 @@ def _artefact_homes() -> None:
             fail(path, "is committed, but its durable home is the tracker or the PR")
 
 
+@check("preconditions — a BLOCKED claim carries the probe that established it")
+def _blocked_carries_probe() -> None:
+    """A precondition asserted without a probe is the defect this check reports.
+
+    One shipped: a unit was BLOCKED on "no second model family" after reading
+    environment variables and finding no config file, while seven models were
+    reachable by a command nobody ran. Neither an absent config nor an unset
+    variable is evidence — they say nobody configured something, which is a
+    different claim from the capability being absent.
+
+    Reports; never corrects. A record someone wrote deliberately is theirs to
+    answer, and a sweep that edits state is a sweep that can be wrong silently.
+    """
+    for path in ROOT.glob(".claude/specs/*/status.yml"):
+        body = text(path)
+        if body is None:
+            continue
+        if not re.search(r"^status:\s*BLOCKED\s*$", body, re.M):
+            continue
+        if not re.search(r"^blocked_on:", body, re.M):
+            fail(rel(path), "is BLOCKED with no blocked_on — the claim has no content")
+        if not re.search(r"^probe:", body, re.M):
+            fail(
+                rel(path),
+                "is BLOCKED with no probe: block — the precondition was asserted, "
+                "not measured",
+            )
+            continue
+        for field in ("invocation", "exit_code", "at"):
+            if not re.search(rf"^\s+{field}:", body, re.M):
+                fail(rel(path), f"probe has no {field} — the measurement is not replayable")
+
+
 # --------------------------------------------------------------------------
 # 6. frontmatter
 # --------------------------------------------------------------------------

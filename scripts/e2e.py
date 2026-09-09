@@ -303,6 +303,98 @@ def test_governance_corrections() -> None:
     )
 
 
+def test_preconditions_are_measured() -> None:
+    """A BLOCKED claim is a measurement, and the rules that keep it one.
+
+    Every assertion here answers a finding a three-family panel raised against
+    an earlier, narrower version of this rule. Two were blockers.
+    """
+    status = doc("skills/quorum-status/SKILL.md")
+
+    # The original defect: a proxy stood in for the capability.
+    assert_that(
+        "invokes the capability being claimed, not a proxy" in status,
+        "a probe must invoke the capability, not a proxy for it",
+    )
+    # gpt, round 2: successful execution alone does not prove a negative.
+    assert_that(
+        "is not a probe that failed to run" in status and "exit_code" in status,
+        "a broken probe is distinguished from an observed absence",
+    )
+    # grok + gpt, blockers: an unspecified cannot-probe terminal re-arms it.
+    assert_that(
+        "There is no cannot-probe state" in status,
+        "there is no cannot-probe state to assert from",
+    )
+    # grok, round 2: without a visible record, "stays put" is a silent park.
+    assert_that(
+        "OPEN QUESTION" in status and "same-state history entry" in status,
+        "an unprobeable precondition becomes a visible history entry",
+    )
+    # kimi: reachability is time-varying, so a claim carries its timestamp.
+    assert_that(
+        "only as current as its probe" in status,
+        "a reachability claim carries the time it was measured",
+    )
+    # kimi: the rule has to bind more than the one agent that tripped over it.
+    rules = doc("governance/rules/GLOBAL.md")
+    assert_that(
+        "Preconditions are measured, never inferred" in rules
+        and "every stage that evaluates one" in rules,
+        "the rule binds every stage, not only triage",
+    )
+    assert_that(
+        "absent config file" in rules and "unset environment variable" in rules,
+        "the two shapes that produced the incident are named",
+    )
+
+
+def test_panel_detects_configured_but_unreachable() -> None:
+    """The state most operators meet first, and the ways of getting it wrong.
+
+    Between installing the engine and paying for a provider, the panel is fully
+    configured and entirely unreachable — the shipped default names paid seats
+    and a fresh install has no credentials. Reported as "no critic panel
+    configured", it sends the operator to write a config that already exists.
+
+    Every assertion answers a finding a three-family panel raised against an
+    earlier version of this fix, which proposed a catalogue lookup.
+    """
+    panel = doc("skills/quorum-panel/SKILL.md")
+
+    assert_that(
+        "panel configured but unreachable" in panel,
+        "the fourth cause is named distinctly from an unconfigured panel",
+    )
+    # All three critics: catalogue presence is not credentialed reachability.
+    assert_that(
+        "Catalogue presence is not reachability" in panel,
+        "a catalogue lookup is rejected as the reachability test",
+    )
+    # The engine already draws typo/gates/auth apart; do not rebuild it.
+    assert_that(
+        "Ask the engine; do not reimplement it" in panel
+        and "critic panel" in panel
+        and "provider:<model>" in panel,
+        "the panel reads the engine's checks rather than reimplementing them",
+    )
+    # kimi: a binary probe collapses "could not check" into "absent".
+    assert_that(
+        "could not determine reachability" in panel,
+        "an unusable diagnostic is indeterminate, not unreachable",
+    )
+    # grok, round 2: name-scraping with a closed fallback restores the defect.
+    assert_that(
+        "The fallback is open, never closed" in panel,
+        "a renamed check falls back to indeterminate, never to unconfigured",
+    )
+    # kimi: per-seat partiality is already modelled; do not flatten it.
+    assert_that(
+        "partially reachable panel is" in panel,
+        "a partly reachable panel is distinguished from a dead one",
+    )
+
+
 def main() -> int:
     keep = "--keep" in sys.argv
     bed = Path(tempfile.mkdtemp(prefix="quorum-e2e-"))
@@ -317,6 +409,8 @@ def main() -> int:
         test_gate_exit_code(bed)
         test_gates_hold()
         test_governance_corrections()
+        test_preconditions_are_measured()
+        test_panel_detects_configured_but_unreachable()
 
         width = max(len(n) for _, n, _ in RESULTS)
         for ok, name, detail in RESULTS:

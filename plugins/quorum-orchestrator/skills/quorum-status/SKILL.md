@@ -90,12 +90,54 @@ absent has done nothing wrong and has nothing left to try — borrowing `STUCK`
 for it would report a loop that never happened, and the iteration count would
 say so.
 
-A `BLOCKED` unit records what is missing:
+### BLOCKED requires a probe that ran
+
+A `BLOCKED` claim says a capability is absent. That is a measurement, and it
+carries the measurement:
 
 ```yaml
 status: BLOCKED
 blocked_on: "a second model family — the panel needs cross-provider dispatch"
+probe:
+  invocation: "opencode models"          # what was RUN
+  exit_code: 0                           # it ran
+  observed: "empty list"                 # and what it saw
+  at: 2026-09-08T14:22Z                  # when
 ```
+
+Four rules, each closing a way absence gets mistaken for evidence.
+
+**A probe invokes the capability being claimed, not a proxy for it.** Checking
+whether a config file exists is not a probe of reachability, because the file is
+not the thing claimed. This defect shipped once: a unit was BLOCKED on "no
+second model family" after reading environment variables and finding no config,
+while seven models were reachable by a command nobody ran.
+
+**A probe that ran and observed absence is not a probe that failed to run.**
+`exit_code: 0` with an empty result is evidence; a non-zero exit is a broken
+probe and proves nothing about the capability. Record both fields so the
+difference survives, because "the command failed" and "the command found
+nothing" are opposite conclusions that look alike in a summary.
+
+**There is no cannot-probe state.** Every version of one recreates the error a
+level up: a terminal that asserts the precondition is the original defect, and
+one that blocks on it is the same park under a new name. When no probe exists,
+the unit **does not enter BLOCKED**. It stays where it is, and the precondition
+is appended to `history` as an open question naming what was tried:
+
+```yaml
+  - { at: …, from: PRD_READY, to: PRD_READY, actor: agent,
+      note: "OPEN QUESTION — precondition 'X' could not be probed. Tried: <what>.
+             Not blocked; a human decides." }
+```
+
+A same-state history entry is deliberate. Staying put silently is a park nobody
+can see; the entry makes it visible in the one place state is read.
+
+**A reachability claim is only as current as its probe.** Reachability varies
+with time — a credential expires, a service returns. The `at` timestamp is what
+lets a later reader tell a measurement from a memory. Re-probe before acting on
+one you did not take.
 
 It is excluded from the queue, like `STUCK`, but for a reason a human can act on
 somewhere other than this repository. The router reports the precondition rather

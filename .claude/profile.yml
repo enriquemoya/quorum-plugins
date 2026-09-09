@@ -62,6 +62,38 @@ memory_bank:
   seeded: false
   seeded_on: null
 
+# Which critic panel each stage convenes. A heavier panel does not follow the
+# response contract better -- measured at 2/3 for both tiers on the same brief
+# -- but it finds what a lighter one does not: the fence defect surfaced only
+# because a heavy-tier critic formats differently, and the fail-open reframing
+# came from a heavy seat none of the six lighter critics reached.
+#
+# The split is by what a stage DECIDES, not by how important it feels. Stages
+# that shape or judge get the heavy panel; stages that verify get the medium
+# one, because a gate result is an observation rather than a judgement.
+panel_tiers:
+  heavy:
+    - scope-audit          # decides whether work may start
+    - impl-audit           # decides whether work may ship
+    - prd                  # shapes the problem
+    - spec                 # shapes what "done" means
+    - architecture
+    - design
+    - prompt-generation    # inside implementation
+    - code-review
+  medium:
+    - triage
+    - tasks
+    - analyze
+    - delivery
+  # Three families per tier. That is the property a panel buys -- a shared
+  # blind spot has to survive several architectures -- not the quality of any
+  # one seat.
+  seats:
+    heavy:  [opencode-go/grok-4.6, opencode-go/gpt-5.6-luna, opencode-go/kimi-k3]
+    medium: [opencode-go/qwen3.7-max, opencode-go/minimax-m3, opencode-go/mimo-v2.5-pro]
+    free:   [opencode/nemotron-3.5-lightning-free, opencode/mimo-v2.5-free, opencode/ling-3.0-flash-fin-free]
+
 governance:
   constitution:  ".claude/governance/rules/CONSTITUTION.md"
   rules_dir:     ".claude/governance/rules"

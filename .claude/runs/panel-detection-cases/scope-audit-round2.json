@@ -1,0 +1,50 @@
+[
+  {
+    "decision_id": "u3-scope",
+    "critic_model": "opencode-go/grok-4.6",
+    "critic_family": "grok",
+    "session_id": "ses_f7bdb6dffffeV56eA7b0KZkwaa",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/grok-4.6",
+    "finding_count": 2,
+    "duration_ms": 148160,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "The original three findings are withdrawn. Delegating to the engine\u2019s diagnostic, at panel time, with the three causes kept distinct, closes catalogue-vs-credentials, the one-shot stale lock, and the collapsed/duplicated probe.\n\nName coupling is **not automatically** worse than duplication. Bare string coupling is.\n\n---\n\n**Finding 1**\n\nSeverity: high\nMechanism: The revision keys the fourth case on three emitted names (`critic panel`, `panel catalog`, `provider:<model>`) without stating that those strings are a stable interface (check IDs / schema) rather than display labels, and without a parse fallback. Duplication\u2019s failure was two diagnostics disagreeing \u2014 still a detection. A name scrape that misses is a silent false negative: the engine still reports the problem, the skill does not enter the new case. If probe 3 is still a catch-all, that miss becomes \u201cno critic panel configured\u201d again \u2014 the original bug with extra steps. If probe 3 is emptiness-only, the miss becomes \u201cpanel looks fine\u201d and dies at dispatch, which is the unnamed state this work exists to kill. Either way the fourth case fails closed on format drift. Substring hits on unrelated doctor text are the false-positive twin.\nFailure mode: Engine rename, rephrase, or extra check in the same dump \u2192 skill does not name configured-unreachable; operator is sent to configure a panel or into a raw dispatch error. Unrelated diagnostic noise \u2192 healthy panel reported unreachable; agent mode may iterate and must not conclude.\nDetection signal: Change a check\u2019s display label without changing behavior; run the ordinary unpaid-credentials path. Fourth case must still fire. Also: inject an unrelated doctor failure whose text contains `critic panel`; fourth case must not fire.\nFalsifier: Those three strings are already versioned check IDs (not labels), the skill matches on ID/status fields not prose, tests pin the IDs, and any unrecognized diagnostic result is recorded as configured-not-callable with the engine text attached \u2014 never as \u201cno panel configured,\u201d never as implicit reachable. Evidence of that contract would drop this finding.\nRecommendation: Bind to check IDs + status, not labels. Specify the fallback in the proposal itself. That is the coupling that is better than duplication; magic strings are not.\n\n---\n\n**Finding 2**\n\nSeverity: medium\nMechanism: `provider:<model>` is glossed \u201cthe seat dispatches or does not.\u201d The other two checks are panel-level; this one is per-seat. The revision does not say how they aggregate, and does not say whether `provider:<model>` is a preflight or a live dispatch. OR-of-any-failure refuses a mixed panel that still has callable seats. AND-of-all-failure (or only treating panel-level checks as fatal) dispatches a mostly-dead panel into `IncompleteDebateError`. A live dispatch as a probe bills, can create sessions, and treats a transient network error as configured-unreachable.\nFailure mode: Over-degrade (block a working subset, tell the operator to authenticate) or under-degrade (start a debate that cannot complete). A flaky probe-dispatch stale-locks agent mode the same way a cached catalogue check would have.\nDetection signal: Panel of two free seats plus one paid default, no paid credentials \u2014 must not report the panel unusable if the remaining seats still satisfy the panel invariant. Paid-only default panel with no credentials \u2014 must still report configured-unreachable. Transient provider 5xx on a preflight \u2014 must not be recorded as the ordinary unpaid path.\nFalsifier: `provider:<model>` is already a side-effect-free preflight, and the fourth case fires only when zero configured seats are callable (partial loss is reported as a warning, not as panel-unreachable).\nRecommendation: State both in the proposal: preflight not dispatch; unreachable means no callable seat, not \u201ca check fired.\u201d\n\nDelegation closes the three original findings. Depending on names is worse than duplication only if the names are scraped labels with no fallback \u2014 which is what the revision currently writes down. Hold for an ID/status contract and a closed fallback; do not withdraw into a pass until that is in the proposal. The mixed-seat aggregation is a real hole but secondary to that.\n\n- severity: major \u2014 name-scrape without an ID contract and closed fallback silently drops the fourth case (or recreates \u201cno panel configured\u201d)\n- severity: minor \u2014 mixed-seat aggregation and preflight-vs-dispatch for `provider:<model>` are unspecified\nverdict: concerns",
+    "resumed_from": "ses_f7bdb6dffffeV56eA7b0KZkwaa",
+    "round1_decision_id": "u3-scope-R0"
+  },
+  {
+    "decision_id": "u3-scope",
+    "critic_model": "opencode-go/gpt-5.6-luna",
+    "critic_family": "gpt",
+    "session_id": "ses_f7bdb67d5ffewfXsbNLT1G0sEd",
+    "verdict": "pass",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/gpt-5.6-luna",
+    "finding_count": 0,
+    "duration_ms": 6717,
+    "failure_reason": null,
+    "severity_parse": "no_records",
+    "critic_text": "Withdraw. A dispatch-based credential probe plus a distinct \u201ccould not determine\u201d outcome closes the finding. The remaining concern is operational only: ensure the probe\u2019s side effects and cost are bounded and documented.\n\nverdict: pass",
+    "resumed_from": "ses_f7bdb67d5ffewfXsbNLT1G0sEd",
+    "round1_decision_id": "u3-scope-R1"
+  },
+  {
+    "decision_id": "u3-scope",
+    "critic_model": "opencode-go/kimi-k3",
+    "critic_family": "kimi",
+    "session_id": "ses_f7bdb601effeDRuVOuSgsuaft4",
+    "verdict": "pass",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/kimi-k3",
+    "finding_count": 0,
+    "duration_ms": 138342,
+    "failure_reason": null,
+    "severity_parse": "no_records",
+    "critic_text": "## Withdraw \u2014 with one condition and one constraint this unit must satisfy\n\n**The scoping call is sound, and I'll say why precisely rather than conceding generally.**\n\nThe fifth finding lives at a different decision point: the pre-flight probe answers \"may this round convene,\" the runtime mapper answers \"what does the record say when the engine fails after convene.\" The author's auditability argument is not a courtesy excuse \u2014 predicate 3 gives it real force. The runtime path is where a degraded verdict's iterate-but-not-conclude behavior is governed, so a change there alters verdict semantics, not just labeling. Folding that into a detection unit would produce a diff whose tests must simultaneously cover probe taxonomy and conclusion-gating. That is exactly how units stop being auditable. Separate unit, correctly drawn.\n\nThe accepted resolutions also shrink the residual hole my fifth finding warned about. With the probe now dispatching to the engine's `provider:<model>` check per seat, the motivating state \u2014 fresh install, shipped paid seats, no credentials \u2014 is caught at convene and never reaches the runtime path at all. What remains is the narrow window: credentials valid at convene, invalid at dispatch (revocation, token expiry, mid-round rate-limiting). Narrower, but not zero.\n\n**The condition.** My withdrawal holds only if the fifth finding is recorded durably as its own tracked unit \u2014 in the plan or findings log, not in this thread \u2014 at or before this unit closes. \"I would rather name it as a separate finding\" is a commitment, and commitments that live only in conversation die with the session. Falsifier for my withdrawal: if this unit closes with no recorded follow-up, or if its done-criteria claim the misdiagnosis is fixed end-to-end rather than at pre-flight, I re-raise the finding at that unit's review unchanged.\n\n**The constraint on this unit.** The deferral creates a dependency: the runtime unit will consume this unit's taxonomy. So this unit must record degradation reasons in the engine's own vocabulary \u2014 the named sub-causes (harness-gate violation, catalogue absence, authentication) verbatim \u2014 not in pre-flight-phrased strings like \"configured-but-unreachable panel\" alone. If the reason strings are phrased for the probe's context, the runtime mapper will need to re-derive or translate them, and the follow-up unit inherits a refactor instead of a mapping. Keeping the reason vocabulary stable and engine-sourced is in scope here: it is a property of what the probe writes, not of the runtime path.\n\n**Priority note for the follow-up, for the record.** Predicate 3 cuts both ways: it justifies the separation, and it also means the runtime label is load-bearing rather than cosmetic \u2014 a mislabel there doesn't just misdirect the operator, it can govern whether a degraded round may conclude. The follow-up should be scheduled adjacent to this unit, not consigned to backlog.\n\nThe four accepted resolutions address findings 1\u20134 as raised, including the two drift mechanisms (credential-scoped check dispatched to the engine; no skill-side catalogue parsing). On the question asked \u2014 hold or withdraw on the scoping call \u2014 I withdraw.\n\nverdict: pass",
+    "resumed_from": "ses_f7bdb601effeDRuVOuSgsuaft4",
+    "round1_decision_id": "u3-scope-R2"
+  }
+]
