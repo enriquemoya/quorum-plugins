@@ -52,9 +52,18 @@ claude
 
 Claude will start, load your project's `CLAUDE.md` (if present), and you're ready to go. Any installed skills are immediately available via `/skill-name`.
 
-### Setting Up the Jira MCP Server
+### Setting up a tracker
 
-MCP (Model Context Protocol) servers give Claude Code access to external services. The Atlassian MCP server is required for skills that interact with Jira — posting test case documents, reading ticket context for QA generation, and so on.
+Nothing in this marketplace talks to a tracker directly. Skills that need one
+resolve `{{role:tracker}}` from your `profile.yml`, and that role names whichever
+skill implements it.
+
+**One driver ships: `quorum-jira-story`.** If your tracker is something else, the
+role has nothing to point at and every step that needs a ticket announces the
+skip — which is a supported configuration, not a broken one. Writing a driver
+for another tracker is the way to change that, and no such driver is included.
+
+The rest of this section sets up the one that ships.
 
 Run this once per repository where you want Jira integration (e.g., `platform`, `websitehub`, `service_api`):
 
@@ -109,7 +118,7 @@ If the commands resolve, the skills are live.
 | Unit Tests — .NET 4.7.2 | `/quorum-gen-unit-tests-dotnet4x` | Generate NUnit / Moq tests for legacy .NET Framework projects |
 | Unit Tests — Jasmine | `/quorum-gen-unit-tests-jasmine` | Generate Jasmine/Karma tests for AngularJS / Angular 5+ / Vue 2 |
 | Unit Tests — Vitest | `/quorum-gen-unit-tests-vitest` | Generate Vitest tests for Vue 3 projects |
-| Manual QA Test Cases | `/quorum-manual-qa-test-cases` | Generate prioritized QA test cases and post them to Jira |
+| Manual QA Test Cases | `/quorum-manual-qa-test-cases` | Generate prioritized QA test cases and publish them through the tracker role |
 | SQL Migration Review | `/quorum-sql-review` | Review migrations for idempotency, destructive ops, lock/rewrite risk, and conventions |
 | Sprint Number | `/quorum-sprint-number` | Calculate and display the current sprint number |
 | Memory Bank | `/quorum-memory-bank` | Maintain a project memory bank of patterns and decisions |
@@ -209,7 +218,7 @@ The code review skill is the primary entry point for the developer workflow. Run
 1. **Analyze** all commits and changed files vs. the `Develop` branch
 2. **Write a review document** covering security findings, code quality, bug detection, and prioritized recommendations — saved to `code-reviews/{year}/Sprint{n}/{app}/{branch}/review_1.md`
 3. **Offer follow-on test generation** — after saving the review it asks whether you want:
-   - Manual QA test cases (posted to Jira automatically)
+   - Manual QA test cases (published through the tracker role when one is configured)
    - Unit tests for each matched language/framework
    - Both
 
@@ -232,12 +241,12 @@ Or against a specific base branch:
 This skill bridges the gap between code changes and QA. It:
 
 1. **Reads the diff** and categorizes changes by type (UI, API, business logic, SQL, config, security)
-2. **Queries Jira** for the linked ticket — walking the parent/sibling hierarchy and related issues for historical context
+2. **Queries the tracker** for the linked ticket — walking the parent/sibling hierarchy and related issues for historical context
 3. **Generates a prioritized test plan** with three tiers:
    - **P1 — Must Test Before Merge** (core happy path, security, data integrity)
    - **P2 — Should Test** (error handling, integration, validation)
    - **P3 — If Time Permits** (edge cases, cosmetic changes)
-4. **Posts the document to Jira** as a comment on the ticket and saves it locally
+4. **Publishes the document** as a comment on the ticket, through the tracker role and saves it locally
 
 Test cases are scoped to **externally observable behavior** only — anything already covered by unit tests is noted in a "Unit Test Coverage" section so QA knows not to duplicate that effort.
 
@@ -295,11 +304,11 @@ The skills are designed to chain together naturally inside a single Claude Code 
 /quorum-code-review
   └─ Review saved
       └─ "Generate tests?" prompt
-          ├─ /quorum-gen-unit-tests-dotnet9  (tests written + posted to Jira)
-          └─ /quorum-manual-qa-test-cases    (test cases written + posted to Jira)
+          ├─ /quorum-gen-unit-tests-dotnet9  (tests written + published through the tracker role)
+          └─ /quorum-manual-qa-test-cases    (test cases written + posted to the tracker)
 ```
 
-All output is saved to the `code-reviews/` directory in your project alongside the source code, and comments are automatically posted to the relevant Jira ticket.
+All output is saved to the `code-reviews/` directory in your project alongside the source code, and comments are published through the tracker roleo the relevant the tracker ticket.
 
 ---
 

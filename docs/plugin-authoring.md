@@ -296,7 +296,7 @@ If you set the same field in both a plugin's `plugin.json` AND its `marketplace.
 
 ## `profile.yml`: the consumer-stack contract
 
-These plugins are **stack-agnostic** — they don't hardcode paths, roles, or Jira conventions. A consumer repo describes its stack once in `.claude/profile.yml`, and plugins resolve `{{profile.PATH.TO.VALUE}}` / `{{role:NAME}}` placeholders against it at runtime.
+These plugins are **stack-agnostic** — they do not hardcode paths, roles, or tracker conventions. A consumer repo describes its stack once in `.claude/profile.yml`, and plugins resolve `{{profile.PATH.TO.VALUE}}` / `{{role:NAME}}` placeholders against it at runtime.
 
 - **Canonical schema:** [`plugins/quorum-orchestrator/PROFILE_SCHEMA.md`](../plugins/quorum-orchestrator/PROFILE_SCHEMA.md) — the full contract (paths, roles, atlassian config, e2e settings).
 - **Worked example:** [`plugins/quorum-orchestrator/profile.example.yml`](../plugins/quorum-orchestrator/profile.example.yml) — copy this into a consumer repo's `.claude/profile.yml` and fill in the values.

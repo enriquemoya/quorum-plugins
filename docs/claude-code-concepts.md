@@ -87,7 +87,7 @@ Frontmatter:
 ```yaml
 ---
 name: quorum-ticket-analyzer
-description: Extracts structured implementation/test-generation inputs from a Jira ticket.
+description: Extracts structured implementation/test-generation inputs from a ticket.
 model: sonnet                  # optional model override
 tools: Read, Glob, Grep, ...   # optional tool allowlist
 ---
@@ -148,7 +148,7 @@ The manifest tells Claude Code what the plugin contains:
 {
   "name": "quorum-orchestrator",
   "version": "1.0.0",
-  "description": "End-to-end Jira ticket delivery orchestrator...",
+  "description": "End-to-end delivery orchestrator, ticket path included...",
   "commands": "./commands",
   "dependencies": [
     { "name": "quorum-tooling", "version": ">=1.0.0" }
