@@ -1,10 +1,27 @@
 slug: installed-paths
 origin: spec
 complexity: medium
-status: NEEDS_FIX
+status: IN_PROGRESS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T05:40Z, from: NEEDS_FIX, to: IN_PROGRESS, actor: agent,
+      note: "Audit iteration 2 fixed. The panel's answer to 'what can a prose suite
+             assert about an instruction that reads correctly and resolves nothing' was
+             that it cannot — it needs an executable test with both trees present. That
+             test now exists: a fixture with a marketplace clone and an installed copy,
+             exercising registry selection, the cache-rooted fallback, a stale entry, two
+             installed versions, and the parent root's ambiguity. The last group takes
+             the Glob root OUT OF THE PROSE and runs it, which is the pattern the suite
+             already used for the routing table and had never applied to the one contract
+             checked by reading. Restoring the previously shipped instruction now fails
+             three assertions including that one.
+             Also taken: installPath is validated to exist before use, or a stale entry
+             reproduces the original silent-nonexistent-path defect; the cache root is
+             labelled an inference observed on registry format version 2, with the
+             registry itself as the fact; and GLOBAL.md gained the rule that a probe
+             records the state it ran under, which is the governance-level shape of this
+             unit's error." }
   - { at: 2026-09-09T05:10Z, from: IMPL_AUDIT, to: NEEDS_FIX, actor: agent,
       note: "The premise was wrong and the fix broke what it fixed. ~/.claude/plugins/cache
              DOES exist — it is created by installing a plugin, not by registering a

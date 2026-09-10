@@ -395,6 +395,140 @@ def test_panel_detects_configured_but_unreachable() -> None:
     )
 
 
+def test_resolution_executed_against_both_trees(bed: Path) -> None:
+    """Execute the resolution. Prose assertions cannot catch a false instruction.
+
+    This exists because the previous version of this unit shipped an
+    instruction that read correctly and resolved nothing. Every assertion about
+    it passed: they compared the text to itself. What none of them could do was
+    run it against a filesystem where both a marketplace clone and an installed
+    copy exist, which is what every real machine has.
+
+    The fixture reproduces that machine:
+
+        plugins/installed_plugins.json          registry, installPath -> cache
+        plugins/cache/<mkt>/<plug>/<ver>/...    the installed copy, loaded
+        plugins/marketplaces/<mkt>/plugins/...  the clone, never loaded
+    """
+    root = bed / "fake-home" / ".claude" / "plugins"
+    inst = root / "cache" / "m" / "p" / "1.0.0"
+    clone = root / "marketplaces" / "m" / "plugins" / "p"
+    for d in (inst / "agents", clone / "agents"):
+        d.mkdir(parents=True, exist_ok=True)
+        (d / "x.md").write_text("bundled")
+    (root / "installed_plugins.json").write_text(
+        json.dumps({"version": 2, "plugins": {"p@m": [{"installPath": str(inst)}]}})
+    )
+
+    def registry(pkg: str, rel: str) -> Path | None:
+        """Step 1, as the runtime files describe it — with kimi's validation."""
+        reg = root / "installed_plugins.json"
+        if not reg.exists():
+            return None
+        entries = json.loads(reg.read_text()).get("plugins", {}).get(pkg, [])
+        for e in entries:
+            cand = Path(e["installPath"]) / rel
+            if cand.exists():          # a stale entry must not resolve
+                return cand
+        return None
+
+    def glob_under(base: Path, plug: str, leaf: str) -> list[Path]:
+        return sorted(base.glob(f"**/{plug}/**/{leaf}"))
+
+    # 1 — the registry selects the installed copy, not the clone
+    hit = registry("p@m", "agents/x.md")
+    assert_that(
+        hit is not None and "cache" in hit.parts,
+        "the registry resolves to the installed copy",
+        "not the marketplace clone beside it",
+    )
+
+    # 2 — the fallback, rooted at cache, is unambiguous
+    assert_that(
+        len(glob_under(root / "cache", "p", "x.md")) == 1,
+        "a cache-rooted glob finds exactly one",
+        "the fallback is usable when the registry is absent",
+    )
+
+    # 3 — the parent root is ambiguous. THIS is the assertion that would have
+    #     failed the previous version of this unit, and no prose check could.
+    assert_that(
+        len(glob_under(root, "p", "x.md")) == 2,
+        "a parent-rooted glob is ambiguous",
+        "clone plus installed copy — why the parent is forbidden",
+    )
+
+    # 4 — a stale registry entry falls through instead of returning a dead path
+    (root / "installed_plugins.json").write_text(
+        json.dumps({"version": 2, "plugins": {"p@m": [{"installPath": str(root / "cache" / "m" / "p" / "0.9.0")}]}})
+    )
+    assert_that(
+        registry("p@m", "agents/x.md") is None,
+        "a stale registry entry does not resolve",
+        "a version bump leaves the old path behind",
+    )
+
+    # 5 — two versions under cache: ambiguous, and the resolution must stop
+    old = root / "cache" / "m" / "p" / "0.9.0" / "agents"
+    old.mkdir(parents=True, exist_ok=True)
+    (old / "x.md").write_text("stale")
+    assert_that(
+        len(glob_under(root / "cache", "p", "x.md")) == 2,
+        "two installed versions are ambiguous to the fallback",
+        "the multiple-match STOP is reachable without the registry",
+    )
+
+    # 6 — with the registry restored, that ambiguity is resolved, not stopped on
+    (root / "installed_plugins.json").write_text(
+        json.dumps({"version": 2, "plugins": {"p@m": [{"installPath": str(inst)}]}})
+    )
+    got = registry("p@m", "agents/x.md")
+    assert_that(
+        got is not None and "1.0.0" in got.parts,
+        "the registry breaks the tie the glob cannot",
+        "which is why it is the primary and the glob the fallback",
+    )
+
+    # the stale version is removed before the last group: it exists to prove
+    # ambiguity, and leaving it would make every later search ambiguous too.
+    shutil.rmtree(root / "cache" / "m" / "p" / "0.9.0")
+
+    # 7 — the root the DOCUMENT names, executed. This is the assertion that
+    #     would have failed the previous version: it takes the Glob root out of
+    #     the prose and runs it, instead of comparing the prose to itself. The
+    #     suite already does this for the routing table; the resolution had been
+    #     the one contract checked by reading.
+    for rel in (
+        "commands/quorum-implement.md",
+        "agents/quorum-decision-documenter.md",
+        "skills/quorum-panel/SKILL.md",
+    ):
+        f = PLUGIN / rel
+        if not f.exists():
+            continue
+        named = re.findall(r"`(~/\.claude/plugins(?:/[a-z_]+)?)`", flat(f.read_text(encoding="utf-8")))
+        roots = {r for r in named if "Do not Glob" not in r}
+        if not roots:
+            continue
+        short = rel.rsplit("/", 1)[-1]
+        # Every root the file offers as a search base must be unambiguous when
+        # run. The parent is not, which is the whole finding.
+        searchable = [r for r in roots if r.endswith("/cache")]
+        assert_that(
+            bool(searchable),
+            f"{short} names a searchable root",
+            "and the parent is named only to forbid it",
+        )
+        for r in searchable:
+            base = root / r.split("plugins/", 1)[1] if "plugins/" in r else root
+            assert_that(
+                len(glob_under(base, "p", "x.md")) == 1,
+                f"{short}'s named root resolves to exactly one file",
+                f"executed against the fixture: {r}",
+            )
+
+
+
 def test_bundled_files_are_resolved_not_guessed() -> None:
     """Six files locate a bundled file at run time. All six ask the registry.
 
@@ -562,6 +696,7 @@ def main() -> int:
         test_preconditions_are_measured()
         test_panel_detects_configured_but_unreachable()
         test_bundled_files_are_resolved_not_guessed()
+        test_resolution_executed_against_both_trees(bed)
         test_implementation_stage_matches_the_pipeline()
 
         width = max(len(n) for _, n, _ in RESULTS)

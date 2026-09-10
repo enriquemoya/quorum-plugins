@@ -144,7 +144,7 @@ definition.
      `plugins["<plugin>@<marketplace>"][].installPath` is where the live copy
      is — the runtime writes it at install time, so it is right by construction
      and stays right across layout changes.
-   - **Then read `<installPath>/agents/quorum-orchestrator.md`.**
+   - **Then read `<installPath>/agents/quorum-orchestrator.md`.** **Check that file exists before using it** — a version bump leaves the old path in place, and a registry entry pointing at a directory that is gone resolves silently to nothing, which is the same failure as a wrong root. If it is missing, fall through.
    - **If that file or the entry is missing**, Glob `path`
      `~/.claude/plugins/cache` with `pattern` `**/quorum-orchestrator/**/quorum-orchestrator.md`. The middle
      `**` is load-bearing: the install path carries a version segment, so a

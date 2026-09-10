@@ -40,6 +40,24 @@ conclusions and they look identical in a summary.
 When no probe exists for a precondition, that is the finding. Say what was
 tried and escalate; do not assert the precondition in either direction.
 
+### A probe records the state it ran under
+
+An observation is evidence for the system as it stood when it was taken, and
+for nothing else. So a probe records not only what it saw but the state that
+produced it — the setup step reached, the version of whatever answered, the
+configuration in force.
+
+Without that, an observation taken halfway through a setup is indistinguishable
+from one taken after it, and both read as fact later. That is not hypothetical
+here: a directory was reported as nonexistent, and eight files were rewritten on
+the strength of it, because the probe ran between registering a component and
+installing it. Registration reported success. Only installation created the
+directory. The probe was accurate about the moment and wrong about the system,
+and nothing in its record said which moment it was.
+
+A conclusion drawn from a probe whose state is unrecorded is not stronger than a
+guess; it only looks stronger.
+
 ## Determinism
 
 - The same inputs produce the same verdict within a governance version.
