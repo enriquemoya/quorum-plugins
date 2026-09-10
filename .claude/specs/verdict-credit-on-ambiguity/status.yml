@@ -45,5 +45,14 @@ last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u8-scope,
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null
-accepted_conditions: []
+accepted_conditions:
+  - "Debates concluded under the old rule are not re-opened. The records persist
+     severity_parse, so a READ-ONLY sweep of what the old rule counted is
+     possible and was accepted as a follow-up by the panel. It has not been run,
+     which makes 'this does not claim they were correct' still a hedge rather
+     than a number."
+  - "A record with no severity_parse field votes. Records predating the field
+     carry none, and treating absence as unreadable would retroactively forfeit
+     every one — a different change that was not asked for."
+
 run_mode: human

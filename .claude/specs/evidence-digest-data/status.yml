@@ -1,0 +1,21 @@
+slug: evidence-digest-data
+origin: spec
+complexity: medium
+status: DRAFT_PRD
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T10:20Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity medium — computing the digest is small, deciding what a reference IS is the work" }
+  - { at: 2026-09-09T10:15Z, from: null, to: TRIAGE, actor: agent,
+      note: "found while auditing what the session left open. The same-evidence rule was
+             corrected and asserted; the assertion checks the prose. All five recorded
+             digests are paths, and no history entry carries one — so the corrected rule
+             matches no data in the repository that states it." }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: agent

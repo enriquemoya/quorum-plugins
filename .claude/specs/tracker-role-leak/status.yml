@@ -44,5 +44,17 @@ last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u9-scope,
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null
-accepted_conditions: []
+accepted_conditions:
+  - "The check is a LEXICAL invariant. It proves a file naming a tracker also
+     names an approved way to reach one; an inert reference satisfies it, and it
+     proves no delegation correct. One critic held this as a major and did not
+     withdraw."
+  - "Nineteen files had tracker mentions deleted, changing conventions that no
+     suite exercises — the e2e count says nothing about the tracker path. Over-
+     deletion is additive and cheap to restore, and is recorded as a known
+     non-goal rather than left to be discovered as a regression."
+  - "The classification question — does this file read or write tracker state —
+     was answered once per file and written into an inventory. Nothing re-checks
+     that the answers were right; the inventory is a record, not a gate."
+
 run_mode: agent

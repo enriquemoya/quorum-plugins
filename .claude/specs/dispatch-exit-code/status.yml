@@ -1,0 +1,20 @@
+slug: dispatch-exit-code
+origin: spec
+complexity: simple
+status: DRAFT_PRD
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T10:20Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity simple — the label already exists, only the exit code is missing. Belongs to quorum-core." }
+  - { at: 2026-09-09T10:15Z, from: null, to: TRIAGE, actor: agent,
+      note: "noticed during the session and never filed. cpd-run exits 0 with a
+             dispatch_failure recorded. Safe, because conclude refuses later — but an
+             unattended run reading the exit code sees success." }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: agent

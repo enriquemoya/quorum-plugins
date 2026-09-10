@@ -12,6 +12,37 @@ and watching them fail. Anything below that is *not* covered by them says so.
 
 ## [Unreleased]
 
+### Open, filed as units
+
+A pass over what the session left behind, done after the release rather than
+before it. Four things were open and only living in commit messages or in the
+author's head; each is a unit now, none is implemented.
+
+- **`evidence-digest-data`** — `same-evidence-thrice` was corrected and asserted
+  this session. The assertion checks that the DOCUMENTS state the rule. Every
+  digest actually recorded is a path, and no history entry carries one, so the
+  corrected rule matches no data in the repository that states it. The same
+  shape as the defect it replaced: the old rule read as a bound and bounded
+  nothing; the new one reads as correct and matches nothing.
+- **`guard-sees-only-tracked`** — `check.py` enumerates with `git ls-files`, so
+  all fourteen checks are blind to a file until it is committed. Observed twice
+  in one session and once in a sibling repository. The guard is green exactly
+  when a new file is most likely to be wrong.
+- **`evals-never-executed`** — twenty eval cases across three skills, written,
+  committed, never run. `claude plugin eval` exists and was never invoked. An
+  eval nobody has run has never demonstrated that its grader distinguishes a
+  good answer from a bad one.
+- **`dispatch-exit-code`** — `cpd-run` exits 0 with a `dispatch_failure`
+  recorded. Nothing unsafe: the seat is labelled and `cpd-conclude` refuses
+  later. But an unattended run reading the exit code sees success, and a short
+  panel now matters at dispatch rather than only at conclusion.
+
+Two units also gained the conditions that had been stated only in their commit
+messages, and one stale condition on `implement-phases` is marked closed rather
+than deleted — a condition that quietly disappears cannot be told from one that
+was met.
+
+
 ### quorum-tooling 3.0.1 · quorum-workflows 2.0.1
 
 #### Fixed

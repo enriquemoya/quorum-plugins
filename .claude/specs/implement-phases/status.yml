@@ -94,7 +94,10 @@ accepted_conditions:
      own assertion."
   - "The panel ran with two families, not three. The verdict is to be read as
      narrower than configured."
-  - "Article 2 stays open. This unit clears one file; 41 tracked files keep the
-     product name. Completing this unit is not evidence the article is cleared."
+  - "CLOSED by tracker-role-leak: the 41 files were swept. The condition also
+     mis-stated the rule — this was never an Article 2 violation, since the
+     repository integrates with that product through its driver skill. Left
+     visible rather than deleted, because a condition that quietly disappears
+     cannot be told from one that was met."
 
 run_mode: human

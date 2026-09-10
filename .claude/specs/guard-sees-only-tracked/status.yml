@@ -1,0 +1,20 @@
+slug: guard-sees-only-tracked
+origin: spec
+complexity: simple
+status: DRAFT_PRD
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T10:20Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity simple — one enumeration function, and the judgement is which untracked files to include" }
+  - { at: 2026-09-09T10:15Z, from: null, to: TRIAGE, actor: agent,
+      note: "carried as a condition on installed-paths and promoted to its own unit: it is
+             not a property of that check, it is a property of all fourteen. Observed twice
+             in one session, plus once in a sibling repository." }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: agent
