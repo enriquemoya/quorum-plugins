@@ -49,7 +49,7 @@ Benefits and trade-offs
 
 ## Normalize to Obsidian
 
-After writing the ADR, upgrade the bank in place so links and frontmatter stay Obsidian-navigable. Resolve it: Glob `path` `~/.claude/plugins` — the **parent**, never a directory inside it — with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1`. The middle `**` is load-bearing: one layout puts a version segment between the plugin and its subdirectory. Exactly one match: use it. None, or more than one: STOP and report what you found — two layouts can coexist under that root, and picking one silently is how the wrong file gets read confidently — then run it on the bank:
+After writing the ADR, upgrade the bank in place so links and frontmatter stay Obsidian-navigable. Resolve it: read `~/.claude/plugins/installed_plugins.json` and take `plugins["quorum-tooling@quorum-plugins"][].installPath`; the script is at `<installPath>/skills/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1`. The runtime writes that record at install time, so it survives layout changes and version bumps. If the entry is missing, Glob `path` `~/.claude/plugins/cache` with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1` — the middle `**` is load-bearing, because the install path carries a version segment. Do not Glob the parent `~/.claude/plugins`: a marketplace clone sits beside the installed copies there, so it returns two files of which only one is loaded. No match, or more than one with no installPath to break the tie: STOP and report — then run it on the bank:
 
 ```
 pwsh -NoProfile -File <adapter> -Path {{profile.paths.memory_bank}}

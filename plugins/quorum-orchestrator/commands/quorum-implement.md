@@ -139,19 +139,24 @@ definition.
    above have always claimed this; this step is where it is actually checked.
 3. Read `complexity` from `status.yml`. Do not derive it. Parse the flags.
 4. **Read the orchestrator agent definition** — this is your operating manual for the entire pipeline. It ships **inside the `quorum-orchestrator` plugin** and is **NOT** present in the consumer repo, so do **not** try to read `.claude/agents/quorum-orchestrator.md` from the repo root — that path does not exist there and the read will fail. Resolve it:
-   - Glob `path`: `~/.claude/plugins` — the **parent**. Do not name a directory
-     inside it. The layout below it has already changed once (`cache/` became
-     `marketplaces/`), silently, and a path naming either is correct until it
-     is not.
-   - Glob `pattern`: `**/quorum-orchestrator/**/agents/quorum-orchestrator.md`.
-     The `**` in the middle is load-bearing: one layout puts a version segment
-     between the plugin and `agents`, and a pattern without it finds the other
-     layout only — confidently, while a second candidate sits unseen.
-   - **Exactly one match:** read it.
-   - **No match:** STOP and report. Never guess a path.
-   - **More than one match:** STOP and report every one. Two layouts can
-     coexist under the same root, and choosing between them silently is how the
-     wrong file gets read with confidence.
+   - **Ask the runtime, do not search.** Read
+     `~/.claude/plugins/installed_plugins.json`. Its
+     `plugins["<plugin>@<marketplace>"][].installPath` is where the live copy
+     is — the runtime writes it at install time, so it is right by construction
+     and stays right across layout changes.
+   - **Then read `<installPath>/agents/quorum-orchestrator.md`.**
+   - **If that file or the entry is missing**, Glob `path`
+     `~/.claude/plugins/cache` with `pattern` `**/quorum-orchestrator/**/quorum-orchestrator.md`. The middle
+     `**` is load-bearing: the install path carries a version segment, so a
+     pattern without it matches nothing.
+   - **Do not Glob the parent `~/.claude/plugins`.** A marketplace clone lives
+     beside the installed copies under that parent, so the search finds two
+     files with the same name of which only one is loaded.
+   - **No match: STOP and report.** Never guess a path. A Glob rooted at a
+     directory that does not exist returns nothing and raises nothing, so a
+     wrong root looks exactly like a missing plugin.
+   - **More than one and no `installPath` to break the tie: STOP and report
+     every match.**
 
 ### Execution
 

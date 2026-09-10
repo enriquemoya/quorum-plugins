@@ -396,16 +396,19 @@ def test_panel_detects_configured_but_unreachable() -> None:
 
 
 def test_bundled_files_are_resolved_not_guessed() -> None:
-    """Six files locate a bundled file at run time. All six must do it the same way.
+    """Six files locate a bundled file at run time. All six ask the registry.
 
-    An earlier draft of this fix would have repaired the command and left the
-    other five resolving to nothing — the literal fallback deleted, the Glob
-    still rooted nowhere. The uniformity is the point, so it is asserted per
-    file rather than in aggregate.
+    The runtime records where it put each plugin, in
+    ``~/.claude/plugins/installed_plugins.json`` as ``installPath``. Reading it
+    is right by construction; every alternative is an inference about someone
+    else's directory layout.
 
-    The middle ``**`` is checked because a smoke run showed a narrower pattern
-    finding one layout while a second candidate sat unseen under the same root:
-    a quieter version of the defect this replaced.
+    An earlier version of these assertions pinned the opposite — a Glob rooted
+    at ``~/.claude/plugins`` — and passed, because they tested the text against
+    itself. What they could not test was whether the text was true. It was not:
+    that root matches the installed copy AND the marketplace clone beside it,
+    so the resolution it described would have found two files and stopped, in
+    the ordinary case, on every machine.
     """
     runtime = [
         ("plugins/quorum-orchestrator/commands/quorum-implement.md", "quorum-orchestrator"),
@@ -421,32 +424,34 @@ def test_bundled_files_are_resolved_not_guessed() -> None:
         if short == "SKILL.md":
             short = rel.rsplit("/", 2)[-2] + "/SKILL.md"
         assert_that(
-            "~/.claude/plugins`" in body or "~/.claude/plugins " in body,
-            f"{short} roots its search at the parent",
-            "not at a directory inside it",
+            "installed_plugins.json" in body and "installPath" in body,
+            f"{short} reads the runtime's own registry",
+            "installPath is written at install time",
+        )
+        assert_that(
+            "~/.claude/plugins/cache" in body,
+            f"{short} falls back to the install root, not the parent",
+            "the parent also holds the marketplace clone",
+        )
+        assert_that(
+            "Do not Glob the parent" in body,
+            f"{short} says why the parent is wrong",
+            "two copies, one loaded",
         )
         assert_that(
             f"**/{plugin}/**/" in body,
-            f"{short} keeps the middle ** in its pattern",
-            "a version segment can sit between the plugin and its subdirectory",
+            f"{short} keeps the middle ** in its fallback pattern",
+            "the install path carries a version segment",
         )
+        # Scoped to the sentence that follows the multiple-match clause, because
+        # a bare substring search for "STOP" passed against the OLD text too —
+        # it appears elsewhere in these files, so it was never watched failing.
+        low = body.lower()
+        tail = low.split("more than one")[-1] if "more than one" in low else ""
         assert_that(
-            "STOP and report" in body,
-            f"{short} stops rather than guessing",
-            "no match, or more than one",
-        )
-    for rel, _ in runtime:
-        body = flat((ROOT / rel).read_text(encoding="utf-8")).lower()
-        short = rel.rsplit("/", 1)[-1]
-        if short == "SKILL.md":
-            short = rel.rsplit("/", 2)[-2] + "/SKILL.md"
-        # Lower-cased on purpose: both "More than one match:" and "or more than
-        # one:" are correct prose, and an assertion that pins the capitalisation
-        # tests the sentence position rather than the rule.
-        assert_that(
-            "more than one" in body,
-            f"{short} names the multiple-match case",
-            "two layouts can coexist under one root",
+            "stop and report" in tail[:200],
+            f"{short} stops on an ambiguous match",
+            "and stops in that clause, not merely somewhere in the file",
         )
 
 

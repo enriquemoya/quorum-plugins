@@ -1,0 +1,23 @@
+slug: command-skill-collision
+origin: spec
+complexity: simple
+status: DRAFT_PRD
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T04:10Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity simple — one name, three candidate resolutions, the choice is the work" }
+  - { at: 2026-09-09T04:05Z, from: null, to: TRIAGE, actor: agent,
+      note: "created by the installation wave, second finding. quorum-code-review exists
+             as both a command and a skill; the installed inventory lists the name twice,
+             so the runtime picks. The docs call the command a thin wrapper around the
+             skill; it is a 56-line second copy that has already diverged. Neither suite
+             could find this: each file is internally fine, and the defect is that two
+             answer to one name." }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: human

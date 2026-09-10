@@ -286,7 +286,7 @@ A rename is a breaking change to anyone with the old name in their muscle memory
 
 ### "Plugins can't reference files outside their directory"
 
-Claude Code copies each installed plugin into a directory under `~/.claude/plugins`. The shape below that parent is **observed, not contracted** — it has changed once already — so resolve it with a Glob rooted at the parent rather than naming a directory inside it. Paths like `../shared-utils` in a plugin's prose or scripts will NOT resolve at runtime because the file isn't copied. If you need cross-plugin sharing, use the `dependencies:` mechanism (the dependent plugin gets its own cache copy) or symlinks declared via `${CLAUDE_PLUGIN_ROOT}` in hooks. See the [official caching docs](https://docs.claude.com/en/docs/claude-code/plugins-reference#plugin-caching-and-file-resolution).
+Claude Code copies each installed plugin to `~/.claude/plugins/cache/<marketplace>/<plugin>/<version>/` and records that path as `installPath` in `~/.claude/plugins/installed_plugins.json`. Read the registry rather than constructing the path: the version segment changes on every bump, and a marketplace clone under `~/.claude/plugins/marketplaces/` holds a second copy of every file that is never the one loaded. Paths like `../shared-utils` in a plugin's prose or scripts will NOT resolve at runtime because the file isn't copied. If you need cross-plugin sharing, use the `dependencies:` mechanism (the dependent plugin gets its own cache copy) or symlinks declared via `${CLAUDE_PLUGIN_ROOT}` in hooks. See the [official caching docs](https://docs.claude.com/en/docs/claude-code/plugins-reference#plugin-caching-and-file-resolution).
 
 ### `.claude-plugin/plugin.json` is the source of truth
 

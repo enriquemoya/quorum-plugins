@@ -385,48 +385,41 @@ def _fences() -> None:
 # --------------------------------------------------------------------------
 
 
-@check("install paths — the parent is a search root, its children are not")
+@check("install paths — a plugin path is resolved, never typed down to a version")
 def _install_paths() -> None:
-    """A path naming a directory INSIDE ~/.claude/plugins is the defect.
+    """A hardcoded path INTO a specific installed plugin is the defect.
 
-    The parent is the one stable thing: it survived the layout below it
-    changing from ``cache/<marketplace>/<plugin>/<hash>/`` to
-    ``marketplaces/<marketplace>/plugins/<plugin>/``. Naming a child pins this
-    repository to someone else's internal layout, which was already wrong in
-    eight tracked files before anything checked for it — and wrong silently,
-    because a Glob rooted at a directory that does not exist returns no
-    matches rather than an error.
+    What the runtime actually does, read from its own registry: an installed
+    plugin lives at ``~/.claude/plugins/cache/<marketplace>/<plugin>/<version>``
+    and ``installed_plugins.json`` records that path as ``installPath``. A
+    marketplace clone also sits under ``~/.claude/plugins/marketplaces/``, and
+    it is NOT what loads — so a search rooted at the shared parent finds two
+    copies of every file and only one of them is live.
 
-    Getting the parent/child distinction wrong here fails every runtime file
-    or none of them, so it is the whole check.
+    Roots are fine: ``~/.claude/plugins``, ``~/.claude/plugins/cache``, and the
+    registry file itself. What goes stale is everything below — a marketplace
+    name, a plugin name, and above all a version, which changes on every bump
+    and takes the path with it.
+
+    This check has already been wrong once in the other direction. Its first
+    version banned ``cache`` outright, on an observation taken from a machine
+    where a marketplace had been registered and no plugin installed — so only
+    the clone existed. Registering is not installing, and the difference was
+    invisible until a plugin was actually installed.
     """
-    # ``~``/``$HOME``/``%USERPROFILE%``/an absolute home, then .claude/plugins,
-    # then a separator and at least one more name component.
-    # The home prefix is OPTIONAL on purpose. The phrasing this check was
-    # written for was "your home `.claude/plugins/cache` directory" — no tilde,
-    # no slash, the home named in prose instead. A first version required the
-    # prefix and let that exact sentence through; it was caught by reverting the
-    # fix and watching the check stay green.
-    child = re.compile(
-        r"\.claude[/\\]plugins[/\\]([A-Za-z0-9_.-]+)"
+    # Two or more path segments below ~/.claude/plugins: a marketplace plus at
+    # least one more name. One segment (a root) is permitted.
+    deep = re.compile(
+        r"\.claude[/\\]plugins[/\\]([A-Za-z0-9_.-]+)[/\\]([A-Za-z0-9_.<>{}-]+)"
     )
-    # The two documents whose job is to describe the layout. The allowance is
-    # narrowed to the shape actually observed: the expelled ``cache`` spelling
-    # cannot come back here either.
-    allowed = {"INSTALL.md": {"marketplaces"}, "docs/plugin-authoring.md": {"marketplaces"}}
-
-    # Records, not instructions. A spec narrating "cache/ became marketplaces/"
-    # has to name both; a critic transcript cannot be edited at all without
-    # ceasing to be evidence. Neither is a file an agent follows, so neither can
-    # send one to a directory that does not exist.
-    #
-    # This exemption exists because the check passed at commit time and failed
-    # immediately after: the spec files were still untracked, and ``tracked()``
-    # does not see untracked files. That is the second time in this codebase a
-    # guard has been green against files it was not yet reading.
+    # The documents whose job is to describe the layout, and which therefore
+    # have to show it in full.
+    allowed = {"INSTALL.md", "docs/plugin-authoring.md", "docs/claude-code-concepts.md"}
+    # Records, not instructions: a spec narrating the layout has to name it, and
+    # a critic transcript cannot be edited without ceasing to be evidence. Kept
+    # narrow — an exemption is a place a defect can live.
     records = (".claude/specs/", ".claude/runs/")
-    # This file must contain the pattern it forbids. A guard in this repository
-    # already shipped once without excluding itself, and passed while untracked.
+    # This file must contain the pattern it forbids.
     myself = Path(__file__).name
 
     for path in tracked():
@@ -436,15 +429,16 @@ def _install_paths() -> None:
         if body is None:
             continue
         rel = path.relative_to(ROOT).as_posix()
-        if rel.startswith(records):
+        if rel in allowed or rel.startswith(records):
             continue
-        permitted = allowed.get(rel, set())
         for n, line in enumerate(body.splitlines(), 1):
-            for m in child.finditer(line):
-                seg = m.group(1)
-                if seg in permitted:
-                    continue
-                fail(f"{rel}:{n}", f"names '{seg}' inside ~/.claude/plugins — Glob the parent instead")
+            m = deep.search(line)
+            if m:
+                fail(
+                    f"{rel}:{n}",
+                    f"types a path into '{m.group(1)}/{m.group(2)}' — read installPath "
+                    "from installed_plugins.json instead",
+                )
 
 
 @check("example profile — parses, and covers every schema block")

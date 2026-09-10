@@ -1,63 +1,76 @@
 # Smoke — resolving a bundled file against an install
 
-## What was run
+## The correction this file exists to record
 
-A fixture reproducing both plugin layouts under one root, because they can
-coexist and that is the only condition under which the ambiguity rule matters:
+An earlier version of this document reported that
+`~/.claude/plugins/cache/` does not exist, and eight files plus both suites
+were rewritten on that basis.
 
-```
-<root>/marketplaces/quorum-plugins/plugins/quorum-orchestrator/agents/…   (current)
-<root>/cache/quorum-plugins/quorum-orchestrator/2.0.0/agents/…            (previous)
-```
+**The observation was taken on a machine where a marketplace had been
+registered and no plugin installed.** Registering clones the marketplace to
+`~/.claude/plugins/marketplaces/<mkt>/`; it does not install anything, and the
+`cache/` tree is created by installation. The two steps look like one from the
+outside — `/plugin marketplace add` reports success and the plugins appear in
+the marketplace listing — and nothing distinguishes them until you look for a
+directory that installation is what creates.
 
-## Result
+So the original instruction in these files was **right**: root at
+`~/.claude/plugins/cache`, pattern with a middle `**` for the version segment,
+example path `cache/<mkt>/<plugin>/<version>/`. All three correct. The rewrite
+replaced a working instruction with one that fails.
 
-| Pattern | Matches | Reading |
-|---|---|---|
-| `*/quorum-orchestrator/agents/<file>` | 1 | the previous layout is **invisible** — a version segment sits between the plugin and `agents` |
-| `*/quorum-orchestrator/*agents/<file>` | 2 | both found; the resolution stops and reports both |
+## What the runtime actually does
 
-No match, and a nonexistent plugin name: 0 matches, which is the STOP branch.
-
-## What this changed
-
-The narrow pattern was about to be written into six files. It resolves
-confidently to one file while a second candidate sits unseen under the same
-root — a smaller copy of the defect this unit exists to fix. The wide pattern
-is required, and it is what the original document already used: **only the root
-was ever wrong.** A fix that narrowed the pattern while correcting the root
-would have traded a loud failure for a quiet one.
-
-## Against a real install
-
-The marketplace was then installed and both instructions run against it. The
-installed copy is the published one, which still carries the defect, so the two
-could be compared on the same tree:
-
-| Instruction | Glob root | Matches |
-|---|---|---|
-| as published | `~/.claude/plugins/cache` | **0, and no error** — the root does not exist |
-| as corrected | `~/.claude/plugins` | 1 |
-
-Three resolutions were exercised, one per distinct target, all returning exactly
-one match at `marketplaces/quorum-plugins/plugins/<plugin>/…`:
+`~/.claude/plugins/installed_plugins.json`, format version 2, after installing
+four plugins from one marketplace:
 
 ```
-quorum-orchestrator  → agents/quorum-orchestrator.md
-quorum-memory-bank   → scripts/memory-bank-to-obsidian.ps1
-quorum-obsidian-vault → scripts/scaffold_vault.ps1
+quorum-orchestrator@quorum-plugins    → ~/.claude/plugins/cache/quorum-plugins/quorum-orchestrator/2.1.0
+quorum-tooling@quorum-plugins         → ~/.claude/plugins/cache/quorum-plugins/quorum-tooling/2.1.0
+quorum-workflows@quorum-plugins       → ~/.claude/plugins/cache/quorum-plugins/quorum-workflows/1.0.0
+quorum-integration-kit@quorum-plugins → ~/.claude/plugins/cache/quorum-plugins/quorum-integration-kit/0.1.0
 ```
 
-The zero-match row is the whole point. A Glob rooted at a directory that does
-not exist is not an error, so every one of these lookups had been failing
-silently for as long as the instruction existed, and an agent following it would
-report that it could not find its operating manual rather than that the
-instruction was wrong.
+`installPath` is the live copy. The marketplace clone is a second copy of every
+file, under the same parent, that is never loaded.
 
-## What this still does not establish
+## Measured, on a real install
 
-The multiple-match branch has been exercised only against a fixture: a single
-install has one layout. It stays in the text because the two layouts *can*
-coexist, and because a resolution that picks silently between two candidates is
-the failure this unit exists to prevent — but nobody has watched it fire on a
-real machine.
+| Glob root | Matches for `**/quorum-orchestrator/**/agents/quorum-orchestrator.md` |
+|---|---|
+| `~/.claude/plugins/cache` | 1 — the installed copy |
+| `~/.claude/plugins` (the parent) | **2** — installed copy plus marketplace clone |
+| `~/.claude/plugins/cache`, before any plugin was installed | 0, and no error |
+
+Row two is why the rewrite was wrong: rooting at the parent makes the ordinary
+case ambiguous, so a resolution that stops on ambiguity stops on every machine.
+
+Row three is why the rewrite happened: a Glob rooted at a directory that does
+not yet exist returns nothing and raises nothing, so "not installed" and "wrong
+path" are the same observation.
+
+## The multiple-match branch, exercised
+
+A critic pointed out this branch was recorded as unexercisable when a decoy
+makes it trivial. Copying one plugin to a second marketplace directory:
+
+```
+3 matches:
+  ~/.claude/plugins/marketplaces/quorum-plugins-decoy/plugins/quorum-orchestrator/agents/…
+  ~/.claude/plugins/cache/quorum-plugins/quorum-orchestrator/2.1.0/agents/…
+  ~/.claude/plugins/marketplaces/quorum-plugins/plugins/quorum-orchestrator/agents/…
+```
+
+The decoy was removed afterwards. That run is also what surfaced the cache
+directory, so the finding that reshaped this unit came from taking a critic's
+"you could just test it" literally.
+
+## What resolution ships
+
+Read `installPath` from the registry. Fall back to a Glob rooted at
+`~/.claude/plugins/cache` when the entry is absent. Never the parent. Stop on
+zero matches, and on several with no `installPath` to break the tie.
+
+The registry is preferred over any path because it is the runtime's own record
+rather than an inference about the runtime's directory layout — which is the
+class of thing this unit has now been wrong about twice.

@@ -1,10 +1,27 @@
 slug: installed-paths
 origin: spec
 complexity: medium
-status: IN_PROGRESS
+status: NEEDS_FIX
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T05:10Z, from: IMPL_AUDIT, to: NEEDS_FIX, actor: agent,
+      note: "The premise was wrong and the fix broke what it fixed. ~/.claude/plugins/cache
+             DOES exist — it is created by installing a plugin, not by registering a
+             marketplace, and the original observation was taken between those two steps.
+             installed_plugins.json records installPath as
+             cache/<mkt>/<plugin>/<version>, so the original instruction was correct on
+             all three counts: root, middle **, and the version segment in its example.
+             Rooting at the parent, which this unit shipped, matches the installed copy
+             AND the marketplace clone beside it: two matches, and a resolution that
+             stops on ambiguity stops on every machine in the ordinary case.
+             Corrected to read installPath from the registry, with a cache-rooted Glob
+             as fallback. The registry is preferred because it is the runtime's own
+             record rather than an inference about its directory layout — the class of
+             thing this unit has now been wrong about twice.
+             Found by running a critic's decoy suggestion: the decoy produced three
+             matches and the second was the cache directory reported as nonexistent an
+             hour earlier." }
   - { at: 2026-09-09T03:40Z, from: IN_PROGRESS, to: IN_PROGRESS, actor: human,
       note: "AC5 closed. The marketplace was installed and both instructions run against
              it. Published instruction: 0 matches and no error. Corrected instruction: 1
@@ -46,7 +63,7 @@ history:
              real install. First defect found by checking against an installed
              marketplace rather than a checkout." }
 in_flight: true
-audit_iterations: 1
+audit_iterations: 2
 last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u6-scope,
               governance_version: null, panel: cpd, panel_reason: "three families",
               evidence_digest: ".claude/runs/installed-paths/u6-scope" }

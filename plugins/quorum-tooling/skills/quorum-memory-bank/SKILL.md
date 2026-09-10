@@ -540,7 +540,7 @@ It does three things:
 
 ### Step 1: Resolve the adapter script
 
-The script ships with this skill. **Resolve it at runtime — never type an install path:** Glob `path` `~/.claude/plugins` — the **parent**, never a directory inside it, because the layout below it has already changed once and silently — with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1`. The middle `**` is load-bearing: one layout puts a version segment between the plugin and its subdirectory, and a pattern without it finds the other layout only. Exactly one match: use that absolute path. None, or more than one: STOP and report what you found — the adapter is best-effort, but reading the wrong copy of it is not.
+The script ships with this skill. **Resolve it at runtime — never type an install path.** Read `~/.claude/plugins/installed_plugins.json` and take `plugins["quorum-tooling@quorum-plugins"][].installPath`; the file is at `<installPath>/skills/quorum-memory-bank/scripts/memory-bank-to-obsidian.ps1`. The runtime writes that record at install time, so it survives layout changes and version bumps. If the entry is missing, Glob `path` `~/.claude/plugins/cache` with `pattern` `**/quorum-memory-bank/**/memory-bank-to-obsidian.ps1` — the middle `**` is load-bearing, because the install path carries a version segment. Do not Glob the parent `~/.claude/plugins`: a marketplace clone sits beside the installed copies there, so it returns two files of which only one is loaded. No match, or more than one with no installPath to break the tie: STOP and report what you found — the adapter is best-effort, but reading the wrong copy of it is not.
 
 ### Step 2: Resolve the memory-bank path
 
