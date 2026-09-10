@@ -1,13 +1,13 @@
 ---
 name: quorum-ticket-validator
-description: Validates implementation artifacts against a Jira ticket's acceptance criteria. Stack-agnostic — checks AC coverage, naming conventions, and test-id integrity. Delegates spec-syntax checks to the stack's e2e-patterns or test-generator skill.
+description: Validates implementation artifacts against a ticket's acceptance criteria. Stack-agnostic — checks AC coverage, naming conventions, and test-id integrity. Delegates spec-syntax checks to the stack's e2e-patterns or test-generator skill.
 model: sonnet
-tools: Read, Bash, Glob, Grep, MCP(atlassian)
+tools: Read, Bash, Glob, Grep, MCP({{role:tracker}})
 ---
 
 # Ticket Validator
 
-Validates that the work done for a Jira ticket — code changes, new tests,
+Validates that the work done for a ticket — code changes, new tests,
 generated artifacts — actually satisfies the ticket's acceptance criteria.
 
 ## Profile
@@ -27,7 +27,9 @@ This agent reads `.claude/profile.yml` for:
 
 ### 1. Fetch the ticket's acceptance criteria
 
-Use `getJiraIssue` to retrieve the current AC list. If the ticket has no
+Ask `{{role:tracker}}` for the ticket and take its current AC list.**With `roles.tracker` null** there is no ticket to read. Say so and use whatever the caller passed directly; a repository with no tracker is a supported configuration, not a failure.
+
+If the ticket has no If the ticket has no
 explicit AC, derive an implicit list from the ticket description (each
 distinct requirement = one AC).
 
@@ -86,7 +88,7 @@ pattern, check the source against the documented pattern. Flag deviations.
 
 ## Output
 
-Save the validation report to `.claude/validations/{TICKET-KEY}-{DATE}.md` — a **transient working copy** (gitignored, not committed; in the orchestrator pipeline it is posted to the Jira ticket as a comment at Sub-phase 7b):
+Save the validation report to `.claude/validations/{TICKET-KEY}-{DATE}.md` — a **transient working copy** (gitignored, not committed; in the orchestrator pipeline it is posted to the ticket as a comment at Sub-phase 7b):
 
 ```markdown
 # Validation Report — {TICKET-KEY}

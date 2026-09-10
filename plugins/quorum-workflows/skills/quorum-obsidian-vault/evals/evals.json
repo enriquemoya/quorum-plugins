@@ -6,11 +6,11 @@
       "id": 0,
       "name": "story-start",
       "prompt": "Starting PROJ-69835, AcmeSync property-fee mapping and dedup. Branch feature/PROJ-69835-fee-mapping. Set up notes.",
-      "expected_output": "Stories/PROJ-69835/ folder with PROJ-69835.md (story-shaped: AC checkboxes, Jira link) + status.md + attachments/; kind: story; Home under '## Stories'.",
+      "expected_output": "Stories/PROJ-69835/ folder with PROJ-69835.md (story-shaped: AC checkboxes, ticket link) + status.md + attachments/; kind: story; Home under '## Stories'.",
       "files": [],
       "assertions": [
         "Created Stories/PROJ-69835/PROJ-69835.md overview + Stories/PROJ-69835/status.md + attachments/",
-        "Overview frontmatter has kind: story and a jira: link",
+        "Overview frontmatter has kind: story and a ticket: link",
         "Overview has an Acceptance Criteria section",
         "status.md records the branch feature/PROJ-69835-fee-mapping",
         "Home.md lists [[PROJ-69835]] under '## Stories'"
@@ -19,15 +19,15 @@
     {
       "id": 1,
       "name": "initiative-start",
-      "prompt": "Starting a POC to migrate our big reporting solution onto the new platform-v2 stack. There's no Jira ticket. Set up notes so I can track this daily across sessions.",
-      "expected_output": "Initiatives/<slug>/ folder with an initiative MOC (Goal/Definition of Done + phase checklist, NO User Story/AC/Jira), status.md, lessons.md, decisions/_index.md; kind: initiative + no-ticket: true; Home under '## Initiatives & POCs'; no dangling Jira/QA links.",
+      "prompt": "Starting a POC to migrate our big reporting solution onto the new platform-v2 stack. There's no the tracker ticket. Set up notes so I can track this daily across sessions.",
+      "expected_output": "Initiatives/<slug>/ folder with an initiative MOC (Goal/Definition of Done + phase checklist, NO User Story/AC/the tracker), status.md, lessons.md, decisions/_index.md; kind: initiative + no-ticket: true; Home under '## Initiatives & POCs'; no dangling the tracker/QA links.",
       "files": [],
       "assertions": [
         "Created an Initiatives/<slug>/ folder (NOT under Stories)",
         "Overview frontmatter has kind: initiative and no-ticket: true",
         "Initiative folder has status.md, lessons.md, and decisions/_index.md",
-        "Overview has Goal / Definition of Done and a phase/progress checklist, and NO User Story / Acceptance Criteria / jira sections",
-        "No dangling '[ in Jira]()' link and no empty jira: \"\" anywhere in the initiative notes",
+        "Overview has Goal / Definition of Done and a phase/progress checklist, and NO User Story / Acceptance Criteria / ticket sections",
+        "No dangling '[ in the tracker]()' link and no empty ticket: \"\" anywhere in the initiative notes",
         "Home.md lists the initiative under '## Initiatives & POCs'"
       ]
     },
@@ -63,11 +63,11 @@
       "id": 4,
       "name": "routing-tiebreaker",
       "prompt": "Starting PROJ-1200 — it's the platform-v2 migration of the fees module. Set up notes.",
-      "expected_output": "Routed to a STORY because a ticket key is present: Stories/PROJ-1200/ folder (NOT an Initiatives/ tree), kind: story, jira link, status.md; Home under '## Stories'.",
+      "expected_output": "Routed to a STORY because a ticket key is present: Stories/PROJ-1200/ folder (NOT an Initiatives/ tree), kind: story, ticket link, status.md; Home under '## Stories'.",
       "files": [],
       "assertions": [
         "Created Stories/PROJ-1200/ (story folder) — NOT an Initiatives/<...migration> folder",
-        "Overview frontmatter has kind: story and a jira: link to PROJ-1200",
+        "Overview frontmatter has kind: story and a ticket: link to PROJ-1200",
         "status.md exists in the story folder",
         "Home.md lists [[PROJ-1200]] under '## Stories'"
       ]

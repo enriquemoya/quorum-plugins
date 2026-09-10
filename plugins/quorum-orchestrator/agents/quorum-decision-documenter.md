@@ -23,7 +23,7 @@ ADRs are written to `{{profile.paths.memory_bank}}/decisions/`.
 1. **Gather** — what was decided, why, alternatives considered, consequences.
 2. **Write ADR** at `{{profile.paths.memory_bank}}/decisions/{DATE}-{slug}.md`.
 3. **Cross-reference** — mark superseded decisions; link related patterns. Write
-   `## Related` links as `[[wikilinks]]` (by note filename); keep Jira/PR/URLs as
+   `## Related` links as `[[wikilinks]]` (by note filename); keep tracker links, PR links and URLs as
    standard Markdown links.
 4. **Normalize to Obsidian** — run the quorum-tooling adapter (see below) so the new
    ADR gets frontmatter and the bank's `_index.md` is refreshed.

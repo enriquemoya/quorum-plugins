@@ -14,8 +14,8 @@ param(
     [ValidateSet('not-started', 'in-progress', 'blocked', 'in-review', 'done')]
     [string]$Status = 'in-progress',
     [string]$Branch = '(none yet)',
-    [string]$Jira = '',
+    [string]$the tracker = '',
     [string]$Vault = $(if ($env:QUORUM_VAULT) { $env:QUORUM_VAULT } else { Join-Path $HOME 'quorum-vault' })
 )
 & (Join-Path $PSScriptRoot 'scaffold_vault.ps1') -Kind story `
-    -Key $Key -Title $Title -Status $Status -Branch $Branch -Jira $Jira -Vault $Vault
+    -Key $Key -Title $Title -Status $Status -Branch $Branch -the tracker $the tracker -Vault $Vault

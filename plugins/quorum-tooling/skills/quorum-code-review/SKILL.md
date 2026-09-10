@@ -75,7 +75,7 @@ After the review document is written and saved:
    - Build a list of applicable unit test skills with their labels (use the entry's `label`, or derive one from the skill name when absent)
 
 2. **Ask the developer:** Use `AskUserQuestion` to ask: "Would you like to generate tests for this branch?" with dynamically built options:
-   - **Manual QA Test Cases** — "Generate manual QA test cases and post to Jira"
+   - **Manual QA Test Cases** — "Generate manual QA test cases and publish them through `{{role:tracker}}`"
    - **Unit Tests ({label})** — one option per matched unit test skill (e.g., "Unit Tests (.NET 4.7.2 Backend)", "Unit Tests (Jasmine/Karma Frontend)"). Only shown if `UnitTestSkills` is configured and at least one skill matched.
    - **All Tests** — "Generate manual QA test cases and all matched unit tests" (only shown if at least one unit test skill matched)
    - **Skip** — "Skip test generation"

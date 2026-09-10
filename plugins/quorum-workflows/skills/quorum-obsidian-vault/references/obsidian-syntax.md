@@ -20,7 +20,7 @@ tags:
 Rules that actually bite:
 - **Dates** use ISO `YYYY-MM-DD` (or `YYYY-MM-DDTHH:MM`) so they sort correctly.
 - **Lists** (like `tags`, `aliases`) use the block style shown above, one `- value` per line.
-- **Internal links inside frontmatter must be quoted**: `jira: "[[PROJ-68433]]"`. External URLs do not need quotes unless they contain a colon-space or other YAML-confusing punctuation — when unsure, quote it.
+- **Internal links inside frontmatter must be quoted**: `ticket: "[[PROJ-68433]]"`. External URLs do not need quotes unless they contain a colon-space or other YAML-confusing punctuation — when unsure, quote it.
 - `tags`, `aliases`, and `cssclasses` are built-in properties Obsidian treats specially. Don't put a `#` on tags in frontmatter — write `story`, not `#story`.
 
 ## Internal links (wikilinks)
@@ -34,7 +34,7 @@ Use wikilinks for anything **inside the vault** — Obsidian tracks renames and 
 | Link a heading | `[[status#Next Steps / Handoff]]` |
 | Link a block | `[[status#^block-id]]` (append `^block-id` to the target paragraph) |
 
-Use standard Markdown links **only for external URLs** (Jira, docs, PRs): `[PROJ-68433 in Jira](https://...)`.
+Use standard Markdown links **only for external URLs** (the tracker, docs, PRs): `[PROJ-68433 in the tracker](https://...)`.
 
 ## Embeds
 

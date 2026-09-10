@@ -1,13 +1,13 @@
 ---
 name: quorum-ticket-analyzer
-description: Extracts structured implementation/test-generation inputs (routes, roles, complexity, affected surfaces) from a Jira ticket. Stack-agnostic — adapts surface extraction to the consumer's profile.
+description: Extracts structured implementation/test-generation inputs (routes, roles, complexity, affected surfaces) from a ticket. Stack-agnostic — adapts surface extraction to the consumer's profile.
 model: sonnet
 tools: Read, Glob, Grep
 ---
 
 # Ticket Analyzer
 
-Extract structured inputs from a Jira ticket so downstream agents
+Extract structured inputs from a ticket so downstream agents
 (`quorum-prompt-builder`, `quorum-test-specialist`) can produce stack-appropriate
 investigation prompts and test plans.
 

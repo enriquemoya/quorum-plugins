@@ -1,8 +1,8 @@
 ---
 name: quorum-pr-generator
-description: Generates PR descriptions linking the Jira ticket, investigation prompt, validation report, and artifact summary. Stack-agnostic — adapts run commands, related-artifact tables, and the testing checklist to the consumer's profile.
+description: Generates PR descriptions linking the ticket, investigation prompt, validation report, and artifact summary. Stack-agnostic — adapts run commands, related-artifact tables, and the testing checklist to the consumer's profile.
 model: sonnet
-tools: Read, Bash, Glob, Grep, MCP(atlassian)
+tools: Read, Bash, Glob, Grep, MCP({{role:tracker}})
 ---
 
 # PR Generator
@@ -23,7 +23,7 @@ Reads `.claude/profile.yml` for:
 
 ## Process
 
-1. Fetch Jira ticket via MCP — summary, AC, sprint, assignee
+1. Fetch the ticket through `{{role:tracker}}` — summary, AC, sprint, assignee. Skipped when that role is null; the PR description then omits the ticket block rather than failing.
 2. Find artifacts: glob `.claude/prompts/`, `.claude/validations/`, `.claude/reviews/` for this ticket key
 3. Analyze git diff against `{{profile.git.default_base_branch}}` — list files added/modified
 4. **If `{{role:e2e-patterns}}` non-null AND E2E specs changed:** count test scenarios in the changed spec files using the convention named by that skill (`Scenario:` for Gherkin/Karate, `it(` for Mocha/Jest/Cypress/Vitest, `test(` for Playwright/Bun, etc.)
@@ -33,7 +33,7 @@ Reads `.claude/profile.yml` for:
 
 ```markdown
 ## {TICKET-KEY}: {Summary}
-**Jira:** [{TICKET-KEY}]({{ticket_url}}) | **Sprint:** {N} | **Type:** {type}
+**Ticket:** [{TICKET-KEY}]({{profile.tracker.browse_url_template}}) | **Sprint:** {N} | **Type:** {type}
 
 ### Summary
 {2–3 sentences describing what changed and why. Pull the "why" from the ticket
@@ -45,7 +45,7 @@ description / AC, not the code.}
 | `{path/to/file}` | {one-line description of the change} |
 
 ### Acceptance Criteria
-{from Jira}
+{from the tracker}
 - [x] {AC met — link evidence in the diff if non-obvious}
 - [ ] {AC not met — reason / deferred ticket}
 
@@ -55,7 +55,7 @@ description / AC, not the code.}
 | Investigation prompt | `.claude/prompts/{TICKET-KEY}-{DATE}.md` |
 | Validation report | `.claude/validations/{TICKET-KEY}-{DATE}.md` |
 | Code review | `.claude/reviews/.../review_N.md` (if present) |
-| QA handoff (automated tests) | `.claude/qa-handoff/{TICKET-KEY}/qa_automation_tests.md` + Jira subtask "Review Automation Tests" |
+| QA handoff (automated tests) | `.claude/qa-handoff/{TICKET-KEY}/qa_automation_tests.md` + a "Review Automation Tests" subtask on the ticket |
 
 ### Run Commands
 \`\`\`bash

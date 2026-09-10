@@ -3,7 +3,7 @@ key: {{ID}}
 title: {{TITLE}}
 kind: bugfix
 status: {{STATUS}}
-jira: "{{JIRA_URL}}"
+ticket: "{{TICKET_URL}}"
 reporter:
 repro-property:
 created: {{DATE}}
@@ -54,7 +54,7 @@ tags:
 
 ## Source
 
-- [{{ID}} in Jira]({{JIRA_URL}})
+- [{{ID}} in the tracker]({{TICKET_URL}})
 
 ## Related
 

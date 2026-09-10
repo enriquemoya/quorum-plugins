@@ -3,7 +3,7 @@ key: {{ID}}
 title: {{TITLE}}
 kind: {{KIND}}
 status: {{STATUS}}
-jira: "{{JIRA_URL}}"
+ticket: "{{TICKET_URL}}"
 sprint:
 points:
 epic:
@@ -30,11 +30,11 @@ tags:
 
 ## User Story
 
-<!-- Paste verbatim from Jira customfield_10202. -->
+<!-- Paste verbatim from the tracker customfield_10202. -->
 
 ## Acceptance Criteria
 
-<!-- Paste each AC from Jira customfield_10037 as a checkbox so progress is trackable. -->
+<!-- Paste each AC from the tracker customfield_10037 as a checkbox so progress is trackable. -->
 - [ ]
 
 ## Scope
@@ -61,7 +61,7 @@ tags:
 
 ## Source
 
-- [{{ID}} in Jira]({{JIRA_URL}})
+- [{{ID}} in the tracker]({{TICKET_URL}})
 
 ## Related
 

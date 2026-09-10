@@ -64,4 +64,4 @@ tags:
 - Overview / home: [[{{ID}}]]
 - Lessons register: {{LESSONS_LINK}}
 - QA test plan: `{{QA_PLAN}}`
-- Jira: [{{ID}}]({{JIRA_URL}})
+- the tracker: [{{ID}}]({{TICKET_URL}})

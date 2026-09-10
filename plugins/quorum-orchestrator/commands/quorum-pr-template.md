@@ -1,6 +1,6 @@
 ---
 argument-hint: <TICKET-KEY> [base-branch]
-description: Generate a PR description linking the Jira ticket, investigation prompt, validation report, and run commands. Stack-agnostic — works for any artifact type (code changes, test files, configs).
+description: Generate a PR description linking the ticket, investigation prompt, validation report, and run commands. Stack-agnostic — works for any artifact type (code changes, test files, configs).
 ---
 
 # PR Template Command
@@ -26,7 +26,7 @@ This command delegates to the `quorum-pr-generator` agent, which reads `.claude/
 
 1. Validate ticket key format against `{{profile.tracker.ticket_prefix}}` (defaults to `PROJ-NNNNN` when null)
 2. Resolve base branch — argument > `{{profile.git.default_base_branch}}` > fallback
-3. Fetch ticket from Jira via MCP
+3. Fetch ticket from the tracker via MCP
 4. Find artifacts: `.claude/prompts/`, `.claude/validations/`
 5. Analyze git diff — list files added/modified
 6. Delegate to **quorum-pr-generator** agent

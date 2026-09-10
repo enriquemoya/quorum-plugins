@@ -1,10 +1,28 @@
 slug: tracker-role-leak
 origin: spec
 complexity: complex
-status: DRAFTING_TASKS
+status: IN_PROGRESS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T09:00Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
+      note: "Swept. 239 mentions to zero outside the driver and the two abstraction files.
+             The audit changed three things before an edit was made. It caught the spec
+             citing Article 2 for a rule the constitution does not contain — there is no
+             layer clause, and 'the driver may name it, the agnostic layer may not' is a
+             design rule that had been given borrowed authority. It caught the gate
+             bounding ~45 of 239 occurrences while the spec called the split honest;
+             co-occurrence, proposed by a critic, made the rest checkable and failed on
+             27 of 35 files at the time it was written. And it caught 23 of 35 files
+             having no owning task.
+             Implementation found a fourth thing the audit had asked about: the vault
+             tree legitimately LINKS to a tracker without needing one, so deleting the
+             mention would have lost something real. Three operations, not two —
+             delegate, genericise, delete.
+             Residue the first sweep missed because the verification was case-sensitive:
+             a named MCP server in four agents' tools lists, a `jira:` frontmatter field
+             in the note schema, and the driver invoked by skill id rather than by role.
+             Evidence: three injections caught, the driver passes." }
   - { at: 2026-09-09T06:40Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity complex — 35 files, and the fix is structural rather than a rename" }
   - { at: 2026-09-09T06:35Z, from: null, to: TRIAGE, actor: agent,
       note: "created from a scope-audit finding on implement-phases, which fixed one file
@@ -15,8 +33,10 @@ history:
              clean; the driver skill keeps its name because a driver naming what it drives
              is what the article allows." }
 in_flight: false
-audit_iterations: 0
-last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+audit_iterations: 1
+last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u9-scope,
+              governance_version: null, panel: cpd, panel_reason: "three families",
+              evidence_digest: ".claude/runs/tracker-role-leak/u9-scope" }
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null

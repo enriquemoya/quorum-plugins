@@ -1,11 +1,11 @@
 ---
 argument-hint: <TICKET-KEY>
-description: Validate work artifacts (code changes, tests) against a Jira ticket's acceptance criteria. Stack-agnostic — checks AC coverage and convention compliance; delegates syntax-level checks to consumer's e2e-patterns / test-generator skills.
+description: Validate work artifacts (code changes, tests) against a ticket's acceptance criteria. Stack-agnostic — checks AC coverage and convention compliance; delegates syntax-level checks to consumer's e2e-patterns / test-generator skills.
 ---
 
 # Validate Ticket Command
 
-Validate that the current branch's artifacts satisfy a Jira ticket's requirements.
+Validate that the current branch's artifacts satisfy a ticket's requirements.
 
 ## Usage
 
@@ -24,14 +24,14 @@ This command delegates to the `quorum-ticket-validator` agent, which reads `.cla
 
 ## Process
 
-1. Fetch ticket from Jira (`getJiraIssue`) to retrieve AC
+1. Fetch ticket from the tracker (`{{role:tracker}}`) to retrieve AC
 2. Discover artifacts via `git diff` and grep for the ticket key
 3. Delegate to **quorum-ticket-validator** agent
 4. Save validation report
 
 ## Output
 
-Validation report saved to `.claude/validations/{TICKET-KEY}-{DATE}.md` (transient working copy — gitignored; in the orchestrator pipeline it is posted to the Jira ticket as a comment).
+Validation report saved to `.claude/validations/{TICKET-KEY}-{DATE}.md` (transient working copy — gitignored; in the orchestrator pipeline it is posted to the ticket as a comment).
 
 Checks performed (each gated on the relevant role being non-null):
 - AC coverage — every AC item has at least one piece of evidence in code or tests

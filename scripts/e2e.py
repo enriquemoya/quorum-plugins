@@ -679,6 +679,49 @@ def test_implementation_stage_matches_the_pipeline() -> None:
     )
 
 
+def test_the_same_evidence_bound_can_actually_fire() -> None:
+    """A bound that compares a value against itself is not a bound.
+
+    ``same-evidence-thrice`` stops a loop that keeps finding the same thing
+    inside the iteration cap. It reads ``evidence_digest``. An earlier version
+    stored that digest only in ``last_audit``, where each iteration overwrote
+    the one before — so exactly one value ever existed, "seen three times" had
+    nothing to compare against, and the check could never fire. It was written
+    down, it read as a bound, and it bounded nothing.
+
+    Two things are pinned here because either alone lets the rule rot back:
+    where the digest is read from, and what a digest is OF.
+    """
+    status = doc("skills/quorum-status/SKILL.md")
+    pipeline = doc("PIPELINE.md")
+
+    assert_that(
+        "occurrences of this verdict's evidence_digest in HISTORY" in status,
+        "the same-evidence count reads the history",
+        "not last_audit, which holds one value",
+    )
+    assert_that(
+        "Each history entry carries the digest" in status,
+        "every iteration appends its digest",
+        "append-only is what makes the count possible",
+    )
+    assert_that(
+        "it is not what the rule reads" in status,
+        "last_audit is named as display-only",
+        "so a reader does not wire the check to it again",
+    )
+    assert_that(
+        "digest of *references*, not a path" in status,
+        "a digest is of references, not of a location",
+        "an artifact path makes every iteration of a unit look identical",
+    )
+    assert_that(
+        "read from the **history**" in pipeline,
+        "PIPELINE.md agrees with the state contract",
+        "two documents describing one rule must not drift",
+    )
+
+
 def main() -> int:
     keep = "--keep" in sys.argv
     bed = Path(tempfile.mkdtemp(prefix="quorum-e2e-"))
@@ -698,6 +741,7 @@ def main() -> int:
         test_bundled_files_are_resolved_not_guessed()
         test_resolution_executed_against_both_trees(bed)
         test_implementation_stage_matches_the_pipeline()
+        test_the_same_evidence_bound_can_actually_fire()
 
         width = max(len(n) for _, n, _ in RESULTS)
         for ok, name, detail in RESULTS:

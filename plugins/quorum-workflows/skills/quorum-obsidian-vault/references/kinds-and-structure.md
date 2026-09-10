@@ -25,7 +25,7 @@ When the work is named but you're unsure it'll recur, start as an `effort` and p
 
 ## Identifiers
 
-- **Stories/bugfix:** the Jira key verbatim (`PROJ-68433`) — it's the folder name, the overview filename (`PROJ-68433.md` → `[[PROJ-68433]]`), and `key:` in frontmatter. Self-identifying, so no disambiguation needed.
+- **Stories/bugfix:** the the tracker key verbatim (`PROJ-68433`) — it's the folder name, the overview filename (`PROJ-68433.md` → `[[PROJ-68433]]`), and `key:` in frontmatter. Self-identifying, so no disambiguation needed.
 - **Ticketless kinds:** a lowercase hyphenated slug derived from the title (`platform-v2-migration`, `local-nuget-skill`, `spike-evaluate-grpc`). The slug is the folder/file name and `id:`. Because slugs are fuzzy, the skill **searches Home.md / the folder first and confirms the target before any update** to avoid duplicates or wrong-target writes.
 
 ## Frontmatter schema
@@ -34,12 +34,12 @@ Every note carries `kind:` as the first-class discriminator — it's what makes 
 
 Shared core: `id` (or `key` for stories), `title`, `kind`, `status`, `created`, `updated`, `tags: [<kind>, <id>]`.
 
-- **story / bugfix** add: `jira`, `sprint`, `points`, `epic` (bugfix swaps in `reporter`, `repro-property`).
+- **story / bugfix** add: `ticket`, `sprint`, `points`, `epic` (bugfix swaps in `reporter`, `repro-property`).
 - **initiative** adds: `subtype`, `no-ticket: true`, `owner`, `started`, `target`.
 - **effort** adds: `no-ticket: true`, `promoted-to` (set when it graduates).
 - **reference** adds: `type`, `topic`/`subject`, `no-ticket: true`; has **no status** (evergreen) and never archives.
 
-Ticketless notes OMIT the `jira:` line entirely — never emit an empty `jira: ""` or a dangling `[ in Jira]()` link. The scaffolder strips those lines automatically.
+Ticketless notes OMIT the `ticket:` line entirely — never emit an empty `ticket: ""` or a dangling `[ in the tracker]()` link. The scaffolder strips those lines automatically.
 
 ## Status lifecycle
 
@@ -51,7 +51,7 @@ One living handoff note, identical across the ticketed-and-initiative kinds (thi
 
 `Snapshot` (`> [!abstract]`, the always-true "where are we?") · `Branches, PRs & Environment` (0..N branches, cross-repo/NuGet chain, "n/a — no branch" allowed) · `Progress Log` (reverse-chron, what+why) · `Discoveries` (`> [!note]` + file:line) · `Risks & Blockers` (`> [!warning]`/`[!danger]` + what unblocks) · `Decisions` · `Lessons Learned` (`> [!tip]`/`[!success]` tagged `#lesson`) · `Screenshots & Evidence` · `Next Steps / Handoff` (`- [ ]`) · `Related`.
 
-Stories additionally surface AC/QA verification and a "Pending Jira Updates (drafted? posted?)" block in the overview. Initiatives embed `![[migration/dashboard]]` when relevant.
+Stories additionally surface AC/QA verification and a "Pending the tracker Updates (drafted? posted?)" block in the overview. Initiatives embed `![[migration/dashboard]]` when relevant.
 
 ## Initiative internal structure
 

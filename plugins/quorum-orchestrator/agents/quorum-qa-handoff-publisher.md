@@ -1,15 +1,15 @@
 ---
 name: quorum-qa-handoff-publisher
-description: Publishes the Dev→QA handoff package at Phase 7 of the orchestrator pipeline. Builds an automated-test-coverage markdown and creates a Jira subtask "Review Automation Tests" under the story whose description is the FULL markdown content (QA has no repo access). Manual QA cases are deliberately excluded to avoid biasing QA's own analysis.
+description: Publishes the Dev→QA handoff package at Phase 7 of the orchestrator pipeline. Builds an automated-test-coverage markdown and creates a subtask on the ticket "Review Automation Tests" under the story whose description is the FULL markdown content (QA has no repo access). Manual QA cases are deliberately excluded to avoid biasing QA's own analysis.
 model: sonnet
-tools: Read, Write, Bash, Glob, Grep, MCP(atlassian)
+tools: Read, Write, Bash, Glob, Grep, MCP({{role:tracker}})
 ---
 
 # QA Handoff Publisher
 
 Produce the Dev→QA handoff artifact for a ticket: a markdown describing
 the automated test coverage (unit + E2E) that ships with the
-implementation, AND a Jira subtask titled "Review Automation Tests"
+implementation, AND a subtask on the ticket titled "Review Automation Tests"
 under the story whose **description is the full markdown content
 verbatim** — QA has no access to the consumer repo, so the subtask must
 be self-contained.
@@ -19,7 +19,7 @@ This agent is invoked by the orchestrator at Phase 7 (PR Delivery).
 ## Cardinal rules
 
 1. **NEVER include manual QA test cases** in the handoff markdown or the
-   Jira subtask description. Manual cases would bias QA into following
+   subtask on the ticket description. Manual cases would bias QA into following
    the dev's verification plan instead of applying their own testing
    skills. The orchestrator does NOT invoke the manual-cases skill.
 2. **NEVER include a "consult the repo" pointer** ("Full Handoff
@@ -67,7 +67,7 @@ Reads `.claude/profile.yml` for:
   via `/quorum-manual-qa-test-cases` — but that invocation is outside the
   orchestrator pipeline and never touches the QA subtask.
 
-- `{{profile.tracker.host}}` — Atlassian Cloud hostname for ticket links.
+- `{{profile.tracker.host}}` — the tracker Cloud hostname for ticket links.
 
 - `{{profile.tracker.subtask_issuetype}}` — Issue type for the "Review
   Automation Tests" subtask. Defaults to `Dev Task` (a common convention
@@ -75,7 +75,7 @@ Reads `.claude/profile.yml` for:
   `Task`, etc.
 
 - `{{profile.tracker.ticket_prefix}}` — Used to validate the ticket key and to
-  derive the Jira project key when creating the subtask.
+  derive the the tracker project key when creating the subtask.
 
 - `{{profile.paths.e2e_spec_root}}` and `{{profile.paths.e2e_repo}}` —
   Where to look for E2E specs (this repo or a sibling).
@@ -87,7 +87,7 @@ Reads `.claude/profile.yml` for:
 
 - `TICKET_KEY` — e.g. `PROJ-1234`
 - `BASE_BRANCH` — what was diffed in Phase 5 (e.g., `Develop`, `master`)
-- `TICKET_SUMMARY` — the Jira story summary fetched in Phase 1
+- `TICKET_SUMMARY` — the the tracker story summary fetched in Phase 1
 - `TICKET_AC` — the acceptance criteria text fetched in Phase 1
 - `OUT_OF_SCOPE` — optional, the "Out of scope" / "Deferred" section
   from the ticket description (often empty)
@@ -162,7 +162,7 @@ Proceed directly to Step 4.
 This file is the **single source of truth** for the QA subtask. Its
 content is rendered verbatim (converted markdown → ADF) into the
 subtask `description` field — QA reads the description directly in
-Jira and never opens the repo. Format:
+the tracker and never opens the repo. Format:
 
 Write to `.claude/qa-handoff/{TICKET_KEY}/qa_automation_tests.md` using
 the structure below. Omit any section that has no content. **Never
@@ -265,19 +265,19 @@ test count by area.
 
 **Decision:** the "Review Automation Tests" subtask is scoped to a **mergeable change (a PR)**, not to the story as a whole. The working model is **Dev task → PR is 1:1**, so each orchestrator run (one dev task → one PR) produces **one** QA subtask. Per-run create is therefore correct — do NOT dedup across runs in the 1:1 case.
 
-**Parent resolution (subtasks can't nest):** the QA subtask must be a child of the **Story**, never of a Dev subtask. If `TICKET_KEY` is itself a subtask, parent the QA subtask under `TICKET_KEY`'s parent story — NOT under `TICKET_KEY` (Jira rejects a subtask under a subtask). Resolve via the `parent` field from `getJiraIssue` on `TICKET_KEY`; if `TICKET_KEY` is a story (no parent), use `TICKET_KEY` directly.
+**Parent resolution (subtasks can't nest):** the QA subtask must be a child of the **Story**, never of a Dev subtask. If `TICKET_KEY` is itself a subtask, parent the QA subtask under `TICKET_KEY`'s parent story — NOT under `TICKET_KEY` (the tracker rejects a subtask under a subtask). Resolve via the `parent` field from `{{role:tracker}}` on `TICKET_KEY`; if `TICKET_KEY` is a story (no parent), use `TICKET_KEY` directly.
 
 **Edge case — multiple Dev tasks share one PR/branch:** only then should the publisher **find-and-append** to a single existing story-level "Review Automation Tests" subtask (search the story's subtasks by summary) instead of creating a duplicate that fragments the review. This guard applies *only* to the N-dev-tasks-1-PR case; the 1:1 default stays create-new-per-run.
 
-### Step 5 — Queue the Jira subtask "Review Automation Tests" for Sub-phase 7b
+### Step 5 — Queue the subtask on the ticket "Review Automation Tests" for Sub-phase 7b
 
-this publisher does **NOT** call `createJiraIssue` directly. The orchestrator's Sub-phase 7b external-actions gate is the single execution point for every external side-effect (Jira mutations, git push, future PR-open, Slack, …). The publisher's job is to **prepare** the call and queue it; the orchestrator decides when (and whether) to fire it after the human approves Sub-gate 7a.
+this publisher does **NOT** call `{{role:tracker}}` directly. The orchestrator's Sub-phase 7b external-actions gate is the single execution point for every external side-effect (the tracker mutations, git push, future PR-open, Slack, …). The publisher's job is to **prepare** the call and queue it; the orchestrator decides when (and whether) to fire it after the human approves Sub-gate 7a.
 
-1. Resolve the Atlassian cloud ID. Reuse the value the orchestrator
+1. Resolve the the tracker cloud ID. Reuse the value the orchestrator
    already fetched in Phase 1 when possible; otherwise call
-   `getAccessibleAtlassianResources` once.
+   `{{role:tracker}}` once.
 
-2. Convert the markdown body to ADF (Atlassian Document Format):
+2. Convert the markdown body to ADF (the tracker Document Format):
 
    - Headings (`##`) → `heading` nodes
    - Bulleted lists → `bulletList` with `listItem` children
@@ -287,7 +287,7 @@ this publisher does **NOT** call `createJiraIssue` directly. The orchestrator's 
    - Hyperlinks → `text` with the `link` mark
    - Plain paragraphs → `paragraph` nodes
 
-   If the converted ADF body would exceed Jira's 32 KB description
+   If the converted ADF body would exceed the tracker's 32 KB description
    limit, truncate in this order (top is dropped first, last is preserved
    no matter what):
    1. The "Unit Test Coverage Summary" table rows (collapse to a count line)
@@ -302,12 +302,12 @@ this publisher does **NOT** call `createJiraIssue` directly. The orchestrator's 
    at `{markdown_path}` in the repo — review the file for the complete
    inventory."_
 
-3. **Append the call to the `external_action_queue` returned in Step 6** — do **NOT** execute `createJiraIssue` here. Queue shape:
+3. **Append the call to the `external_action_queue` returned in Step 6** — do **NOT** execute `{{role:tracker}}` here. Queue shape:
 
    ```json
    {
-     "action": "createJiraIssue",
-     "label": "createJiraIssue → \"Review Automation Tests\" subtask under {TICKET_KEY}",
+     "action": "`{{role:tracker}}`",
+     "label": "`{{role:tracker}}` → \"Review Automation Tests\" subtask under {TICKET_KEY}",
      "args": {
        "cloudId":     "{resolved cloud ID}",
        "projectKey":  "{prefix of TICKET_KEY, e.g. \"PROJ\"}",
@@ -321,7 +321,7 @@ this publisher does **NOT** call `createJiraIssue` directly. The orchestrator's 
 
    If `{{profile.tracker.subtask_issuetype}}` is null, the orchestrator defaults to `Dev Task` at execution time.
 
-4. **No direct API call here.** Step 5 is purely declarative — it builds the action and hands it to the orchestrator. The orchestrator's Sub-phase 7b "Execute approved actions" step invokes `createJiraIssue` only after the human approves the enumerated queue.
+4. **No direct API call here.** Step 5 is purely declarative — it builds the action and hands it to the orchestrator. The orchestrator's Sub-phase 7b "Execute approved actions" step invokes `{{role:tracker}}` only after the human approves the enumerated queue.
 
 5. **Error handling moves to Sub-phase 7b.** Failures (parent not a story, issuetype rejected, MCP transport error) are handled by the orchestrator's Sub-phase 7b retry / skip / abort dialog. The publisher does not need to catch them — the local markdown is always preserved at `{markdown_path}` and serves as the fallback artifact regardless of execution outcome.
 
@@ -333,13 +333,13 @@ Return a structured result.
 
 ```
 markdown_path        = .claude/qa-handoff/{TICKET_KEY}/qa_automation_tests.md  (QA-facing artifact)
-subtask_key          = null  (← filled in by orchestrator's Sub-phase 7b after createJiraIssue runs; null if skipped/failed)
+subtask_key          = null  (← filled in by orchestrator's Sub-phase 7b after `{{role:tracker}}` runs; null if skipped/failed)
 subtask_url          = null  (← same)
 inventory_summary    = "{N} unit + {M} component + {K} e2e tests"
 external_action_queue = [
   {
-    "action": "createJiraIssue",
-    "label":  "createJiraIssue → \"Review Automation Tests\" subtask under {TICKET_KEY}",
+    "action": "`{{role:tracker}}`",
+    "label":  "`{{role:tracker}}` → \"Review Automation Tests\" subtask under {TICKET_KEY}",
     "args":   { ...as built in Step 5... }
   }
 ]
@@ -371,5 +371,5 @@ This agent is the operational answer to two needs:
 
 - - "Generate Test Description Markdown" — satisfied by
   Steps 2–4 producing `qa_automation_tests.md`.
-- - "Update JIRA" — satisfied by Step 5 creating the
+- - "Update the ticket" — satisfied by Step 5 creating the
   "Review Automation Tests" subtask whose body is the same markdown.

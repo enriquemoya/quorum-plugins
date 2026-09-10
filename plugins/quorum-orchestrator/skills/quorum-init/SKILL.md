@@ -110,7 +110,7 @@ listing a generated pattern you are unsure about.
 
 **Tracker and docs** cannot be discovered from a repository in general, only
 guessed at from branch names and commit messages. Ticket keys like `ABC-123`
-suggest a prefix; a `.jira` or Atlassian URL in a CI config suggests a host.
+suggest a prefix; a tracker marker file or URL in a CI config suggests a host.
 Treat both as hypotheses to confirm, never as findings.
 
 ## Step 2 — Map the components and characteristics
@@ -232,7 +232,7 @@ stack.characteristics.auth   (not examined)      ← null, nobody looked
 
 ticket_prefix                PROJ                ← GUESS: 23 of the last 40
                                                   branch names start with PROJ-
-atlassian.host               (none found)        ← ASK
+tracker.host               (none found)        ← ASK
 ```
 
 Mark guesses and gaps distinctly from findings. The operator reads this table to
@@ -306,7 +306,7 @@ context invents an answer, and an invented answer is indistinguishable from a
 measured one once it is in the file.
 
 **Ask for the shape, not the vendor.** `tracker.browse_url_template` is
-`https://…/{key}`; it is not "your Jira host". A question phrased around one
+`https://…/{key}`; it is not "your the tracker host". A question phrased around one
 vendor gets a vendor-shaped answer, and the operator on GitHub Issues or Linear
 either answers wrong or concludes the tool is not for them. Show two or three
 concrete templates from different trackers so the shape is obvious.

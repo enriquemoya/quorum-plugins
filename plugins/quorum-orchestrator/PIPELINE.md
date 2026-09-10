@@ -111,6 +111,11 @@ incremented on write, and compared against the bound before any loop is taken.
 `same-evidence-thrice`: if the same finding evidence (`file:line` or artifact
 ref) appears in three audit iterations, the loop is not converging. `STUCK`.
 
+The digest is read from the **history**, where every iteration appends one — not
+from `last_audit`, which holds only the latest and overwrites it each round. A
+rule that compares a value against itself cannot fire, and this one could not
+until the append was specified.
+
 ## Autonomy
 
 ```yaml

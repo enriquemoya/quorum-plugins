@@ -9,10 +9,10 @@ Create a properly named git branch for PR work following the project branch nami
 
 ## Branch Naming Convention
 
-Format: `{prefix}/{PROJ-XXXXX}_{task_description}`
+Format: `{prefix}/{{{profile.ticket_prefix}}-NNNNN}_{task_description}`
 
 - **Prefix:** One of `hotfix`, `bugfix`, `feature`, `release`
-- **Ticket ID:** Jira ticket number with a hyphen (e.g., `PROJ-12345`)
+- **Ticket ID:** ticket number with a hyphen (e.g., `PROJ-12345`)
 - **Description:** Lowercase words separated by underscores (e.g., `add_payment_validation`)
 
 Example: `feature/PROJ-112233_task_description`
@@ -21,21 +21,23 @@ Example: `feature/PROJ-112233_task_description`
 
 ### Step 1: Gather Information from User
 
+**With `roles.tracker` null, `{{profile.ticket_prefix}}` may be unset too.** Then there is no key to recognise: skip the extraction, say so, and carry on with the branch name as given. A ticket key is an annotation here, not an input — it labels output when one is available, and its absence changes nothing else.
+
 Prompt the user for the following (accept all in one prompt if possible):
 
 1. **Branch prefix** — Ask user to choose: `hotfix`, `bugfix`, `feature`, or `release`
-2. **Jira ticket number** — e.g., `PROJ-12345`. Validate it matches the pattern `PROJ-\d+`
+2. **ticket number** — e.g., `PROJ-12345`. Validate it matches the pattern `{{profile.ticket_prefix}}-\d+`
 3. **Source branch** — Default is `Develop`. Ask if they want a different source branch.
 
-### Step 2: Get Task Description from Jira
+### Step 2: Get Task Description from the tracker
 
-1. Attempt to fetch the Jira ticket summary using `getJiraIssue` MCP tool with the ticket number from Step 1, requesting the `summary` field.
-2. **If Jira is accessible:**
+1. Attempt to fetch the ticket summary using `{{role:tracker}}` with the ticket number from Step 1, requesting the `summary` field.
+2. **If the tracker is accessible:**
    - Extract the ticket summary
    - Convert to a branch-friendly description: lowercase, replace spaces and special characters with underscores, remove consecutive underscores, trim trailing underscores
    - Present the generated branch name to the user and ask for confirmation or modification
-3. **If Jira is NOT accessible** (MCP tool fails or times out):
-   - Inform the user that Jira could not be reached
+3. **If the tracker is NOT accessible** (MCP tool fails or times out):
+   - Inform the user that the tracker could not be reached
    - Ask the user to provide a short task description
    - Convert their input to branch-friendly format (same rules as above)
 
@@ -58,12 +60,12 @@ Display the result:
 ```
 Branch created: {branch_name}
 Source branch: {source_branch}
-Ticket: PROJ-XXXXX ({{ticket_url}})
+Ticket: {{profile.ticket_prefix}}-NNNNN ({{ticket_url}})
 ```
 
 ## Description Formatting Rules
 
-When converting a Jira summary or user input to a branch description:
+When converting a the tracker summary or user input to a branch description:
 - Convert to lowercase
 - Replace spaces with underscores
 - Remove any characters that are not alphanumeric or underscores

@@ -12,7 +12,7 @@ Generate unit test code (.spec.ts files) by analyzing code changes between the c
 **If this skill was invoked with `--post-review` argument** (i.e., chained from `/quorum-code-review`), the current conversation already contains all git analysis data, file contents, sprint number, base branch, and application info from the code review. In this mode:
 
 - **SKIP** the entire Setup Phase (base branch, sprint number, ApplicationName are already known)
-- **SKIP** Step 1 (Jira tickets already extracted from branch name during review)
+- **SKIP** Step 1 (ticket keys already extracted from the branch name during review)
 - **SKIP** Step 2 (all git commands, file reads, and diff data are already in the conversation)
 - **DO run** the directory/filename check — look for the review output directory that was just created and check for existing `unittests_*.md` files to set the filename
 - Then proceed directly to Test Generation using all the context already available
@@ -30,8 +30,10 @@ Generate unit test code (.spec.ts files) by analyzing code changes between the c
 
 ## Analysis Phase
 
-### Step 1: Extract Jira Tickets
-Scan branch name and commit messages for ticket numbers matching pattern `PROJ-\d+`. Normalize to `PROJ-XXXXX` format (uppercase prefix, hyphen, digits). Track the primary ticket (from branch name) and any additional tickets from commits.
+### Step 1: Extract ticket keys
+
+**With `roles.tracker` null, `{{profile.ticket_prefix}}` may be unset too.** Then there is no key to recognise: skip the extraction, say so, and carry on with the branch name as given. A ticket key is an annotation here, not an input — it labels output when one is available, and its absence changes nothing else.
+Scan branch name and commit messages for ticket numbers matching pattern `{{profile.ticket_prefix}}-\d+`. Normalize to `{{profile.ticket_prefix}}-NNNNN` format (uppercase prefix, hyphen, digits). Track the primary ticket (from branch name) and any additional tickets from commits.
 
 ### Step 2: Git Analysis
 1. **Get commits:** `git --no-pager log --pretty=format:'%h %s (%an)' [base_branch]..HEAD`
@@ -489,7 +491,7 @@ Write `unittests_{n}.md` to the review output directory:
 ```markdown
 # Unit Test Generation Summary - Sprint {sprint}
 **Branch:** {branch_name}
-**Ticket:** [PROJ-XXXXX]({{ticket_url}})
+**Ticket:** [{{profile.ticket_prefix}}-NNNNN]({{ticket_url}})
 **Generated:** {date}
 **Base Branch:** {base_branch}
 **Application:** {ApplicationName}
@@ -533,16 +535,20 @@ Write `unittests_{n}.md` to the review output directory:
 
 ---
 
-## Jira Integration Phase
+## Publishing the summary
 
-After writing the summary document to disk:
+After writing the summary document to disk, publish it through
+`{{role:tracker}}` if that role is set: the primary ticket key comes from the
+branch name, and the summary is posted as a comment prefixed with
+`## Unit Test Generation Summary (Auto-Generated)` and the branch it came from.
 
-1. **Get Atlassian cloud ID:** Use `getAccessibleAtlassianResources` MCP tool to retrieve the cloud ID (reuse from earlier if already fetched).
-2. **Identify primary ticket:** Use the primary PROJ-XXXXX ticket number extracted from the branch name
-3. **Post comment:** Use `addCommentToJiraIssue` MCP tool to post the summary document as a comment on the ticket
-4. **Comment format:** Prefix the content with a header: `## Unit Test Generation Summary (Auto-Generated)\nGenerated from branch: {branch_name}\n\n` followed by the full summary document content
-5. **No ticket found:** If no PROJ-XXXXX ticket was found in the branch name or commits, skip Jira posting and inform the user: "No Jira ticket found - skipping Jira comment. Unit test summary saved to: {filepath}"
-6. **Success message:** After posting, show: "Unit tests generated and summary posted to [PROJ-XXXXX]({{ticket_url}}) and saved to: {filepath}"
+**With `roles.tracker` null, or no ticket key in the branch, this step is
+skipped and the run says so** — the summary is on disk either way, and a
+repository with no tracker is a supported configuration rather than a failure.
+
+How the comment reaches the tracker is the tracker skill's business, not this
+one's. Generating unit tests does not require a ticket system; publishing a
+summary to one is an optional courtesy at the end.
 
 ---
 
@@ -553,4 +559,4 @@ After writing the summary document to disk:
 - **Test verification:** Always attempt to run after generation; fix issues iteratively
 - **Source code is read-only:** Never modify source code under test — only generate/modify test files
 - **Timeout handling:** Use 30s timeouts for git operations, fall back to individual file reads
-- **Idempotent Jira posting:** Each run creates a new comment (does not edit previous ones)
+- **Idempotent publishing:** each run creates a new comment; it never edits a previous one

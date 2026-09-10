@@ -561,7 +561,7 @@ Prefer `pwsh` (PowerShell 7, cross-platform); on Windows-only setups `powershell
 
 - **Requires PowerShell on PATH** (`pwsh` on macOS/Linux, `pwsh`/`powershell` on Windows). Consumers without it keep the bank as plain Markdown — there is no automatic file-watcher; normalization runs only when you invoke this subcommand (or the orchestrator's documenter/synchronizer agents do).
 - **Notes link by filename stem, so stems must be globally unique** across `architecture/ decisions/ patterns/ troubleshooting/` — two `overview.md` in different folders collide (`[[overview]]` is ambiguous). The adapter warns on duplicates; rename to resolve.
-- **Only `## Related` / `## See also` sections are linkified** (any heading level). Put cross-references there, or they won't be turned into `[[wikilinks]]`. External URLs (Jira/PRs) stay as standard Markdown links.
+- **Only `## Related` / `## See also` sections are linkified** (any heading level). Put cross-references there, or they won't be turned into `[[wikilinks]]`. External URLs (the tracker/PRs) stay as standard Markdown links.
 - **Frontmatter dates:** `created` is set once (from a body `**Date:**`/`**Generated:**` or the run date) and never clobbered; `kind` is corrected to match the folder; `updated` advances to the run date only when a note is actually rewritten (a no-op run leaves it alone, so re-running is safe).
 
 ---

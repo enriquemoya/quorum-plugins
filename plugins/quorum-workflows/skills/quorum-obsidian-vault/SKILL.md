@@ -31,7 +31,7 @@ open one folder and know exactly where things stand and what to do next, and a
 discovered, and what was learned.
 
 The vault is a *complement* to your other artifacts, never a duplicate of them —
-it links out to Jira, PRs, QA plans, and auto-memory, and writes in only the
+it links out to the tracker, PRs, QA plans, and auto-memory, and writes in only the
 knowledge that's otherwise lost.
 
 ## What goes where (kinds)
@@ -83,9 +83,9 @@ platform-v2 migration" / "spike X", or you open a branch on real work):
 1. **Decide the kind** with the routing rule above.
 2. **Gather the facts:**
    - *story / bugfix:* if not already in the conversation, fetch the ticket with
-     `quorum-workflows:quorum-jira-story` (it pulls the user story `customfield_10202`,
+     `{{role:tracker}}` (it pulls the user story `customfield_10202`,
      acceptance criteria `customfield_10037`, and subtasks a plain read misses).
-   - *initiative / effort / reference:* there is no Jira issue — seed the Goal /
+   - *initiative / effort / reference:* there is no ticket — seed the Goal /
      Definition of Done / Question / procedure from the user and the conversation.
 3. **Scaffold** with the bundled PowerShell script (idempotent, never clobbers,
    maintains `Home.md`). The `-Kind` drives the folder, templates, and Home
@@ -106,7 +106,7 @@ platform-v2 migration" / "spike X", or you open a branch on real work):
    (`scaffold_story.ps1 -Key …` still works as a story-only alias.)
 4. **Fill the overview/home note** in plain language: for a story, paste the
    User Story and each AC as `- [ ]` checkboxes inline (so a fresh session needs
-   no Jira access) and keep the Jira link; for an initiative, write the Goal /
+   no tracker access) and keep the ticket link; for an initiative, write the Goal /
    Definition of Done and the phase checklist.
 5. **Seed `status.md`** (where present): write the Snapshot paragraph and the
    branch(es). Everything else fills in as work happens.
@@ -207,7 +207,7 @@ reference note.
 
 ## Cross-linking (link out, write in)
 
-Facts that live in a source of truth (Jira, PR, Confluence, the QA plan,
+Facts that live in a source of truth (the tracker, PR, Confluence, the QA plan,
 auto-memory) get **linked** in a Related section; only discovered/decided/learned
 knowledge gets **written** into the vault. Link related work with `[[PROJ-XXXXX]]`
 and `[[<slug>]]`; an initiative links its spin-off tickets and the reference

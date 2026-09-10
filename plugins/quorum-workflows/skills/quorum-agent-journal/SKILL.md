@@ -35,7 +35,7 @@ Inputs you read (never ask the user for these):
 
 1. **Ensure the story note exists** (idempotent — safe every run):
    ```
-   pwsh <obsidian-skill-dir>\scripts\scaffold_vault.ps1 -Kind story -Key <PROJ-KEY> -Title "<from jira/branch>" -Branch <branch>
+   pwsh <obsidian-skill-dir>\scripts\scaffold_vault.ps1 -Kind story -Key <PROJ-KEY> -Title "<from the ticket or branch>" -Branch <branch>
    ```
    If it already exists the scaffolder skips it. If the ticket key can't be derived from the branch, STOP and report — do not write to a guessed folder.
 
@@ -105,6 +105,6 @@ The vault is the staging ground; the skill/agent definition is where behavior ac
 ## Rules
 
 - **No questions, ever.** Every target is derived from artifacts + the branch. If a required input is missing (no ticket key, no results.jsonl), STOP and report — never guess a target or prompt.
-- **Link out, write in.** Source-of-truth facts (Jira, the run `report.md`, the QA plan) get linked, not duplicated. Only proof and lessons are written into the vault.
+- **Link out, write in.** Source-of-truth facts (the tracker, the run `report.md`, the QA plan) get linked, not duplicated. Only proof and lessons are written into the vault.
 - **Deterministic slugs.** Story = ticket key (self-identifying). Kaizen log = fixed slug `qa-kaizen`. Client slug = lowercased client name. No fuzzy matching.
 - **Append/replace, never clobber.** Story proof block is fence-replaced; kaizen is append-with-dedupe; the scaffolder never overwrites an existing note.

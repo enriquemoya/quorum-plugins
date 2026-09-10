@@ -10,7 +10,7 @@ description: >
   plan for PROJ-XXXXX", "mark TC-01 as passed", "TC-03 blocked", "where are we on testing
   PROJ-XXXXX", "list my qa plans". Also trigger proactively when the user finishes implementing
   a story and hasn't yet created a test plan — offer to create one.
-argument-hint: Jira ticket key (e.g.) and optional operation (create/update/resume/persist/list)
+argument-hint: ticket key (e.g.) and optional operation (create/update/resume/persist/list)
 ---
 
 # QA Test Plans
@@ -31,10 +31,10 @@ These are **complementary lanes, not duplicates**:
   every AC to an executor (ui-tester/backend-tester/human), tracks pass/fail/blocked status across sessions,
   and reconciles whole-story coverage. Use it when QA needs to *execute and track* a story.
 - **`quorum-manual-qa-test-cases`** (`quorum-tooling`) is the **one-shot, dev-facing** lane: it generates
-  a manual checklist from a diff and (optionally) posts it to Jira as a comment, with no persistence
+  a manual checklist from a diff and (optionally) posts it to the tracker as a comment, with no persistence
   or tracking. Use it for a quick pre-PR pass or when chaining from `/quorum-code-review`.
 - **`quorum-qa-handoff-publisher`** (`quorum-orchestrator`, Phase 7) publishes **automated** coverage
-  (unit + E2E) as a "Review Automation Tests" Jira subtask; it deliberately excludes manual cases and does not consume this skill's plans.
+  (unit + E2E) as a "Review Automation Tests" subtask on the ticket; it deliberately excludes manual cases and does not consume this skill's plans.
 
 ---
 
@@ -48,9 +48,9 @@ These are **complementary lanes, not duplicates**:
    - If it does: ask the user whether to open the existing plan or regenerate it.
    - If not: proceed.
 
-2. Fetch the full story by invoking the `quorum-jira-story` skill:
+2. Fetch the full story by invoking the the skill named by `{{role:tracker}}`:
    ```
-   Skill(skill: "quorum-workflows:quorum-jira-story", args: "{story-key}")
+   Skill(skill: "{{role:tracker}}", args: "{story-key}")
    ```
    This returns the complete story with ACs, subtasks, sprint, and comments.
 
@@ -75,7 +75,7 @@ capture it to disk.
 1. Look for plan content in context — prior conversation turns, memory entries, or a plan
    already printed in this session.
    - If found: convert to **Plan Format** and write to `{cwd}/qa-test-plans/{story-key}/plan.md`.
-   - If not found: fall back to CREATE (fetch from Jira, generate, then write).
+   - If not found: fall back to CREATE (fetch from the tracker, generate, then write).
 
 2. Confirm: "Persisted to `qa-test-plans/{story-key}/plan.md`."
 
@@ -167,7 +167,7 @@ entirely if its source data is empty (e.g., no open questions, no notes yet).
 ```markdown
 # {STORY-KEY}: {Story Summary}
 
-**Jira**: {STORY-KEY}
+**the tracker**: {STORY-KEY}
 **Created**: {YYYY-MM-DD}
 **Last Updated**: {YYYY-MM-DD}
 **Progress**: {done}/{total} complete — {N} ✅ Pass | {N} ❌ Fail | {N} ⏸ Blocked | {N} ⬜ Pending
@@ -217,7 +217,7 @@ entirely if its source data is empty (e.g., no open questions, no notes yet).
 
 ## Open Questions
 
-- {Unresolved items from Jira comments or grooming — remove when resolved}
+- {Unresolved items from the tracker comments or grooming — remove when resolved}
 
 ## Notes
 
@@ -287,7 +287,7 @@ AC coverage at a glance.
 gap (e.g., "needs test client with virtual tours"), document it in Open Questions so it
 doesn't silently block a TC without explanation.
 
-**Pull from Jira comments and subtask details** — grooming notes and PM comments often
+**Pull from the tracker comments and subtask details** — grooming notes and PM comments often
 contain edge cases and constraints that don't make it into the formal ACs.
 
 ### Per-AC test-design checklist (forces the oracle types that catch real defects)

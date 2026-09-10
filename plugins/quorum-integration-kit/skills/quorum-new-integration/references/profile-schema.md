@@ -51,7 +51,7 @@ credentials:
 
 # Optional. Ticket tracker, for the change-planner skill.
 tracker:
-  kind: jira                   # jira | github | linear | none
+  kind: ticket                   # the tracker | github | linear | none
   key_prefix: PROJ
   branch_pattern: "feature/{KEY}-{slug}"
 ```

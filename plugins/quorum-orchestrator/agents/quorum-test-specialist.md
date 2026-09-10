@@ -53,7 +53,7 @@ to skip).
 
 ### Inputs
 
-- Ticket key + ticket details (from `getJiraIssue` or the orchestrator's cached fetch)
+- Ticket key + ticket details (from `{{role:tracker}}`, or the orchestrator's cached fetch; both absent when `roles.tracker` is null, and the run proceeds without them)
 - List of files changed in Phase 4 (from `git --no-pager diff --name-only`)
 - Resolved profile values (orchestrator passes them in via prompt context)
 

@@ -441,6 +441,72 @@ def _install_paths() -> None:
                 )
 
 
+@check("tracker — the driver's name stays inside the driver")
+def _tracker_leak() -> None:
+    """A skill that describes steps it cannot perform is wrong.
+
+    ``roles.tracker`` plus ``tracker.browse_url_template`` model any tracker or
+    none, and the schema shows three to make the point. Thirty-five files under
+    ``plugins/`` ignored it and called one product's tools directly — 239
+    mentions, 58 tool calls, and 27 files that mentioned a tracker while
+    referencing neither the role nor the profile. A repository with a different
+    tracker read instructions to call tools that were not there.
+
+    This is NOT a constitution violation and an earlier draft of the unit said
+    it was. Article 2 forbids naming a product the repository does not integrate
+    with; through its driver skill it integrates with this one. "The driver may
+    name it, the agnostic layer may not" is a design rule of this marketplace,
+    and citing the constitution for it was borrowed authority.
+
+    **What this check is:** a lexical invariant. It proves a file that talks
+    about a tracker also names an approved way to reach one. It does NOT prove
+    the delegation is correct — an inert reference satisfies it, as a critic
+    pointed out, and the spec no longer claims otherwise. The matcher is a
+    CLOSED list on purpose: product names, tool names, key patterns. Matching
+    "ticket-words" instead would pressure a correct conditional annotation
+    toward a spurious role reference.
+    """
+    product = re.compile(r"\bJira\b|\bAtlassian\b", re.I)
+    tools = re.compile(r"\b(?:get|add|edit|create|search)[A-Za-z]*Jira[A-Za-z]*\b|getAccessibleAtlassianResources")
+    keypat = re.compile(r"PROJ-\\+d|\bPROJ-\[")
+    # The three approved abstraction references. A file may reach the tracker
+    # through the role, through its profile block, or — for a file that only
+    # needs to recognise a key — through the prefix. That third case is why the
+    # unit's classifying question is "does this file read or write tracker
+    # state", not "does it need a ticket": a branch namer needs the prefix and
+    # delegates nothing.
+    approved = ("{{role:tracker}}", "{{profile.tracker.", "{{profile.ticket_prefix}}")
+
+    driver = "plugins/quorum-workflows/skills/quorum-jira-story"
+    # The abstraction's own home: the schema shows three trackers so a reader
+    # can see the field resolves, and Article 1's text permits exactly that.
+    abstraction = {
+        "plugins/quorum-orchestrator/PROFILE_SCHEMA.md",
+        "plugins/quorum-orchestrator/profile.example.yml",
+    }
+    records = (".claude/specs/", ".claude/runs/")
+    myself = Path(__file__).name
+
+    for path in tracked():
+        if path.name == myself:
+            continue
+        rel = path.relative_to(ROOT).as_posix()
+        if rel.startswith(driver) or rel in abstraction or rel.startswith(records):
+            continue
+        if not rel.startswith("plugins/"):
+            continue
+        body = text(path)
+        if body is None:
+            continue
+        for n, line in enumerate(body.splitlines(), 1):
+            if tools.search(line):
+                fail(f"{rel}:{n}", "calls a tracker-specific tool — use {{role:tracker}}")
+            elif keypat.search(line):
+                fail(f"{rel}:{n}", "hardcodes a ticket-key pattern — use {{profile.ticket_prefix}}")
+        if product.search(body) and not any(a in body for a in approved):
+            fail(rel, "names a tracker product and references no approved abstraction")
+
+
 @check("namespace — no name is both a command and a skill")
 def _namespace_collisions() -> None:
     """The runtime lists commands and skills in one ``/`` namespace.

@@ -19,7 +19,7 @@
 
     The script only lays down the skeleton with frontmatter filled in. Filling the body
     (summary, goal, AC, findings, progress) is the agent's job afterward — that content comes
-    from Jira / the conversation / the work itself, not from a template.
+    from the tracker / the conversation / the work itself, not from a template.
 
 .EXAMPLE
     pwsh scaffold_vault.ps1 -Kind story -Key PROJ-68433 -Title "AcmeSync virtual tours" -Branch PROJ-68433-virtual-tours
@@ -47,7 +47,7 @@ param(
     [string]$Status = 'in-progress',
 
     [string]$Branch = '(none yet)',
-    [string]$Jira = '',
+    [string]$the tracker = '',
     [string]$Owner = '',
     [string]$Vault = $(if ($env:QUORUM_VAULT) { $env:QUORUM_VAULT } else { Join-Path $HOME 'quorum-vault' })
 )
@@ -72,7 +72,7 @@ function Get-Slug([string]$s) {
 function Expand-Template([string]$Path, [hashtable]$Subs, [string[]]$Strip) {
     $text = Get-Content -Path $Path -Raw -Encoding utf8
     # Drop whole lines that carry a strippable token whose value is empty
-    # (kills dangling '[ in Jira]()' / dead QA-plan links on ticketless notes).
+    # (kills dangling '[ in the tracker]()' / dead QA-plan links on ticketless notes).
     foreach ($t in $Strip) {
         if ([string]::IsNullOrWhiteSpace($Subs[$t])) {
             $kept = ($text -split "`r?`n") | Where-Object { $_ -notmatch [regex]::Escape("{{$t}}") }
@@ -97,16 +97,16 @@ else {
 $displayTitle = if ($Title) { $Title } else { $id }
 
 # ---- Token values --------------------------------------------------------
-$jiraUrl = if ($ticketed) { if ($Jira) { $Jira } else { "https://your-org.atlassian.net/browse/$id" } } else { '' }
+$ticketUrl = if ($ticketed) { if ($the tracker) { $the tracker } else { ($profile.tracker.browse_url_template -replace "\{key\}", $id) } } else { '' }
 $qaPlan = if ($ticketed) { "qa-test-plans/$id/plan.md" } else { '' }
 $lessonsLink = if ($Kind -eq 'initiative') { '[[lessons]]' } else { '' }
 
 $subs = @{
     ID = $id; KEY = $id; TITLE = $displayTitle; KIND = $Kind; SUBTYPE = $Subtype
     STATUS = $Status; BRANCH = $Branch; OWNER = $Owner; DATE = $today
-    JIRA_URL = $jiraUrl; QA_PLAN = $qaPlan; LESSONS_LINK = $lessonsLink; INITIATIVE = $id
+    TICKET_URL = $ticketUrl; QA_PLAN = $qaPlan; LESSONS_LINK = $lessonsLink; INITIATIVE = $id
 }
-$strip = @('JIRA_URL', 'QA_PLAN', 'LESSONS_LINK')
+$strip = @('TICKET_URL', 'QA_PLAN', 'LESSONS_LINK')
 
 # ---- Plan: folder + (template -> output file) ----------------------------
 $created = @(); $skipped = @()
@@ -214,7 +214,7 @@ foreach ($c in $created) { Write-Host "  created: $c" }
 foreach ($s in $skipped) { Write-Host "  kept (already exists): $s" }
 Write-Host ""
 switch ($Kind) {
-    { $_ -in 'story', 'bugfix' } { Write-Host "Next: fill Summary / User Story / Acceptance Criteria from Jira; keep status.md current as you work." }
+    { $_ -in 'story', 'bugfix' } { Write-Host "Next: fill Summary / User Story / Acceptance Criteria from the tracker; keep status.md current as you work." }
     'initiative' { Write-Host "Next: write Goal / Definition of Done from the user; log progress in status.md; record significant choices as decisions/NNNN-*.md; append durable insights to lessons.md." }
     'effort' { Write-Host "Next: state the Goal/Question + timebox; log what you try; capture Findings; record a go/no-go Outcome. Promote to an initiative if it outgrows one note." }
     'reference' { Write-Host "Next: fill the procedure/facts so it can be reread verbatim later. Bump 'updated' whenever you re-verify." }

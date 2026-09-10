@@ -9,7 +9,7 @@ tools: Read, Write, Glob
 
 Build comprehensive, structured investigation prompts that guide a developer
 through requirements → investigation → implementation → testing for a single
-Jira ticket.
+ticket.
 
 ## Profile
 
@@ -60,7 +60,7 @@ Contains:
 ### Section 2: Problem Statement
 
 Contains:
-- Full ticket description from Jira
+- Full ticket description, from `{{role:tracker}}`
 - Acceptance criteria (if available)
 - Related subtasks (if `--include-subtasks` flag used)
 - **Visual Spec** subsection — only if image analysis exists for this ticket
@@ -69,7 +69,7 @@ Contains:
 ```markdown
 ## Problem Statement
 
-{Full description from Jira}
+{Full description, from the tracker}
 
 ### Acceptance Criteria
 - {Criterion 1}
@@ -295,7 +295,7 @@ empty Visual Spec subsections.
 - Proper markdown formatting
 - Actionable checklists
 - Clear next steps
-- Saved to `.claude/prompts/{TICKET-KEY}-{DATE}.md` — a **transient working copy** (gitignored, not committed). In the orchestrator pipeline the prompt is posted to the Jira ticket as a comment at Sub-phase 7b; the ticket is its durable home.
+- Saved to `.claude/prompts/{TICKET-KEY}-{DATE}.md` — a **transient working copy** (gitignored, not committed). In the orchestrator pipeline the prompt is posted to the ticket as a comment at Sub-phase 7b; the ticket is its durable home.
 
 ## Integration Points
 

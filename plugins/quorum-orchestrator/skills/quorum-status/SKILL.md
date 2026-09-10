@@ -180,15 +180,35 @@ Before taking any audit loop:
 
 ```
 read audit_iterations from status.yml
+count = occurrences of this verdict's evidence_digest in HISTORY
 if audit_iterations >= 3          → STUCK
-if evidence_digest seen 3 times   → STUCK
-otherwise                         → increment, write, loop
+if count >= 2 (this makes 3)      → STUCK
+otherwise                         → increment, append, loop
 ```
 
 `evidence_digest` is a stable digest of the finding evidence references
 (`file:line` / artifact refs) a verdict cited, sorted. Three identical digests
 mean three rounds that found the same thing — the loop is not converging, and
 the iteration count alone would not catch it inside the cap.
+
+### The digest is appended, not overwritten
+
+**Each history entry carries the digest of the verdict that produced it.**
+`last_audit.evidence_digest` holds the latest for display; it is not what the
+rule reads.
+
+That distinction is the whole rule. An earlier version stored the digest only in
+`last_audit`, where each iteration overwrote the one before — so at any moment
+exactly one value existed, "seen three times" had nothing to compare against,
+and **the check could never fire.** It was written down, it looked like a bound,
+and it bounded nothing.
+
+A digest is a digest of *references*, not a path to where the evidence lives.
+Two rounds that cited the same three files produce the same digest even though
+their transcripts sit in different directories; two rounds that cited different
+files must not collide because their transcripts share a parent. Storing the
+artifact path instead makes every iteration of a unit look identical, which
+fails in the other direction — a loop that IS converging reads as stuck.
 
 ## Deriving the queue
 
