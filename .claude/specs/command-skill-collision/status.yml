@@ -1,10 +1,20 @@
 slug: command-skill-collision
 origin: spec
 complexity: simple
-status: DRAFT_PRD
+status: MERGED
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T06:15Z, from: DRAFT_PRD, to: MERGED, actor: human,
+      note: "Resolved by deleting the command; the skill owns the name. The skill is the
+             fuller file and carries the git lifecycle contract the command never had, so
+             deleting the command loses nothing and stops half the callers from getting a
+             review with no statement about who commits the artifact. LIGHT: no spec, the
+             commit is the record. check.py now fails on any name declared in both a
+             commands/ and a skills/ directory, within a plugin or across two — watched
+             failing against the restored command and against a synthetic cross-plugin
+             collision. docs/claude-code-concepts.md documented the pairing as deliberate
+             and now documents the rule instead." }
   - { at: 2026-09-09T04:10Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity simple — one name, three candidate resolutions, the choice is the work" }
   - { at: 2026-09-09T04:05Z, from: null, to: TRIAGE, actor: agent,
       note: "created by the installation wave, second finding. quorum-code-review exists

@@ -13,7 +13,7 @@
       "name": "quorum-orchestrator",
       "source": "./plugins/quorum-orchestrator",
       "description": "Governed delivery pipeline with triage, product shaping, two audit gates and a state machine in status.yml. Runs supervised or autonomous, one unit or a batch. Stack-agnostic via profile.yml.",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "author": {
         "name": "Enrique Moya"
       },
@@ -32,7 +32,7 @@
       "name": "quorum-tooling",
       "source": "./plugins/quorum-tooling",
       "description": "Portable developer tooling: code review, SQL migration review (idempotency, destructive ops, lock/rewrite risk), unit-test generators (.NET 4.7.2 / .NET 9 / Jasmine / Vitest), a memory bank with an Obsidian adapter, manual QA test cases, sprint numbering, and branch naming. Stack-agnostic via profile.yml.",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "author": {
         "name": "Enrique Moya"
       },
@@ -51,7 +51,7 @@
       "name": "quorum-workflows",
       "source": "./plugins/quorum-workflows",
       "description": "Cross-repo development workflows: ticket-story intake, AC-routed QA test plans with executor tracking, an agent journal for autonomous test runs, and an Obsidian knowledge vault.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "author": {
         "name": "Enrique Moya"
       },

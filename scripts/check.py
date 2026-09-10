@@ -441,6 +441,41 @@ def _install_paths() -> None:
                 )
 
 
+@check("namespace — no name is both a command and a skill")
+def _namespace_collisions() -> None:
+    """The runtime lists commands and skills in one ``/`` namespace.
+
+    Two files under one name means the runtime picks, and neither file says
+    which it will be. This repository shipped exactly one such pair, documented
+    as a deliberate convenience — a command that was "a thin wrapper around the
+    skill". It was a second copy of the procedure that had drifted: the skill
+    carried a git lifecycle contract saying it writes the review file and does
+    not stage or commit it, and the command never mentioned that. Whichever one
+    answered, half the callers got an artifact with no statement about who
+    commits it.
+
+    Found by installing the marketplace and reading the component inventory,
+    which listed the name twice. Neither suite could have found it by reading:
+    each file was internally fine.
+    """
+    seen: dict[str, list[str]] = {}
+    for plug in sorted((ROOT / "plugins").iterdir()):
+        if not plug.is_dir():
+            continue
+        cmds = (plug / "commands")
+        skls = (plug / "skills")
+        if cmds.is_dir():
+            for f in cmds.glob("*.md"):
+                seen.setdefault(f.stem, []).append(f"{plug.name}/commands")
+        if skls.is_dir():
+            for d in skls.iterdir():
+                if d.is_dir():
+                    seen.setdefault(d.name, []).append(f"{plug.name}/skills")
+    for name, homes in sorted(seen.items()):
+        if len(homes) > 1:
+            fail(f"/{name}", f"declared in {' and '.join(homes)} — the runtime picks")
+
+
 @check("example profile — parses, and covers every schema block")
 def _example_profile() -> None:
     """The example is what people copy, so a block missing from it is a block

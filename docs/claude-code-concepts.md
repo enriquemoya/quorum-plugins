@@ -62,7 +62,7 @@ In practice the line is thin. The Claude Code runtime treats both as `/<name>` i
 - **`skills/<name>/SKILL.md`** — heavier, may have supporting files (templates, schemas), often calls sub-agents, longer body. Auto-discoverable.
 - **`commands/<name>.md`** — lighter, single-purpose, no supporting files. Typed entrypoint.
 
-In these plugins the same name can have both — e.g., `quorum-code-review` exists as a skill (heavy workflow) AND a command (thin wrapper that invokes the skill). Either invocation works; the command is the user-friendly handle.
+**A name must not be both.** The runtime lists commands and skills in one `/` namespace, so two files under one name means the runtime picks and neither file says which. This repository had exactly one such pair — `quorum-code-review` — documented here as a thin wrapper around the skill. It was not a wrapper: it was a second copy of the procedure that had already drifted, missing the git lifecycle contract the skill carries. The command was deleted and the skill owns the name.
 
 **When to use a command:**
 - You want a memorable slash command without the overhead of a full skill

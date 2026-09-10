@@ -1,10 +1,18 @@
 slug: installed-paths
 origin: spec
 complexity: medium
-status: IN_PROGRESS
+status: VERIFIED_WITH_CONDITIONS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T06:00Z, from: IN_PROGRESS, to: VERIFIED_WITH_CONDITIONS, actor: human,
+      note: "Accepted after two audit iterations rather than a third. The panel's own
+             answer to 'what can a prose suite assert here' was that it cannot, and needs
+             an executable test with both trees present; that test exists and the failure
+             mode it was written for is exercised — restoring the previously shipped
+             instruction fails three assertions. A third iteration would audit a fix whose
+             failure mode has already been run. Four conditions recorded, none of them
+             closed by this unit." }
   - { at: 2026-09-09T05:40Z, from: NEEDS_FIX, to: IN_PROGRESS, actor: agent,
       note: "Audit iteration 2 fixed. The panel's answer to 'what can a prose suite
              assert about an instruction that reads correctly and resolves nothing' was
@@ -79,7 +87,7 @@ history:
              segment. /quorum-implement cannot locate its own orchestrator agent in a
              real install. First defect found by checking against an installed
              marketplace rather than a checkout." }
-in_flight: true
+in_flight: false
 audit_iterations: 2
 last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u6-scope,
               governance_version: null, panel: cpd, panel_reason: "three families",
@@ -87,5 +95,20 @@ last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u6-scope,
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null
-accepted_conditions: []
+accepted_conditions:
+  - "The cache-rooted fallback is an INFERENCE about the runtime's layout,
+     observed on registry format version 2. The registry is the fact. If a
+     future version moves or renames installed_plugins.json, the fallback is
+     what breaks and the prose says so."
+  - "scripts/check.py reads git ls-files, so a new runtime file is outside the
+     guard until it is committed. This is how the check passed at commit time
+     and failed immediately after. Unfixed, and named."
+  - "Files under .claude/specs/ and .claude/runs/ are exempt from the check.
+     Two critics called this a place a defect can live and neither withdrew.
+     Kept because a spec narrating the layout must name it and a transcript
+     cannot be edited without ceasing to be evidence — but it is a hole, not a
+     design."
+  - "The multiple-match branch was exercised with a decoy and in the fixture,
+     never in an unaided real install. One machine has one layout."
+
 run_mode: agent

@@ -12,6 +12,75 @@ and watching them fail. Anything below that is *not* covered by them says so.
 
 ## [Unreleased]
 
+### quorum-orchestrator 2.2.0 · quorum-tooling 2.2.0 · quorum-workflows 1.1.0
+
+Everything here came from **installing the marketplace and using it**, which had
+never been done. Both suites check the documents; the documents were internally
+consistent and two of them were wrong about the machine.
+
+#### Fixed
+
+- **A bundled file is located by asking the runtime, not by guessing its
+  layout.** Six files resolve `installPath` out of
+  `~/.claude/plugins/installed_plugins.json`, verify the file is there, and fall
+  back to a Glob rooted at `~/.claude/plugins/cache` only when the entry is
+  missing. Never the parent: a marketplace clone sits beside the installed
+  copies under it, so a parent-rooted search finds two files of which one is
+  loaded.
+
+- **`quorum-code-review` was a command and a skill.** The runtime lists both in
+  one `/` namespace, so it picked, and neither file said which. The two had
+  drifted — the skill states that it writes the review file and does not stage
+  or commit it; the command never mentioned that, so half the callers got an
+  artifact with no statement about who commits it. The command is deleted and
+  the skill owns the name.
+
+- **The implementation stage describes what it does.** Five phases, not the
+  seven it had when it was the entry point, and the document says five stops
+  rather than leaving them to be counted. Fetch and plan are reads now —
+  `tasks.md` arrives audited and re-planning produced a second plan with less
+  information. The tracker is a role everywhere, and a repository with no
+  tracker gets a stated answer rather than a silence.
+
+#### Added
+
+- `check.py` — install-path depth check, and a namespace check that fails on any
+  name declared in both a `commands/` and a `skills/` directory.
+- `e2e.py` — 43 assertions became 98. The resolution is now **executed** against
+  a fixture holding a marketplace clone, an installed copy and the registry;
+  the Glob root is parsed out of the prose and run, rather than compared to
+  itself.
+- `GLOBAL.md` — a probe records the state it ran under.
+
+#### A wrong fix, kept in the history
+
+The first version of the install-path fix **broke resolution on every machine**,
+and is worth reading in the log rather than only here. It rooted the search at
+`~/.claude/plugins` on the finding that `cache/` did not exist. That finding was
+measured between registering a marketplace and installing a plugin — registration
+clones and reports success; installation is what creates `cache/`. The original
+instruction had been right on all three counts, including a version segment in
+its example, and the rewrite replaced a working instruction with one whose own
+ambiguity rule would have stopped it.
+
+It never shipped. It was caught by taking a critic's suggestion literally: it
+said the multiple-match branch was exercisable with a decoy rather than
+unexercisable on one machine, and the decoy run returned three matches, the
+second of which was the directory reported as nonexistent an hour earlier.
+
+#### Known, recorded, not fixed
+
+- `check.py` reads `git ls-files`, so a new file is outside the guard until it
+  is committed. This is how the install-path check passed at commit time and
+  failed immediately after.
+- `.claude/specs/` and `.claude/runs/` are exempt from the install-path check.
+  Two critics called it a place a defect can live and neither withdrew.
+- The cache-rooted fallback is an inference about the runtime's layout, observed
+  on registry format version 2.
+- The three units listed in the previous release remain open, plus
+  `iteration-cap-decision`.
+
+
 ### quorum-orchestrator 2.1.0
 
 Everything here came out of running the pipeline on this repository — writing
