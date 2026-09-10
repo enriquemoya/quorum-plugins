@@ -1,10 +1,16 @@
 slug: verdict-credit-on-ambiguity
 origin: spec
 complexity: complex
-status: IN_PROGRESS
+status: VERIFIED_WITH_CONDITIONS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T09:30Z, from: IN_PROGRESS, to: VERIFIED_WITH_CONDITIONS, actor: human,
+      note: "Accepted on the strength of the tests rather than a second audit: five of
+             eight watched failing pre-fix, four against a seat-dropping implementation,
+             and the regression pin against a deliberately over-broad parser. Condition:
+             concluded debates were counted under the old rule and are not re-opened; a
+             read-only sweep of what it counted is a follow-up, not a limitation." }
   - { at: 2026-09-09T07:30Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
       note: "Implemented in quorum-core. The scope audit reshaped it twice. Three critics
              independently caught that 'excluded from the verdict list' violates

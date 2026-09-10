@@ -1,6 +1,6 @@
 {
   "name": "quorum-tooling",
-  "version": "2.2.0",
+  "version": "3.0.0",
   "description": "Developer tooling library: code review, SQL migration review, unit-test generators (.NET 4.7.2 / .NET 9 / Jasmine / Vitest), a memory bank with an in-place Obsidian adapter, manual QA test cases, sprint numbering, branch naming, and the supporting hooks consumer repos wire in. Stack-agnostic via profile.yml.",
   "author": {
     "name": "Enrique Moya"

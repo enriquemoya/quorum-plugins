@@ -1,10 +1,13 @@
 slug: implement-phases
 origin: spec
 complexity: complex
-status: IN_PROGRESS
+status: VERIFIED_WITH_CONDITIONS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T09:30Z, from: IN_PROGRESS, to: VERIFIED_WITH_CONDITIONS, actor: human,
+      note: "Accepted. Twelve assertions with five statements reverted one at a time and
+             each watched failing. The five scope conditions carry forward." }
   - { at: 2026-09-09T03:20Z, from: READY_WITH_CONDITIONS, to: IN_PROGRESS, actor: agent,
       note: "T1-T7 implemented. The stage is five phases and says so — it was seven with
              eight stops, and a --human unit that changes how often it interrupts a
@@ -69,7 +72,7 @@ history:
   - { at: 2026-09-08T10:00Z, from: null, to: TRIAGE, actor: human, note: "created — dogfood run: the pipeline builds its own missing pieces" }
   - { at: 2026-09-08T11:00Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved" }
   - { at: 2026-09-08T10:05Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path (roles.tracker null, ticket path unavailable); complexity complex" }
-in_flight: true
+in_flight: false
 audit_iterations: 1
 last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u5-scope,
               governance_version: null, panel: cpd,

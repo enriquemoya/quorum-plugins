@@ -1,10 +1,14 @@
 slug: tracker-role-leak
 origin: spec
 complexity: complex
-status: IN_PROGRESS
+status: VERIFIED_WITH_CONDITIONS
 created: 2026-09-09
 updated: 2026-09-09
 history:
+  - { at: 2026-09-09T09:30Z, from: IN_PROGRESS, to: VERIFIED_WITH_CONDITIONS, actor: human,
+      note: "Accepted. Two of three critics passed at round 2; the third's remaining major
+             is recorded as a condition rather than argued away — co-occurrence is a
+             lexical invariant and an inert reference satisfies it." }
   - { at: 2026-09-09T09:00Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
       note: "Swept. 239 mentions to zero outside the driver and the two abstraction files.
              The audit changed three things before an edit was made. It caught the spec

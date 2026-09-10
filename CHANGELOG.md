@@ -12,6 +12,70 @@ and watching them fail. Anything below that is *not* covered by them says so.
 
 ## [Unreleased]
 
+### quorum-orchestrator 3.0.0 · quorum-tooling 3.0.0 · quorum-workflows 2.0.0
+
+**Major, because a consumer repository that named a tracker-specific tool in its
+own profile or overrides will find those references gone.** Nothing else in the
+contract changed.
+
+#### Fixed
+
+- **The tracker driver's name stays inside the driver.** Thirty-five files
+  described steps they could not perform — calling one product's tools directly,
+  extracting credentials from a named MCP server's environment block, validating
+  keys against a hardcoded prefix. 239 mentions, 58 tool calls, and 27 files that
+  talked about tickets while referencing neither `{{role:tracker}}` nor the
+  profile. Zero now, outside the driver skill and the two files that ARE the
+  abstraction.
+
+  Three operations, not the two the spec first proposed: delegate where the file
+  reads or writes tracker state, genericise where it only links to one, delete
+  where it had no business knowing. The middle case was found during
+  implementation — the vault tree legitimately links to a ticket without needing
+  one, and deleting those mentions would have lost something real.
+
+- **`same-evidence-thrice` could not fire.** The rule stops a loop that keeps
+  finding the same thing inside the iteration cap, and it reads
+  `evidence_digest`. That digest lived only in `last_audit`, where each iteration
+  overwrote the one before — so exactly one value ever existed and "seen three
+  times" had nothing to compare against. It was written down, it read as a bound,
+  and it bounded nothing. The digest is appended to each history entry now, and
+  `last_audit` is named as display-only so nobody wires the check back to it.
+
+#### Added
+
+- `check.py` — the tracker check, with a **closed** matcher (product names, tool
+  names, key patterns) rather than "ticket-words", because a loose matcher
+  pressures a correct conditional annotation toward a spurious role reference.
+  Three injections watched failing; the driver passes.
+- `e2e.py` — 103 assertions, including one that the same-evidence bound reads
+  the history.
+- `.claude/runs/panel-tiers/BENCHMARK.md` — the tier comparison, whose
+  conclusion is not the obvious one.
+
+#### A correction about the constitution
+
+An earlier draft called the tracker leak an **Article 2** violation. It is not
+one. Article 2 forbids naming an external product the repository does not
+integrate with; through its driver skill it integrates with this one. "The
+driver may name it, the agnostic layer may not" is a design rule of this
+marketplace, and citing the constitution for it was borrowed authority. The rule
+stands on its own: a skill that describes steps it cannot perform is wrong.
+
+#### Known, recorded, not fixed
+
+- The tracker check is a **lexical invariant**. It proves a file that names a
+  tracker also names an approved way to reach one. An inert reference satisfies
+  it, and it does not prove any delegation is correct.
+- Deleting tracker mentions from 19 files changed conventions that no suite
+  exercises — the e2e count says nothing about the tracker path. Over-deletion is
+  additive and cheap to restore; it is recorded as a known non-goal rather than
+  waiting to be discovered.
+- `check.py` reads `git ls-files`: a new file is outside every guard until it is
+  committed.
+- The `installed-paths` conditions carry forward unchanged.
+
+
 ### quorum-orchestrator 2.2.0 · quorum-tooling 2.2.0 · quorum-workflows 1.1.0
 
 Everything here came from **installing the marketplace and using it**, which had
