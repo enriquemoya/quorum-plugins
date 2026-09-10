@@ -1,0 +1,50 @@
+[
+  {
+    "decision_id": "u8-scope",
+    "critic_model": "opencode-go/grok-4.6",
+    "critic_family": "grok",
+    "session_id": "ses_f7742a274ffeXRjX4yssZoje4s",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/grok-4.6",
+    "finding_count": 1,
+    "duration_ms": 90154,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "The three majors and two minors from round 1 are withdrawn as stated. Seat-in-panel, always-escalate, `malformed`/`none_declared` pins, named surface, and intended blockless-forfeit are the right repairs.\n\nThe new question: withheld-token and no-token-recorded **do collapse in the decision enum** \u2014 both are `escalate`. That collapse is correct. Do not invent `escalate_unread`.\n\nThey must **not** collapse in the path that produces it. \u201cNo token recorded\u201d is the under_invoked / `IncompleteDebateError` path: no verdict is emitted, the panel looks incomplete, never-shrink is undone. \u201cWithheld token\u201d is the `dispatch_failure` analogue: a verdict **is** emitted, decision is `escalate`, the seat remains in the denominator, the literal token stays on the audit record, AC3 names the unread seats. Those are different operations. If `_compute_decision` blanks the token or omits it from the records it receives, you have re-implemented exclusion and the denominator commitment becomes cosmetic.\n\nSo: skip the token only in vote aggregation. Do not skip the seat, do not clear the token field, do not take the incomplete-debate path.\n\n- severity: major \u2014 Withheld token must stay on the record and skip only vote aggregation; implementing it as \u201cno token recorded\u201d is under_invoked (no verdict), not escalate-with-disclosure.\nverdict: concerns",
+    "resumed_from": "ses_f7742a274ffeXRjX4yssZoje4s",
+    "round1_decision_id": "u8-scope-R0"
+  },
+  {
+    "decision_id": "u8-scope",
+    "critic_model": "opencode-go/gpt-5.6-luna",
+    "critic_family": "gpt",
+    "session_id": "ses_f77429c5bffewRPGlnW1tE9Xo7",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/gpt-5.6-luna",
+    "finding_count": 1,
+    "duration_ms": 7223,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "It needs the assertion. The invariant is now clear, but without a regression test comparing panel membership and required-session count before and after an unreadable seat, a future implementation can silently drop that seat while still escalating. Add this as an explicit acceptance criterion and include a deliberately broken implementation that the test catches.\n\n- severity: major \u2014 The never-shrink invariant is stated but not yet protected by an executable regression assertion.\nverdict: concerns",
+    "resumed_from": "ses_f77429c5bffewRPGlnW1tE9Xo7",
+    "round1_decision_id": "u8-scope-R1"
+  },
+  {
+    "decision_id": "u8-scope",
+    "critic_model": "opencode-go/kimi-k3",
+    "critic_family": "kimi",
+    "session_id": "ses_f774294a7ffeGFfwPZ0B48t711",
+    "verdict": "concerns",
+    "verdict_raw": null,
+    "effective_model": "opencode-go/kimi-k3",
+    "finding_count": 3,
+    "duration_ms": 93799,
+    "failure_reason": null,
+    "severity_parse": "ok",
+    "critic_text": "# Round 2 \u2014 rebuttal and the hold/withdraw question\n\n**Both majors are resolved, and one resolution is better than what I asked for.** The remaining disagreement is not about the spec's scope or criteria but about the content of a decision the spec now writes down \u2014 and one new verification gap of exactly the class you just praised.\n\n## The resolutions, checked\n\n**T1.** The correction is sound and it narrows the scope claim honestly: `severity_parse` persists on the record, `_debate_state`'s `dict[str, str]` return discards it, so the change is a signature change to `_debate_state`, not a record-creation change. That keeps record creation out of scope *for a stated reason* rather than an asserted one.\n\n**AC4/AC5.** Watching the inflation test fail against a *deliberately over-broad fix* \u2014 a tree that counts fenced blocks \u2014 is a legitimate Article 3 break, and arguably a stronger one than the original formulation. The guarantee being pinned is \"the fix must not swing past the parser,\" the broken tree breaks precisely that, and the assertion's failure is attributable to the right layer because the parser is untouched. Both directions now have honest failing observations: drop-direction against the unfixed tree, inflation-direction against the over-broad tree. The contradiction I raised is gone.\n\n**New finding, same class as T1 (major, trivially closable).** You verified the premise on *\"a real round-1 file.\"* The guarantee you are scoping \u2014 AC1, via `latest_round2` \u2014 consumes **round-2 records**. Persistence on round 1 does not entail persistence on round 2 unless the schema is uniform across rounds, and that uniformity is currently an assumption carried by the same spec that was already burned once by a plausible, load-bearing, unverified premise. One read of a round-2 file closes it; it must be closed before execution, not discovered during it.\n\n## Hold or withdraw: the sweep question\n\n**Withdraw on re-opening. Hold \u2014 narrowly \u2014 on declining to detect.** The defensibility boundary does not run where the amended risk paragraph puts it (re-open vs. don't). It runs between **reversal** and **knowledge**:\n\n- *Declining to re-open* \u2014 re-debating, invalidating, unwinding what verdicts gated \u2014 is defensible. Verdicts were acted on; a system whose outputs are retroactively voidable by its own bug fixes has no finality, and no proportionate remedy exists. That part of the decision stands.\n- *Declining to sweep* is not defensible once persistence is established, for three reasons. (1) **Cost asymmetry**: detection is a read-only scan over records that already exist; this is not a re-debate, it is a `SELECT`. (2) **The disclaimer is unfalsifiable without it**: \"we do not claim they were correct\" is currently a hedge; after a sweep it is a measured statement \u2014 either \"N debates affected, zero returned pass\" or a named list. (3) **Not running the query does not destroy the evidence.** The records persist; anyone can compute this later. Declining converts an undiscovered defect into a discovered-then-ignored one, which is the same failure as \"the caller never did it,\" one level up: a disclosure assigned, knowingly declined.\n\nA sweep is also not a slippery slope into re-litigation. Detection and reversal are separable: the sweep emits a report \u2014 count of concluded debates containing a forfeited-eligible seat, bucketed by the verdict they returned, named by debate ID \u2014 and changes nothing automatically. The operator then decides about specific high-stakes verdicts with numbers in hand, which is exactly the posture the rest of this engine takes toward degraded panels.\n\nOn scope: the sweep belongs **outside** this spec. It is read-only, additive, and shares no semantics with the fix; folding it in would bloat the most load-bearing change in the engine. The spec should name it as an accepted follow-up in the risk paragraph \u2014 one sentence: records persist the state, concluded debates are re-checkable, a one-time sweep with quantified output is accepted as follow-up and does not re-open anything. That makes the accepted risk an informed one, which is what the paragraph is for.\n\n**Minor \u2014 consumers of `_debate_state`.** The corrected spec names the signature change; it should also enumerate who consumes `latest_round2` beyond `_compute_decision`, so \"additive key on the verdict\" and \"changed return shape\" don't silently break a third call site.\n\n- severity: major \u2014 the persistence premise was verified on a round-1 record, but AC1's mechanism (`latest_round2`) consumes round-2 records; schema uniformity across rounds is asserted, not checked \u2014 the same class of load-bearing unverified premise this round just corrected, one read away from closed\n- severity: minor \u2014 declining to re-open concluded debates is defensible, but declining a cheap, read-only detection sweep is not; the risk paragraph should accept the sweep as a non-re-opening follow-up so \"we do not claim they were correct\" becomes a quantified statement rather than an unfalsifiable hedge\n- severity: minor \u2014 the `_debate_state` signature change should enumerate all consumers of `latest_round2` to confirm the changed return shape breaks no third call site\n\nverdict: concerns",
+    "resumed_from": "ses_f774294a7ffeGFfwPZ0B48t711",
+    "round1_decision_id": "u8-scope-R2"
+  }
+]

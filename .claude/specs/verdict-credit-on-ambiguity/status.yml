@@ -1,16 +1,41 @@
 slug: verdict-credit-on-ambiguity
 origin: spec
 complexity: complex
-status: PRD_READY
+status: IN_PROGRESS
 created: 2026-09-08
 updated: 2026-09-08
 history:
+  - { at: 2026-09-09T07:30Z, from: SCOPE_AUDIT, to: IN_PROGRESS, actor: agent,
+      note: "Implemented in quorum-core. The scope audit reshaped it twice. Three critics
+             independently caught that 'excluded from the verdict list' violates
+             never-shrink: exclusion says nothing about the denominator, so an
+             implementation could satisfy every other criterion while shortening the
+             panel. One drew the finer distinction that made it implementable — a
+             withheld token is the dispatch_failure analogue (a verdict IS emitted,
+             seat retained, token readable), while no-token-recorded is the
+             incomplete-debate path (no verdict at all). Both collapse to escalate in
+             the enum and must not collapse in the path that produces it.
+             Another found a logical impossibility in the Article 3 claim: the
+             inflated-example test pins pre-existing behaviour and therefore cannot fail
+             on the unfixed tree, so 'both directions watched failing' was unachievable
+             as written. It is a regression pin now, watched failing against a
+             deliberately over-broad parser instead — which it does, counting an
+             illustration as a real blocker.
+             The same critic then caught the premise check itself being on the wrong
+             round: verified on a round-1 record while the mechanism reads round-2.
+             Read: round 2 is a superset. Consumers of _debate_state: exactly two, both
+             in cpd_audit.py.
+             Evidence: 5 of 8 tests watched failing pre-fix; 4 fail against an
+             implementation that drops the seat while still escalating; the regression
+             pin fails against the over-broad parser." }
   - { at: 2026-09-08T16:00Z, from: null, to: TRIAGE, actor: agent, note: "created from debate fence-parser, verdict escalate" }
   - { at: 2026-09-08T16:02Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complex — changes debate-counting semantics in a published repo, no obvious rollback mid-debate" }
   - { at: 2026-09-08T16:10Z, from: DRAFT_PRD, to: PRD_READY, actor: human, note: "PRD approved; deferred deliberately — the cheap half shipped as the appended-contract fix" }
 in_flight: false
-audit_iterations: 0
-last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+audit_iterations: 1
+last_audit: { step: scope, verdict: escalate, iter: 1, proposal_ref: u8-scope,
+              governance_version: null, panel: cpd, panel_reason: "three families",
+              evidence_digest: ".claude/runs/verdict-credit-on-ambiguity/u8-scope" }
 last_impl: { commit: null }
 depends_on: []
 superseded_by: null

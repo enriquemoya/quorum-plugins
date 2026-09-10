@@ -1,0 +1,24 @@
+slug: tracker-role-leak
+origin: spec
+complexity: complex
+status: DRAFTING_TASKS
+created: 2026-09-09
+updated: 2026-09-09
+history:
+  - { at: 2026-09-09T06:40Z, from: TRIAGE, to: DRAFT_PRD, actor: agent, note: "triage: spec path; complexity complex — 35 files, and the fix is structural rather than a rename" }
+  - { at: 2026-09-09T06:35Z, from: null, to: TRIAGE, actor: agent,
+      note: "created from a scope-audit finding on implement-phases, which fixed one file
+             and recorded that the article stayed open. Measured since: 203 occurrences in
+             35 agnostic files, concentrated in the three closest to the ticket path. Not
+             illustrative examples — direct calls to a named tracker's tools, which is the
+             shape Article 1 does NOT permit. Nothing under governance/, so Article 1 is
+             clean; the driver skill keeps its name because a driver naming what it drives
+             is what the article allows." }
+in_flight: false
+audit_iterations: 0
+last_audit: { step: null, verdict: null, iter: 0, proposal_ref: null, governance_version: null, panel: null, panel_reason: null, evidence_digest: null }
+last_impl: { commit: null }
+depends_on: []
+superseded_by: null
+accepted_conditions: []
+run_mode: agent
