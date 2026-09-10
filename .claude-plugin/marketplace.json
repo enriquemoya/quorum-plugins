@@ -32,7 +32,7 @@
       "name": "quorum-tooling",
       "source": "./plugins/quorum-tooling",
       "description": "Portable developer tooling: code review, SQL migration review (idempotency, destructive ops, lock/rewrite risk), unit-test generators (.NET 4.7.2 / .NET 9 / Jasmine / Vitest), a memory bank with an Obsidian adapter, manual QA test cases, sprint numbering, and branch naming. Stack-agnostic via profile.yml.",
-      "version": "3.0.0",
+      "version": "3.0.1",
       "author": {
         "name": "Enrique Moya"
       },
@@ -51,7 +51,7 @@
       "name": "quorum-workflows",
       "source": "./plugins/quorum-workflows",
       "description": "Cross-repo development workflows: ticket-story intake, AC-routed QA test plans with executor tracking, an agent journal for autonomous test runs, and an Obsidian knowledge vault.",
-      "version": "2.0.0",
+      "version": "2.0.1",
       "author": {
         "name": "Enrique Moya"
       },

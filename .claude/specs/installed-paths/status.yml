@@ -108,7 +108,10 @@ accepted_conditions:
      Kept because a spec narrating the layout must name it and a transcript
      cannot be edited without ceasing to be evidence — but it is a hole, not a
      design."
-  - "The multiple-match branch was exercised with a decoy and in the fixture,
-     never in an unaided real install. One machine has one layout."
+  - "CLOSED after the fact: the multiple-match branch WAS exercised on a real
+     machine. An upgrade leaves the previous version directory in place, so a
+     cache-rooted search returns two matches on any machine that has upgraded
+     once — it is the ordinary case, not a corner. The condition as written
+     ('one machine has one layout') was wrong."
 
 run_mode: agent

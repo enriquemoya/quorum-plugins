@@ -1,10 +1,9 @@
 {
   "name": "quorum-workflows",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "General-purpose development workflows: ticket intake through the configured tracker role, cross-repo scaffolding, and other tasks that span multiple projects",
   "author": {
     "name": "Enrique Moya"
   },
-  "commands": "./commands",
   "skills": "./skills"
 }

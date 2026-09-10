@@ -110,6 +110,26 @@ behaviour. **The install path is version-keyed**, so a stale path really is the
 usual reason an edit appears not to take — read `installPath` again after a bump
 rather than reusing the one you copied into last time.
 
+## Upgrading
+
+```
+/plugin marketplace update quorum-plugins     # refresh the marketplace clone
+claude plugin update <plugin>@quorum-plugins  # then each plugin
+```
+
+`claude plugin install` on something already installed is a **no-op** — it
+reports success and changes nothing. `update` is the verb.
+
+**An upgrade leaves the previous version in place.** After updating once,
+`~/.claude/plugins/cache/<marketplace>/<plugin>/` holds two version directories
+and a search for a bundled file finds two copies. Only the one named by
+`installPath` in `installed_plugins.json` is loaded, which is why anything that
+resolves a bundled file reads the registry first and treats a two-match search
+as ambiguous rather than picking the newer-looking one.
+
+Verified on a real machine: after 2.1.0 → 3.0.0, a cache-rooted search returned
+two matches and the registry resolved to 3.0.0.
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |

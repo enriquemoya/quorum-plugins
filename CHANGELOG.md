@@ -12,6 +12,42 @@ and watching them fail. Anything below that is *not* covered by them says so.
 
 ## [Unreleased]
 
+### quorum-tooling 3.0.1 · quorum-workflows 2.0.1
+
+#### Fixed
+
+- **Two manifests declared a `commands` directory that does not exist.** The
+  runtime reports that as a load failure and the plugin's components never load
+  — a total failure, and invisible from inside this repository where every file
+  is present and every suite is green. One plugin had never had a commands
+  directory; the other lost its only command earlier in the same session when a
+  name collision was resolved by deleting it, and removing the file did not
+  remove the declaration.
+
+  Found by running the platform's own `claude plugin validate` for the first
+  time, on a marketplace already published twice. `check.py` now asserts that
+  every declared component path exists.
+
+- **A verified unit with unchecked tasks.** Seven units had been marked
+  VERIFIED while their task lists still showed open boxes — the same defect as a
+  state file disagreeing with its diff, which this repository shipped once
+  already. `check.py` now fails on it. ABANDONED and SUPERSEDED are exempt:
+  there, open tasks are the honest record of what the unit did not do.
+
+#### Documented
+
+- **How to upgrade.** `claude plugin install` on something already installed is
+  a no-op that reports success; `update` is the verb. This was never tested
+  before and the documentation never said it.
+
+- **An upgrade leaves the previous version directory in place**, so a
+  cache-rooted search for a bundled file returns two matches on any machine that
+  has upgraded once. The multiple-match branch was recorded as fixture-only on
+  the reasoning that "one machine has one layout" — that reasoning was wrong,
+  and the branch is the ordinary case rather than a corner. Verified after
+  2.1.0 → 3.0.0: two matches, and the registry resolved to the right one.
+
+
 ### quorum-orchestrator 3.0.0 · quorum-tooling 3.0.0 · quorum-workflows 2.0.0
 
 **Major, because a consumer repository that named a tracker-specific tool in its

@@ -441,6 +441,77 @@ def _install_paths() -> None:
                 )
 
 
+@check("manifests — every declared component path exists")
+def _declared_paths_exist() -> None:
+    """A manifest that points at a missing directory is a load failure.
+
+    The runtime reports it as one, and the plugin's components never load — so
+    the failure is total and silent from inside this repository, where every
+    file is present and every suite is green.
+
+    Found by running the platform's own `plugin validate` for the first time,
+    on a marketplace this repository had already published twice. Two plugins
+    declared a `commands` path with no directory behind it: one had never had
+    one, and the other lost its only command earlier in the same session when a
+    name collision was resolved by deleting it. Removing the file did not remove
+    the declaration, and nothing here noticed.
+    """
+    for manifest in sorted((ROOT / "plugins").glob("*/.claude-plugin/plugin.json")):
+        body = text(manifest)
+        if body is None:
+            continue
+        try:
+            data = json.loads(body)
+        except json.JSONDecodeError:
+            continue  # the manifests check owns malformed JSON
+        plugin_root = manifest.parent.parent
+        rel = manifest.relative_to(ROOT).as_posix()
+        for key in ("commands", "agents", "skills", "hooks"):
+            declared = data.get(key)
+            if not isinstance(declared, str):
+                continue
+            target = (plugin_root / declared.lstrip("./")).resolve()
+            if not target.exists():
+                fail(rel, f"declares {key}: {declared}, which does not exist")
+
+
+@check("units — a verified unit has no open tasks")
+def _verified_units_have_no_open_tasks() -> None:
+    """A state file and a task list that disagree are two records of one thing.
+
+    A unit marked VERIFIED with unchecked boxes is the same defect as a state
+    file that disagrees with its diff, which this repository has already shipped
+    once: the work was done, the record was not updated, and the next reader
+    cannot tell which of the two is stale.
+
+    ABANDONED and SUPERSEDED are exempt on purpose. Those states mean the unit
+    stopped, and open tasks are the honest record of what it did not do —
+    checking them off to make the file tidy would erase the reason the unit was
+    withdrawn.
+    """
+    finished = ("VERIFIED", "VERIFIED_WITH_CONDITIONS", "MERGED")
+    specs = ROOT / ".claude" / "specs"
+    if not specs.is_dir():
+        return
+    for unit in sorted(specs.iterdir()):
+        tasks = unit / "tasks.md"
+        status = unit / "status.yml"
+        if not tasks.exists() or not status.exists():
+            continue
+        body = text(status)
+        if body is None:
+            continue
+        m = re.search(r"^status:\s*(\S+)", body, re.M)
+        if not m or m.group(1) not in finished:
+            continue
+        open_boxes = len(re.findall(r"- \[ \]", text(tasks) or ""))
+        if open_boxes:
+            fail(
+                f".claude/specs/{unit.name}",
+                f"{m.group(1)} with {open_boxes} unchecked task(s) — the record disagrees with itself",
+            )
+
+
 @check("tracker — the driver's name stays inside the driver")
 def _tracker_leak() -> None:
     """A skill that describes steps it cannot perform is wrong.
